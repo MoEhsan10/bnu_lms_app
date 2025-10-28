@@ -206,7 +206,7 @@ abstract class AppLocalizations {
   /// **'Calendar'**
   String get calendar;
 
-  /// No description provided for @quiz.
+  /// No description provided for @quizzes.
   ///
   /// In en, this message translates to:
   /// **'Quiz'**

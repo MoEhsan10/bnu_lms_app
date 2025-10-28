@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/resources/assets_manager.dart';
 import '../../../../shared/resources/colors_manager.dart';
-import '../../../attendance/presentation/screens/courses_tab.dart';
+import '../../../attendance/presentation/screens/attendance_screen.dart';
 import '../../../forums/presentation/screens/messages_tab.dart';
 import '../../../profile/presentation/screens/profile_tab.dart';
 
