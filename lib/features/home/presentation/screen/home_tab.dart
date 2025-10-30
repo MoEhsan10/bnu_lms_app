@@ -57,7 +57,7 @@ class _HomeTabState extends State<HomeTab> {
       },
       {
         'icon': IconsManager.quiz,
-        'title': localizations.quiz,
+        'title': localizations.quizzes,
       },
       {
         'icon': IconsManager.grades,

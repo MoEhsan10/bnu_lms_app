@@ -63,7 +63,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get calendar => 'التقويم';
 
   @override
-  String get quiz => 'الاختبارات';
+  String get quizzes => 'الاختبارات';
 
   @override
   String get grades => 'الدرجات';

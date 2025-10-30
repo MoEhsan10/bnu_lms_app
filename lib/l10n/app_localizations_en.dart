@@ -63,7 +63,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calendar => 'Calendar';
 
   @override
-  String get quiz => 'Quiz';
+  String get quizzes => 'Quizzes';
 
   @override
   String get grades => 'Grades';
