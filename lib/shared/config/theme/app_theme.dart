@@ -16,7 +16,7 @@ class AppTheme {
        // unselectedItemColor: ColorsManager.textSecondary,
     ),
     // iconTheme: const IconThemeData(
-    //     color: ColorsManager.white
+    // color: ColorsManager.white
     // ),
   );
 
