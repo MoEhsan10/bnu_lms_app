@@ -10,7 +10,7 @@ class ColorsManager {
   static const Color black = Color(0xFF1A1D1E);
   static const Color grayDark = Color(0xFF6F757A); // Secondary text
   static const Color grayMedium = Color(0xFF9CA3AF); // Subtle text
-  static const Color background = Color(0xFFF9FBFC); // Screen background
+  static const Color background = Color(0xFFf8fbfc); // Screen background
 
   // Status Colors
   static const Color green = Color(0xFF4CAF50);
