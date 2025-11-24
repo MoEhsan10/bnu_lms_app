@@ -1,5 +1,6 @@
 
 import 'package:bnu_lms_app/features/home/presentation/screen/home_tab.dart';
+import 'package:bnu_lms_app/shared/routes_manager/routes.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -32,7 +33,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       body: tabs[selectedIndex],
-      floatingActionButton: FloatingActionButton(onPressed: () {},
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        Navigator.pushNamed(context, Routes.aiChat);
+      },
         backgroundColor: ColorsManager.blue,
         foregroundColor: Colors.white,
         child: const Icon(Icons.headphones),

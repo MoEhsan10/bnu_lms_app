@@ -1,4 +1,5 @@
 
+import 'package:bnu_lms_app/features/ai_chat/presentation/screens/ai_chat_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -29,6 +30,11 @@ class RoutesGenerator {
         case Routes.login:
         return MaterialPageRoute(
           builder: (context) => const LoginScreen(),
+        );
+
+        case Routes.aiChat:
+        return MaterialPageRoute(
+          builder: (context) => const AiChatScreen(),
         );
 
     // case Routes.onBoarding:
