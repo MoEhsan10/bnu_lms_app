@@ -103,8 +103,8 @@ class _HomeTabState extends State<HomeTab> {
               Text(
                 localizations.upcoming,
                 style: isLight
-                    ? AppLightTextStyles.sectionTitle
-                    : AppDarkTextStyles.sectionTitle,
+                    ? AppLightTextStyles.headlineMedium
+                    : AppDarkTextStyles.headlineMedium,
               ),
               SizedBox(height: AppSizes.smallSpacing),
               UpcomingItemsList(upcomingItems: upcomingItems),
@@ -112,8 +112,8 @@ class _HomeTabState extends State<HomeTab> {
               Text(
                 localizations.quickAccess,
                 style: isLight
-                    ? AppLightTextStyles.sectionTitle
-                    : AppDarkTextStyles.sectionTitle,
+                    ? AppLightTextStyles.headlineMedium
+                    : AppDarkTextStyles.headlineMedium,
               ),
               SizedBox(height: AppSizes.smallSpacing),
               QuickAccessList(categoryItem: categoryItems),

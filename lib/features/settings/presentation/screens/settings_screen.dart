@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -39,8 +38,8 @@ class SettingsScreen extends StatelessWidget {
         title: Text(
           localizations.settingsTitle,
           style: isLight
-              ? AppLightTextStyles.appBarTitle
-              : AppDarkTextStyles.appBarTitle,
+              ? AppLightTextStyles.headlineLarge
+              : AppDarkTextStyles.headlineLarge,
         ),
       ),
       body: Padding(
@@ -50,7 +49,7 @@ class SettingsScreen extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // Theme Settings
+            /// THEME
             SettingsBox(
               icon: IconsManager.theme,
               title: localizations.theme,
@@ -68,7 +67,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             SizedBox(height: AppSizes.smallSpacing),
 
-            // Language Settings
+            /// LANGUAGE
             SettingsBox(
               icon: IconsManager.language,
               title: localizations.language,
@@ -81,16 +80,14 @@ class SettingsScreen extends StatelessWidget {
             ),
             SizedBox(height: AppSizes.smallSpacing),
 
-            // Notifications Settings
+            /// NOTIFICATIONS
             SettingsBox(
               icon: IconsManager.notification,
               title: localizations.notifications,
               subtitle: localizations.on,
               hasSwitch: true,
               switchValue: true,
-              onToggle: (value) {
-                // TODO: Implement notification settings
-              },
+              onToggle: (value) {},
               isLight: isLight,
             ),
           ],
@@ -113,10 +110,9 @@ class SettingsScreen extends StatelessWidget {
         backgroundColor: isLight ? ColorsManager.white : ColorsManager.darkSurface,
         title: Text(
           localizations.language,
-          style: TextStyle(
-            color: isLight ? ColorsManager.black : ColorsManager.white,
-            fontWeight: FontWeight.w600,
-          ),
+          style: isLight
+              ? AppLightTextStyles.titleLarge
+              : AppDarkTextStyles.titleLarge,
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -170,7 +166,9 @@ class SettingsScreen extends StatelessWidget {
           border: Border.all(
             color: isSelected
                 ? ColorsManager.blue
-                : (isLight ? ColorsManager.grayMedium.withValues(alpha: 0.3) : ColorsManager.grayMedium.withValues(alpha: 0.2)),
+                : (isLight
+                ? ColorsManager.grayMedium.withValues(alpha: 0.3)
+                : ColorsManager.grayMedium.withValues(alpha: 0.2)),
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12.r),
@@ -181,17 +179,19 @@ class SettingsScreen extends StatelessWidget {
               isSelected ? Icons.check_circle : Icons.circle_outlined,
               color: isSelected
                   ? ColorsManager.blue
-                  : (isLight ? ColorsManager.grayMedium : ColorsManager.darkTextSecondary),
+                  : (isLight
+                  ? ColorsManager.grayMedium
+                  : ColorsManager.darkTextSecondary),
               size: 24.sp,
             ),
             SizedBox(width: 12.w),
             Text(
               label,
-              style: TextStyle(
-                color: isLight ? ColorsManager.black : ColorsManager.darkTextPrimary,
-                fontSize: 16.sp,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              ),
+              style: isLight
+                  ? AppLightTextStyles.bodyLarge.copyWith(
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400)
+                  : AppDarkTextStyles.bodyLarge.copyWith(
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400),
             ),
           ],
         ),

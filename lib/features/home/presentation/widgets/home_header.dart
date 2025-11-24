@@ -40,26 +40,42 @@ class HomeHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(localizations.welcomeBack, style: isLight ? AppLightTextStyles.welcome : AppDarkTextStyles.welcome ),
-              Text('Mohamed', style: isLight ? AppLightTextStyles.userName : AppDarkTextStyles.userName),
+              Text(
+                localizations.welcomeBack,
+                style: isLight
+                    ? AppLightTextStyles.labelMedium.copyWith(
+                        color: ColorsManager.blue,
+                      )
+                    : AppDarkTextStyles.labelMedium.copyWith(
+                        color: ColorsManager.blue,
+                      ),
+              ),
+              Text(
+                'Mohamed',
+                style: isLight
+                    ? AppLightTextStyles.labelLarge
+                    : AppDarkTextStyles.labelLarge,
+              ),
             ],
           ),
         ),
         Row(
           children: [
             GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, Routes.notifications);
-                },
-                child: const ImageIcon(AssetImage(IconsManager.notification))),
+              onTap: () {
+                Navigator.pushNamed(context, Routes.notifications);
+              },
+              child: const ImageIcon(AssetImage(IconsManager.notification)),
+            ),
             SizedBox(width: 20.w),
             GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, Routes.settings);
-                },
-                child: const Icon(Icons.settings)),
+              onTap: () {
+                Navigator.pushNamed(context, Routes.settings);
+              },
+              child: const Icon(Icons.settings),
+            ),
           ],
-        )
+        ),
       ],
     );
   }
