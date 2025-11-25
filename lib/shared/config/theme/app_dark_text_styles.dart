@@ -19,7 +19,7 @@ class AppDarkTextStyles {
       AppTypography.headlineMedium.copyWith(color: ColorsManager.darkTextPrimary);
 
   static TextStyle get headlineSmall =>
-      AppTypography.headlineSmall.copyWith(color: ColorsManager.darkTextSecondary);
+      AppTypography.headlineSmall.copyWith(color: ColorsManager.white);
 
   // Title
   static TextStyle get titleLarge =>
@@ -30,17 +30,17 @@ class AppDarkTextStyles {
 
   // Body
   static TextStyle get bodyLarge =>
-      AppTypography.bodyLarge.copyWith(color: ColorsManager.darkTextSecondary);
+      AppTypography.bodyLarge.copyWith(color: ColorsManager.darkTextPrimary);
 
   static TextStyle get bodyMedium =>
-      AppTypography.bodyMedium.copyWith(color: ColorsManager.white);
+      AppTypography.bodyMedium.copyWith(color: ColorsManager.darkTextSecondary);
 
   static TextStyle get bodySmall =>
       AppTypography.bodySmall.copyWith(color: ColorsManager.darkTextSecondary);
 
   // Label
   static TextStyle get labelLarge =>
-      AppTypography.labelLarge.copyWith(color: ColorsManager.white);
+      AppTypography.labelLarge.copyWith(color: ColorsManager.darkTextSecondary);
 
   static TextStyle get labelMedium =>
       AppTypography.labelMedium.copyWith(color: ColorsManager.darkTextSecondary);

@@ -68,7 +68,7 @@ class NotificationCard extends StatelessWidget {
                   title,
                   style: isLight
                       ? AppLightTextStyles.bodyMedium
-                      : AppDarkTextStyles.bodyMedium,
+                      : AppDarkTextStyles.bodyMedium.copyWith(color: ColorsManager.darkTextPrimary),
                 ),
                 SizedBox(height: 4.h),
                 Text(

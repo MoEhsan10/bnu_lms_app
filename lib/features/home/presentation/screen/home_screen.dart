@@ -2,10 +2,8 @@
 import 'package:bnu_lms_app/features/home/presentation/screen/home_tab.dart';
 import 'package:bnu_lms_app/shared/routes_manager/routes.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/resources/assets_manager.dart';
-import '../../../../shared/resources/colors_manager.dart';
 import '../../../courses/presentation/screens/courses_tab.dart';
 import '../../../forums/presentation/screens/forums_tab.dart';
 import '../../../profile/presentation/screens/profile_tab.dart';
@@ -36,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(onPressed: () {
         Navigator.pushNamed(context, Routes.aiChat);
       },
-        backgroundColor: ColorsManager.blue,
+        backgroundColor: Color(0xFF32C9E0),
         foregroundColor: Colors.white,
         child: const Icon(Icons.headphones),
 

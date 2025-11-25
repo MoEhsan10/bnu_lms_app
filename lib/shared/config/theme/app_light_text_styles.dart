@@ -19,7 +19,7 @@ class AppLightTextStyles {
       AppTypography.headlineMedium.copyWith(color: ColorsManager.black);
 
   static TextStyle get headlineSmall  =>
-      AppTypography.headlineSmall.copyWith(color: ColorsManager.grayDark);
+      AppTypography.headlineSmall.copyWith(color: ColorsManager.black);
 
   // Title
   static TextStyle get titleLarge  =>
@@ -30,20 +30,20 @@ class AppLightTextStyles {
 
   // Body
   static TextStyle get bodyLarge =>
-      AppTypography.bodyLarge.copyWith(color: ColorsManager.black);
+      AppTypography.bodyLarge.copyWith(color: ColorsManager.grayDark);
 
   static TextStyle get bodyMedium =>
-      AppTypography.bodyMedium.copyWith(color: ColorsManager.black);
+      AppTypography.bodyMedium.copyWith(color: ColorsManager.grayDark);
 
   static TextStyle get bodySmall =>
       AppTypography.bodySmall.copyWith(color: ColorsManager.grayMedium);
 
   // Label
   static TextStyle get labelLarge =>
-      AppTypography.labelLarge.copyWith(color: ColorsManager.black);
+      AppTypography.labelLarge.copyWith(color: ColorsManager.grayDark);
 
   static TextStyle get labelMedium =>
-      AppTypography.labelMedium.copyWith(color: ColorsManager.black);
+      AppTypography.labelMedium.copyWith(color: ColorsManager.grayMedium);
 
   static TextStyle get labelSmall =>
       AppTypography.labelSmall.copyWith(color: ColorsManager.grayDark);
