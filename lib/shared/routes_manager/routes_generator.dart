@@ -1,6 +1,6 @@
 import 'package:bnu_lms_app/features/ai_chat/presentation/screens/ai_chat_screen.dart';
 import 'package:bnu_lms_app/features/gate/presentation/screens/gate_screen.dart';
-import 'package:bnu_lms_app/features/grades/presentation/screens/grade_screen.dart';
+import 'package:bnu_lms_app/features/grades/presentation/screens/grades_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
