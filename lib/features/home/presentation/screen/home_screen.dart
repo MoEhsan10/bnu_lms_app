@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/resources/assets_manager.dart';
 import '../../../../shared/resources/colors_manager.dart';
-import '../../../attendance/presentation/screens/attendance_screen.dart';
-import '../../../forums/presentation/screens/messages_tab.dart';
+import '../../../courses/presentation/screens/courses_tab.dart';
+import '../../../forums/presentation/screens/forums_tab.dart';
 import '../../../profile/presentation/screens/profile_tab.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> tabs = [
     HomeTab(),
     CoursesTab(),
-    MessagesTab(),
+    ForumsTab(),
     ProfileTab(),
   ];
 

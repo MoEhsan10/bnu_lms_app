@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +8,7 @@ import '../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../shared/providers/theme_provider.dart';
 import '../../../../shared/resources/app_sizes.dart';
 import '../../../../shared/resources/assets_manager.dart';
+import '../../../../shared/routes_manager/routes.dart';
 import '../widgets/home_header.dart';
 import '../widgets/quck_access_list.dart';
 import '../widgets/upcoming_items_list.dart';
@@ -50,26 +50,32 @@ class _HomeTabState extends State<HomeTab> {
       {
         'icon': IconsManager.courses,
         'title': localizations.courses,
+        'route': Routes.courses,
       },
       {
         'icon': IconsManager.calendar,
         'title': localizations.calendar,
+        'route': Routes.calendar,
       },
       {
         'icon': IconsManager.quiz,
         'title': localizations.quizzes,
+        'route': Routes.quizzes,
       },
       {
         'icon': IconsManager.grades,
         'title': localizations.grades,
+        'route': Routes.grades,
       },
       {
         'icon': IconsManager.attendance,
         'title': localizations.attendance,
+        'route': Routes.attendance,
       },
       {
         'icon': IconsManager.gate,
         'title': localizations.entrance,
+        'route': Routes.entrance,
       },
     ];
   }
@@ -92,8 +98,9 @@ class _HomeTabState extends State<HomeTab> {
     return SafeArea(
       child: Padding(
         padding: REdgeInsets.symmetric(
-            horizontal: AppSizes.horizontalPadding,
-            vertical: AppSizes.verticalSectionSpacing),
+          horizontal: AppSizes.horizontalPadding,
+          vertical: AppSizes.verticalSectionSpacing,
+        ),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +123,12 @@ class _HomeTabState extends State<HomeTab> {
                     : AppDarkTextStyles.headlineMedium,
               ),
               SizedBox(height: AppSizes.smallSpacing),
-              QuickAccessList(categoryItem: categoryItems),
+              QuickAccessList(
+                categoryItem: categoryItems,
+                onItemTap: (route) {
+                  Navigator.pushNamed(context, route);
+                },
+              ),
             ],
           ),
         ),

@@ -9,8 +9,9 @@ import '../../../../shared/resources/app_sizes.dart';
 import 'category_box.dart';
 
 class QuickAccessList extends StatelessWidget {
-  const QuickAccessList({super.key, required this.categoryItem});
+  const QuickAccessList({super.key, required this.categoryItem, required this.onItemTap});
   final List<Map<String, dynamic>> categoryItem;
+  final Function(String route) onItemTap;
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +40,14 @@ class QuickAccessList extends StatelessWidget {
         itemCount: categoryItem.length,
         itemBuilder: (context, index) {
           final item = categoryItem[index];
-          return CategoryBox(
-            imagePath: item['icon'],
-            title: item['title'],
-            isLight: isLight,
-            isArabic: currentLang == 'ar',
+          return GestureDetector(
+            onTap: () => onItemTap(item['route']),
+            child: CategoryBox(
+              imagePath: item['icon'],
+              title: item['title'],
+              isLight: isLight,
+              isArabic: currentLang == 'ar',
+            ),
           );
         },
       ),

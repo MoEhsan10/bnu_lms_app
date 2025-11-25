@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
-class CoursesTab extends StatelessWidget {
-  const CoursesTab({super.key});
+class AttendanceScreen extends StatelessWidget {
+  const AttendanceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: Colors.red,);
+    return  Center(
+      child: Text('AttendanceScreen'),
+    );
   }
 }

@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       backgroundColor:
-      isLight ? ColorsManager.background : ColorsManager.darkBackground,
+      isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -66,12 +66,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                   ],
                 ),
-                padding: EdgeInsets.all(20.w),
+                clipBehavior: Clip.hardEdge, // IMPORTANT for perfect circle clipping
                 child: Image.asset(
                   ImagesManager.bnuLogo,
-                  fit: BoxFit.contain,
+                  fit: BoxFit.cover, // makes the logo fill all space
                 ),
               ),
+
 
               SizedBox(height: 40.h),
 
@@ -106,6 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: emailController,
                       prefixIcon: const Icon(Icons.person_outline),
                       hintText: "Student ID or Email",
+                      fillColor: isLight ? ColorsManager.white : ColorsManager.darkSurface,
                       prefixIconColor: isLight
                           ? ColorsManager.grayDark
                           : ColorsManager.darkTextSecondary,
@@ -123,6 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       isPassword: true,
                       prefixIcon: const Icon(Icons.lock_outline),
                       hintText: "Password",
+                      fillColor: isLight ? ColorsManager.white : ColorsManager.darkSurface,
                       prefixIconColor: isLight
                           ? ColorsManager.grayDark
                           : ColorsManager.darkTextSecondary,

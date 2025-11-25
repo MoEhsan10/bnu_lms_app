@@ -33,7 +33,7 @@ class AppLightTextStyles {
       AppTypography.bodyLarge.copyWith(color: ColorsManager.black);
 
   static TextStyle get bodyMedium =>
-      AppTypography.bodyMedium.copyWith(color: ColorsManager.grayDark);
+      AppTypography.bodyMedium.copyWith(color: ColorsManager.black);
 
   static TextStyle get bodySmall =>
       AppTypography.bodySmall.copyWith(color: ColorsManager.grayMedium);

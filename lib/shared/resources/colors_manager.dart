@@ -10,7 +10,7 @@ class ColorsManager {
   static const Color black = Color(0xFF1A1D1E);
   static const Color grayDark = Color(0xFF6F757A); // Secondary text
   static const Color grayMedium = Color(0xFF9CA3AF); // Subtle text
-  static const Color background = Color(0xFFf8fbfc); // Screen background
+  static const Color lightBackground = Color(0xFFf8fbfc); // Screen background
 
   // Status Colors
   static const Color green = Color(0xFF4CAF50);
@@ -21,7 +21,7 @@ class ColorsManager {
   static const Color blueGray = Color(0xFF4D7485);
 
   // 🌙 Dark Mode (Updated with your values)
-  static const Color darkBackground = Color(0xFF111E21); // Main dark bg
+  static const Color darkBackground = Color(0xFF0F1A1E); // Main dark bg
   static const Color darkSurface = Color(0xFF1A2E32); // Cards, containers
 
   static const Color darkTextPrimary = Color(0xFFFFFFFF); // Text on dark

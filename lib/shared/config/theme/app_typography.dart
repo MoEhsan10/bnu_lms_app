@@ -21,8 +21,8 @@ class   AppTypography {
   );
 
   static final headlineMedium = GoogleFonts.poppins(
-    fontSize: 20.sp,
-    fontWeight: FontWeight.w500,
+    fontSize: 21.sp,
+    fontWeight: FontWeight.w600,
   );
 
   static final headlineSmall = GoogleFonts.poppins(

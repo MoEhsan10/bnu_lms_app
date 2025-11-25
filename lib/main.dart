@@ -43,7 +43,7 @@ class BNU extends StatelessWidget {
         locale: Locale(languageProvider.currentLanguage),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        initialRoute: Routes.login,
+        initialRoute: Routes.main,
         onGenerateRoute: RoutesGenerator.getRoute,
       ),
     );
