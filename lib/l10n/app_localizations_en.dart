@@ -81,6 +81,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get delete => 'Delete';
 
   @override
+  String get searchForums => 'search forums';
   String get quizDetails => 'Quiz Details';
 
   @override
