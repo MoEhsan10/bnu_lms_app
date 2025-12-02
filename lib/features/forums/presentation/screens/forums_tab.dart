@@ -1,8 +1,10 @@
 import 'package:bnu_lms_app/features/forums/data/forums_data.dart';
-import 'package:bnu_lms_app/features/forums/widgets/forum_card.dart';
-import 'package:bnu_lms_app/features/forums/widgets/forum_search.dart';
+
 import 'package:bnu_lms_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+
+import '../widgets/forum_card.dart';
+import '../widgets/forum_search.dart';
 
 class ForumsTab extends StatefulWidget {
   const ForumsTab({super.key});
