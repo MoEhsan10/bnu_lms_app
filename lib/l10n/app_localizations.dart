@@ -241,6 +241,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get delete;
+
+  /// No description provided for @searchForums.
+  ///
+  /// In en, this message translates to:
+  /// **'search forums'**
+  String get searchForums;
 }
 
 class _AppLocalizationsDelegate
