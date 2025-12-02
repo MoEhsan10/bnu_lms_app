@@ -25,4 +25,7 @@
   "welcomeBack": "مرحباً بعودتك،",
   "delete": "حذف",
   "searchForums": "بحث في المنتديات"
+  "quizDetails": "تفاصيل الاختبار",
+  "quizQuestions": "أسئلة الاختبار",
+  "quizResults": "نتيجة الاختبار"
 }

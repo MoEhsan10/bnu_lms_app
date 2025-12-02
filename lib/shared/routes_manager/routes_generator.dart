@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/home/presentation/screen/home_screen.dart';
 import '../../features/notification/presentation/screens/notifications_screen.dart';
+import '../../features/quizzes/presentation/screens/quiz_details_screen.dart';
+import '../../features/quizzes/presentation/screens/quiz_questions_screen.dart';
+import '../../features/quizzes/presentation/screens/quiz_results_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import 'package:bnu_lms_app/shared/routes_manager/routes.dart';
 
@@ -44,13 +47,8 @@ class RoutesGenerator {
         );
 
     // -------------------------
-    //   CATEGORY ROUTES
+    // CATEGORY ROUTES
     // -------------------------
-
-      // case Routes.courses:
-      //   return MaterialPageRoute(
-      //     builder: (context) => const CoursesScreen(),
-      //   );
 
       case Routes.calendar:
         return MaterialPageRoute(
@@ -75,6 +73,25 @@ class RoutesGenerator {
       case Routes.entrance:
         return MaterialPageRoute(
           builder: (context) => const GateScreen(),
+        );
+
+    // -------------------------
+    // QUIZ ROUTES
+    // -------------------------
+
+      case Routes.quizDetails:
+        return MaterialPageRoute(
+          builder: (context) => const QuizDetailsScreen(),
+        );
+
+      case Routes.quizQuestions:
+        return MaterialPageRoute(
+          builder: (context) => const QuizQuestionsScreen(),
+        );
+
+      case Routes.quizResults:
+        return MaterialPageRoute(
+          builder: (context) => const QuizResultsScreen(),
         );
 
       default:

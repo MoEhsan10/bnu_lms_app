@@ -22,12 +22,12 @@ class SemesterTabs extends StatelessWidget {
       ),
       child: TabBar(
         indicator: BoxDecoration(
-          color: isLight ? Colors.white : ColorsManager.darkBackground,
+          color: isLight ? ColorsManager.blue : ColorsManager.blue,
           borderRadius: BorderRadius.circular(20.r),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
-        labelColor: isLight ? Colors.black : Colors.white,
+        labelColor: isLight ? Colors.white : Colors.white,
         unselectedLabelColor: Colors.grey,
         labelStyle: isLight
             ? AppLightTextStyles.labelMedium
