@@ -79,4 +79,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get delete => 'حذف';
+
+  @override
+  String get quizDetails => 'تفاصيل الاختبار';
+
+  @override
+  String get quizQuestions => 'أسئلة الاختبار';
+
+  @override
+  String get quizResults => 'نتيجة الاختبار';
 }

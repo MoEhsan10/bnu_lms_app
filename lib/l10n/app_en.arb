@@ -23,5 +23,8 @@
   "attendance": "Attendance",
   "entrance": "Entrance",
   "welcomeBack": "Welcome back,",
-  "delete": "Delete"
+  "delete": "Delete",
+  "quizDetails": "Quiz Details",
+  "quizQuestions": "Quiz Questions",
+  "quizResults": "Quiz Results"
 }

@@ -34,6 +34,12 @@ class IconsManager{
   // Auth
   static const String bnuIcon = "$iconsPath/app_icon.png";
 
+  // Quizzes
+  static const String time = "$iconsPath/time.png";
+  static const String think = "$iconsPath/think.png";
+  static const String clock = "$iconsPath/clock.png";
+  static const String check = "$iconsPath/check.png";
+  static const String arrowRight = "$iconsPath/arrow_right.png";
 }
 
 

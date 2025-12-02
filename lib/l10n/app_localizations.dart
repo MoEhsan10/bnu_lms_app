@@ -241,6 +241,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get delete;
+
+  /// No description provided for @quizDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiz Details'**
+  String get quizDetails;
+
+  /// No description provided for @quizQuestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiz Questions'**
+  String get quizQuestions;
+
+  /// No description provided for @quizResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiz Results'**
+  String get quizResults;
 }
 
 class _AppLocalizationsDelegate

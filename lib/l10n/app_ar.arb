@@ -23,5 +23,8 @@
   "attendance": "الحضور",
   "entrance": "البوابة",
   "welcomeBack": "مرحباً بعودتك،",
-  "delete": "حذف"
+  "delete": "حذف",
+  "quizDetails": "تفاصيل الاختبار",
+  "quizQuestions": "أسئلة الاختبار",
+  "quizResults": "نتيجة الاختبار"
 }

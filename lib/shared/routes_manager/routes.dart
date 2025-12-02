@@ -10,8 +10,14 @@ class Routes {
   // --- Category routes ---
   static const String courses = "/courses";
   static const String calendar = "/calendar";
-  static const String quizzes = "/quizzes";
   static const String grades = "/grades";
   static const String attendance = "/attendance";
   static const String entrance = "/entrance";
+
+
+  //Quizzes
+  static const String quizzes = "/quizzes";
+  static const String quizDetails = "/quizDetails";
+  static const String quizQuestions = "/quizQuestions";
+  static const String quizResults = "/quizResults";
 }

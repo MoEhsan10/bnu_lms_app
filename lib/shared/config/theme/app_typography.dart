@@ -43,17 +43,17 @@ class   AppTypography {
 
   // Body (النصوص العادية)
   static final bodyLarge = GoogleFonts.poppins(
-    fontSize: 15.sp,
+    fontSize: 18.sp,
     fontWeight: FontWeight.w400,
   );
 
   static final bodyMedium = GoogleFonts.poppins(
-    fontSize: 14.sp,
+    fontSize: 16.sp,
     fontWeight: FontWeight.w400,
   );
 
   static final bodySmall = GoogleFonts.poppins(
-    fontSize: 12.sp,
+    fontSize: 14.sp,
     fontWeight: FontWeight.w400,
   );
 
