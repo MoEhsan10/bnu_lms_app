@@ -82,6 +82,8 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get searchForums => 'بحث في المنتديات';
+
+  @override
   String get quizDetails => 'تفاصيل الاختبار';
 
   @override

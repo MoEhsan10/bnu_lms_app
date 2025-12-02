@@ -247,6 +247,7 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'search forums'**
   String get searchForums;
+
   /// No description provided for @quizDetails.
   ///
   /// In en, this message translates to:

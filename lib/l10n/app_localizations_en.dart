@@ -82,6 +82,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchForums => 'search forums';
+
+  @override
   String get quizDetails => 'Quiz Details';
 
   @override
