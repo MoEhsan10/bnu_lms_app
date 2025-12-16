@@ -1,5 +1,6 @@
 import 'package:bnu_lms_app/shared/resources/colors_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../shared/config/theme/app_light_text_styles.dart';
@@ -26,53 +27,80 @@ class ProfileHeaderCard extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLight = themeProvider.isLightTheme();
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          width: 320,
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          decoration: BoxDecoration(
-            color: isLight ?  ColorsManager.white : ColorsManager.darkSurface,
-            borderRadius: BorderRadius.circular(20),
+    return Container(
+      width: double.infinity,
+      padding: REdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: isLight ? ColorsManager.white : ColorsManager.darkSurface,
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: ColorsManager.blue,
+                width: 3,
+              ),
+            ),
+            child: CircleAvatar(
+              radius: 50.r,
+              backgroundImage: AssetImage(profileImage),
+            ),
           ),
-          child: Column(
+          SizedBox(height: 16.h),
+          Text(
+            name,
+            style: isLight
+                ? AppLightTextStyles.headlineLarge.copyWith(
+              fontWeight: FontWeight.bold,
+            )
+                : AppDarkTextStyles.headlineLarge.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            department,
+            style: isLight
+                ? AppLightTextStyles.bodyMedium.copyWith(
+              color: ColorsManager.grayDark,
+            )
+                : AppDarkTextStyles.bodyMedium.copyWith(
+              color: ColorsManager.darkTextSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 12.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.blue,
-                backgroundImage: AssetImage(profileImage),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                name,
-                style: isLight
-                    ? AppLightTextStyles.headlineLarge
-                    : AppDarkTextStyles.headlineLarge,
-              ),
-              const SizedBox(height: 5),
-              Text(
-                department,
-                style: isLight
-                    ? AppLightTextStyles.bodyMedium
-                    : AppDarkTextStyles.bodyMedium,
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'ID: $studentId',
-                style: isLight
-                    ? AppLightTextStyles.bodyMedium
-                    : AppDarkTextStyles.bodyMedium,
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'Year: $year',
-                style: isLight
-                    ? AppLightTextStyles.bodyMedium
-                    : AppDarkTextStyles.bodyMedium,
-              ),
+              _buildInfoChip('ID: $studentId', isLight),
+              SizedBox(width: 12.w),
+              _buildInfoChip('Year: $year', isLight),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(String text, bool isLight) {
+    return Container(
+      padding: REdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: isLight
+            ? ColorsManager.lightBlueAccent
+            : ColorsManager.darkBackground,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 13.sp,
+          fontWeight: FontWeight.w600,
+          color: ColorsManager.blue,
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:bnu_lms_app/shared/resources/colors_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../shared/config/theme/app_light_text_styles.dart';
@@ -10,23 +11,13 @@ class ProfileStatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            StatCard(label: 'GPA', value: '3.85'),
-            StatCard(label: 'Credits', value: '92'),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            StatCard(label: 'Attendance', value: '98%'),
-            StatCard(label: 'Rank', value: '7th'),
-          ],
-        ),
+        Expanded(child: StatCard(label: 'GPA', value: '3.85')),
+        SizedBox(width: 12.w),
+        Expanded(child: StatCard(label: 'Credits', value: '92')),
+        SizedBox(width: 12.w),
+        Expanded(child: StatCard(label: 'Rank', value: '7th')),
       ],
     );
   }
@@ -48,29 +39,36 @@ class StatCard extends StatelessWidget {
     final isLight = themeProvider.isLightTheme();
 
     return Container(
-      alignment: Alignment.center,
-      width: 150,
-      height: 91,
+      padding: REdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: isLight ? ColorsManager.white :ColorsManager.darkSurface,
-        borderRadius: BorderRadius.circular(20),
+        color: isLight ? ColorsManager.white : ColorsManager.darkSurface,
+        borderRadius: BorderRadius.circular(16.r),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            label,
-            style: isLight
-                ? AppLightTextStyles.bodyMedium
-                : AppDarkTextStyles.bodyMedium,
-          ),
-          const SizedBox(height: 10),
           Text(
             value,
             style: isLight
-                ? AppLightTextStyles.headlineLarge
-                : AppDarkTextStyles.headlineLarge,
+                ? AppLightTextStyles.headlineLarge.copyWith(
+              fontWeight: FontWeight.bold,
+              color: ColorsManager.blue,
+            )
+                : AppDarkTextStyles.headlineLarge.copyWith(
+              fontWeight: FontWeight.bold,
+              color: ColorsManager.blue,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            label,
+            style: isLight
+                ? AppLightTextStyles.bodySmall.copyWith(
+              color: ColorsManager.grayMedium,
+            )
+                : AppDarkTextStyles.bodySmall.copyWith(
+              color: ColorsManager.darkTextSecondary,
+            ),
           ),
         ],
       ),

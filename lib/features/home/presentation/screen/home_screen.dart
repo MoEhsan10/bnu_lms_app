@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
         backgroundColor: Color(0xFF32C9E0),
         foregroundColor: Colors.white,
-        child: const Icon(Icons.headphones),
+        child: ImageIcon(AssetImage(IconsManager.ai)),
 
         
       ),

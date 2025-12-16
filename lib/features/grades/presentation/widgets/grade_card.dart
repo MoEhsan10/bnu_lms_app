@@ -4,6 +4,7 @@ import 'package:bnu_lms_app/shared/resources/colors_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+// Updated GradeScore class - removed percentage calculation
 class GradeScore {
   final String label;
   final int earnedPoints;
@@ -15,9 +16,7 @@ class GradeScore {
     required this.totalPoints,
   });
 
-  int get percentage => totalPoints > 0
-      ? ((earnedPoints / totalPoints) * 100).round()
-      : 0;
+// Removed: percentage getter (not needed for academic grading display)
 }
 
 class GradeCard extends StatelessWidget {
@@ -46,7 +45,6 @@ class GradeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-
       margin: REdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: isLight ? Colors.white : ColorsManager.darkSurface,
@@ -106,60 +104,51 @@ class GradeCard extends StatelessWidget {
 
   Widget _buildInstructor() {
     return Text(
-      instructor,
-      style: isLight
-          ? AppLightTextStyles.bodySmall
-          : AppDarkTextStyles.bodySmall
+        instructor,
+        style: isLight
+            ? AppLightTextStyles.bodySmall
+            : AppDarkTextStyles.bodySmall
     );
   }
 
+  // UPDATED: Removed progress bar, showing only numeric grades
   Widget _buildScoreRow(GradeScore score) {
+    final baseStyle = isLight
+        ? AppLightTextStyles.bodyMedium
+        : AppDarkTextStyles.bodyMedium;
+
+    final secondaryColor = isLight
+        ? ColorsManager.grayDark
+        : ColorsManager.darkTextSecondary;
+
     return Padding(
       padding: REdgeInsets.only(bottom: 14),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                score.label,
-                style: isLight
-                    ? AppLightTextStyles.bodyMedium
-                    : AppDarkTextStyles.bodyMedium,
-              ),
-              Text(
-                '${score.percentage}%',
-                style: isLight
-                    ? AppLightTextStyles.bodyMedium
-                    : AppDarkTextStyles.bodyMedium,
-              ),
-            ],
+          Text(
+            score.label,
+            style: baseStyle,
           ),
-          SizedBox(height: 8.h),
-          Stack(
-            children: [
-              // Background bar
-              Container(
-                height: 8.h,
-                decoration: BoxDecoration(
-                  color: isLight
-                      ? Colors.grey.shade700
-                      : Colors.grey.shade800,
-                  borderRadius: BorderRadius.circular(4.r),
-                ),
-              ),
-              // Progress bar
-              FractionallySizedBox(
-                widthFactor: score.percentage / 100,
-                child: Container(
-                  height: 8.h,
-                  decoration: BoxDecoration(
-                    color: gradeColor,
-                    borderRadius: BorderRadius.circular(4.r),
+          RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: score.earnedPoints.toString(),
+                  style: baseStyle.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: ColorsManager.blue,
                   ),
                 ),
-              ),
-            ],
+                TextSpan(
+                  text: ' / ${score.totalPoints}',
+                  style: baseStyle.copyWith(
+                    fontWeight: FontWeight.w400,
+                    color: secondaryColor,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

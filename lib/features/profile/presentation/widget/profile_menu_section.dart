@@ -1,5 +1,6 @@
 import 'package:bnu_lms_app/shared/resources/colors_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../shared/config/theme/app_light_text_styles.dart';
@@ -32,40 +33,45 @@ class ProfileMenuSection extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLight = themeProvider.isLightTheme();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 24, bottom: 8),
-            child: Text(
-              title,
-              style: isLight
-                  ? AppLightTextStyles.labelLarge
-                  : AppDarkTextStyles.labelLarge,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: REdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            title,
+            style: isLight
+                ? AppLightTextStyles.labelLarge.copyWith(
+              fontWeight: FontWeight.bold,
+            )
+                : AppDarkTextStyles.labelLarge.copyWith(
+              fontWeight: FontWeight.bold,
             ),
           ),
-          Center(
-            child: Container(
-              width: 358,
-              decoration: BoxDecoration(
-                color: isLight ? ColorsManager.white : ColorsManager.darkSurface,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                children: [
-                  for (int i = 0; i < items.length; i++) ...[
-                    if (i > 0) const SizedBox(),
-                    MenuItemRow(item: items[i]),
-                  ],
-                  const SizedBox(height: 10),
-                ],
-              ),
-            ),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: isLight ? ColorsManager.white : ColorsManager.darkSurface,
+            borderRadius: BorderRadius.circular(16.r),
           ),
-        ],
-      ),
+          child: Column(
+            children: [
+              for (int i = 0; i < items.length; i++) ...[
+                MenuItemRow(item: items[i]),
+                if (i < items.length - 1)
+                  Divider(
+                    height: 1,
+                    indent: 70.w,
+                    endIndent: 16.w,
+                    color: isLight
+                        ? ColorsManager.grayMedium.withValues(alpha: 0.2)
+                        : ColorsManager.darkTextSecondary.withValues(alpha: 0.2),
+                  ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -85,34 +91,48 @@ class MenuItemRow extends StatelessWidget {
 
     return InkWell(
       onTap: item.onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(16.r),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        padding: REdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.asset(
-              item.icon,
-              width: 40,
-              height: 40,
-            ),
-            const SizedBox(width: 15),
-            Text(
-              item.label,
-              style: isLight
-                  ? AppLightTextStyles.labelMedium.copyWith(
-                color: ColorsManager.black
-              )
-                  : AppDarkTextStyles.labelMedium.copyWith(
-                color: ColorsManager.white
+            Container(
+              width: 40.w,
+              height: 40.w,
+              decoration: BoxDecoration(
+                color: isLight
+                    ? ColorsManager.lightBlueAccent
+                    : ColorsManager.darkBackground,
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Center(
+                child: Image.asset(
+                  item.icon,
+                  width: 22.w,
+                  height: 22.w,
+                  color: ColorsManager.blue,
+                ),
               ),
             ),
-            const Spacer(),
-            const Icon(
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Text(
+                item.label,
+                style: isLight
+                    ? AppLightTextStyles.labelMedium.copyWith(
+                  color: ColorsManager.black,
+                  fontWeight: FontWeight.w500,
+                )
+                    : AppDarkTextStyles.labelMedium.copyWith(
+                  color: ColorsManager.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Icon(
               Icons.arrow_forward_ios,
-              size: 18,
-              color: Colors.grey,
+              size: 16.sp,
+              color: ColorsManager.grayMedium,
             ),
           ],
         ),

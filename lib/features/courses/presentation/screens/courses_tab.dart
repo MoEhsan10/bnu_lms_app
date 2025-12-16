@@ -1,4 +1,4 @@
-import 'package:bnu_lms_app/features/courses/presentation/widgets/course_card.dart';
+import 'package:bnu_lms_app/features/courses/presentation/widgets/courses/course_card.dart';
 import 'package:bnu_lms_app/l10n/app_localizations.dart';
 import 'package:bnu_lms_app/shared/config/theme/app_dark_text_styles.dart';
 import 'package:bnu_lms_app/shared/config/theme/app_light_text_styles.dart';
@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/providers/theme_provider.dart';
+import '../../../../shared/routes_manager/routes.dart';
 
 class CoursesTab extends StatelessWidget {
   const CoursesTab({super.key});
@@ -23,7 +24,6 @@ class CoursesTab extends StatelessWidget {
         'title': 'Advanced Programming',
         'instructor': 'Dr. Angela Yu',
         'category': 'Computer Science',
-        'progress': 0.75,
         'categoryColor': const Color(0xFF5DADE2),
         'iconBgColor': isLight ? const Color(0xFFdbeafe) : const Color(0xFF223049),
         'icon': Icons.computer,
@@ -32,7 +32,6 @@ class CoursesTab extends StatelessWidget {
         'title': 'Data Structures & Algorithms',
         'instructor': 'Dr. Robert Martin',
         'category': 'Computer Science',
-        'progress': 0.60,
         'categoryColor': const Color(0xFF5DADE2),
         'iconBgColor': isLight ? const Color(0xFFdbeafe) : const Color(0xFF223049),
         'icon': Icons.code,
@@ -41,7 +40,6 @@ class CoursesTab extends StatelessWidget {
         'title': 'Web Development',
         'instructor': 'Prof. Sarah Johnson',
         'category': 'Computer Science',
-        'progress': 0.90,
         'categoryColor': const Color(0xFF5DADE2),
         'iconBgColor': isLight ? const Color(0xFFdbeafe) : const Color(0xFF223049),
         'icon': Icons.language,
@@ -50,7 +48,6 @@ class CoursesTab extends StatelessWidget {
         'title': 'Database Management Systems',
         'instructor': 'Dr. Michael Chen',
         'category': 'Computer Science',
-        'progress': 0.45,
         'categoryColor': const Color(0xFF5DADE2),
         'iconBgColor': isLight ? const Color(0xFFdbeafe) : const Color(0xFF223049),
         'icon': Icons.storage,
@@ -59,7 +56,6 @@ class CoursesTab extends StatelessWidget {
         'title': 'Artificial Intelligence',
         'instructor': 'Prof. Emily Watson',
         'category': 'Computer Science',
-        'progress': 0.30,
         'categoryColor': const Color(0xFF5DADE2),
         'iconBgColor': isLight ? const Color(0xFFdbeafe) : const Color(0xFF223049),
         'icon': Icons.psychology,
@@ -68,7 +64,6 @@ class CoursesTab extends StatelessWidget {
         'title': 'Mobile App Development',
         'instructor': 'Dr. Ahmed Hassan',
         'category': 'Computer Science',
-        'progress': 0.85,
         'categoryColor': const Color(0xFF5DADE2),
         'iconBgColor': isLight ? const Color(0xFFdbeafe) : const Color(0xFF223049),
         'icon': Icons.phone_android,
@@ -136,12 +131,20 @@ class CoursesTab extends StatelessWidget {
                   title: course['title'] as String,
                   instructor: course['instructor'] as String,
                   category: course['category'] as String,
-                  progress: course['progress'] as double,
                   categoryColor: course['categoryColor'] as Color,
                   iconBgColor: course['iconBgColor'] as Color,
                   categoryIcon: course['icon'] as IconData,
                   onTap: () {
-                    print("Course ${index + 1} tapped");
+                    Navigator.pushNamed(
+                      context,
+                      Routes.coursesDetails,
+                      arguments: {
+                        'courseTitle': course['title'] as String,
+                        'instructor': course['instructor'] as String,
+                        'courseCode': 'SWE-301',
+                        'icon': course['icon'] as IconData,
+                      },
+                    );
                   },
                 );
               },

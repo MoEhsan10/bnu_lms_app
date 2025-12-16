@@ -5,8 +5,6 @@ class CalendarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Calendar'),
-    );
+    return Container(color: Colors.blueAccent,);
   }
 }

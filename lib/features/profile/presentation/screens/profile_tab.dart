@@ -1,9 +1,10 @@
+import 'package:bnu_lms_app/shared/resources/assets_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../widget/profile_action_card.dart';
 import '../widget/profile_header.dart';
 import '../widget/profile_menu_section.dart';
-import '../widget/profile_section.dart';
 import '../widget/profile_stats.dart';
-
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key});
@@ -17,62 +18,56 @@ class _ProfileTabState extends State<ProfileTab> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: REdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const ProfileHeaderCard(
-              name: 'Amelia',
+              name: 'Mohamed',
               department: 'CS and Engineering',
               studentId: '123456',
               year: 3,
-              profileImage: 'assets/profile.jpg',
+              profileImage: ImagesManager.profileImage,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 24.h),
             const ProfileStatsGrid(),
-            const SizedBox(height: 20),
-            const ProfileActionButtons(),
-            const SizedBox(height: 20),
+            SizedBox(height: 24.h),
+            const PaymentCard(),
+            SizedBox(height: 16.h),
+            const AdvisingSessionCard(),
+            SizedBox(height: 24.h),
             ProfileMenuSection(
               title: 'Account',
               items: [
                 ProfileMenuItem(
-                  icon: 'assets/icons/edit_profile.png',
+                  icon: IconsManager.editProfile,
                   label: 'Edit Profile',
-                  onTap: () {
-                    // Navigate to edit profile
-                  },
+                  onTap: () {},
                 ),
                 ProfileMenuItem(
-                  icon: 'assets/icons/password.png',
+                  icon: IconsManager.password,
                   label: 'Change Password',
-                  onTap: () {
-                    // Navigate to change password
-                  },
+                  onTap: () {},
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             ProfileMenuSection(
               title: 'Support',
               items: [
                 ProfileMenuItem(
-                  icon: 'assets/icons/help_center.png',
+                  icon: IconsManager.helpCenter,
                   label: 'Help Center',
-                  onTap: () {
-                    // Navigate to help center
-                  },
+                  onTap: () {},
                 ),
                 ProfileMenuItem(
-                  icon: 'assets/icons/contact_support.png',
+                  icon: IconsManager.contactSupport,
                   label: 'Contact Support',
-                  onTap: () {
-                    // Navigate to contact support
-                  },
+                  onTap: () {},
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 24.h),
           ],
         ),
       ),

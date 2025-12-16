@@ -104,13 +104,23 @@ class QuizzesScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 10.h),
                         QuizItem(
-                          title: "Final Exam",
+                          title: "Midterm 2 Exam",
                           status: QuizStatus.completed,
                           subtitle: "Database Systems",
                           date: "Oct 15, 2024",
                           duration: "60 min",
                           questionsCount: "40 Questions",
                         ),
+                        SizedBox(height: 10.h),
+                        QuizItem(
+                          title: "Linear Algebra Quiz",
+                          status: QuizStatus.missed,
+                          subtitle: "Database Systems",
+                          date: "Oct 15, 2024",
+                          duration: "30 min",
+                          questionsCount: "20 Questions",
+                        ),
+                        SizedBox(height: 10.h),
                       ],
                     ),
                   ),
@@ -151,7 +161,7 @@ class QuizzesScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         QuizItem(
-                          title: "Final Exam",
+                          title: "Midterm 2 Exam",
                           status: QuizStatus.completed,
                           subtitle: "Database Systems",
                           date: "Oct 15, 2024",

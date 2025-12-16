@@ -20,4 +20,12 @@ class Routes {
   static const String quizDetails = "/quizDetails";
   static const String quizQuestions = "/quizQuestions";
   static const String quizResults = "/quizResults";
+
+  //Forums
+  static const String forumsDetails = "/forumsDetails";
+
+  //courses
+  static const String coursesDetails = "/coursesDetails";
+
+
 }

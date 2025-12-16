@@ -1,9 +1,11 @@
 import 'package:bnu_lms_app/features/ai_chat/presentation/screens/ai_chat_screen.dart';
+import 'package:bnu_lms_app/features/forums/presentation/screens/forums_details_screen.dart';
 import 'package:bnu_lms_app/features/gate/presentation/screens/gate_screen.dart';
 import 'package:bnu_lms_app/features/grades/presentation/screens/grades_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/courses/presentation/screens/courses_details_screen.dart';
 import '../../features/home/presentation/screen/home_screen.dart';
 import '../../features/notification/presentation/screens/notifications_screen.dart';
 import '../../features/quizzes/presentation/screens/quiz_details_screen.dart';
@@ -20,16 +22,11 @@ import '../../features/attendance/presentation/screens/attendance_screen.dart';
 class RoutesGenerator {
   static Route<dynamic>? getRoute(RouteSettings settings) {
     switch (settings.name) {
-
       case Routes.main:
-        return MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        );
+        return MaterialPageRoute(builder: (context) => const HomeScreen());
 
       case Routes.settings:
-        return MaterialPageRoute(
-          builder: (context) => const SettingsScreen(),
-        );
+        return MaterialPageRoute(builder: (context) => const SettingsScreen());
 
       case Routes.notifications:
         return MaterialPageRoute(
@@ -37,33 +34,23 @@ class RoutesGenerator {
         );
 
       case Routes.login:
-        return MaterialPageRoute(
-          builder: (context) => const LoginScreen(),
-        );
+        return MaterialPageRoute(builder: (context) => const LoginScreen());
 
       case Routes.aiChat:
-        return MaterialPageRoute(
-          builder: (context) => const AiChatScreen(),
-        );
+        return MaterialPageRoute(builder: (context) => const AiChatScreen());
 
     // -------------------------
     // CATEGORY ROUTES
     // -------------------------
 
       case Routes.calendar:
-        return MaterialPageRoute(
-          builder: (context) => const CalendarScreen(),
-        );
+        return MaterialPageRoute(builder: (context) => const CalendarScreen());
 
       case Routes.quizzes:
-        return MaterialPageRoute(
-          builder: (context) => const QuizzesScreen(),
-        );
+        return MaterialPageRoute(builder: (context) => const QuizzesScreen());
 
       case Routes.grades:
-        return MaterialPageRoute(
-          builder: (context) => const GradesScreen(),
-        );
+        return MaterialPageRoute(builder: (context) => const GradesScreen());
 
       case Routes.attendance:
         return MaterialPageRoute(
@@ -71,9 +58,7 @@ class RoutesGenerator {
         );
 
       case Routes.entrance:
-        return MaterialPageRoute(
-          builder: (context) => const GateScreen(),
-        );
+        return MaterialPageRoute(builder: (context) => const GateScreen());
 
     // -------------------------
     // QUIZ ROUTES
@@ -94,6 +79,38 @@ class RoutesGenerator {
           builder: (context) => const QuizResultsScreen(),
         );
 
+    // -------------------------
+    // FORUMS ROUTES
+    // -------------------------
+
+      case Routes.forumsDetails:
+        final args = settings.arguments as Map<String, dynamic>?;
+        final forumTitle = args?['forumTitle'] as String? ?? 'Forum Discussion';
+
+        return MaterialPageRoute(
+          builder: (context) => ForumsDetailsScreen(forumTitle: forumTitle),
+        );
+
+    // -------------------------
+    // COURSE ROUTES
+    // -------------------------
+
+      case Routes.coursesDetails:
+        final args = settings.arguments as Map<String, dynamic>?;
+
+        if (args == null) {
+          return _unDefinedRoute();
+        }
+
+        return MaterialPageRoute(
+          builder: (context) => CourseDetailsScreen(
+            courseTitle: args['courseTitle'] as String? ?? 'Unknown Course',
+            instructor: args['instructor'] as String? ?? 'Unknown Instructor',
+            courseCode: args['courseCode'] as String? ?? 'N/A',
+            icon: args['icon'] as IconData? ?? Icons.computer,
+          ),
+        );
+
       default:
         return _unDefinedRoute();
     }
@@ -102,12 +119,8 @@ class RoutesGenerator {
   static Route<dynamic> _unDefinedRoute() {
     return MaterialPageRoute(
       builder: (context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('No Route Found'),
-        ),
-        body: const Center(
-          child: Text('No Route Found'),
-        ),
+        appBar: AppBar(title: const Text('No Route Found')),
+        body: const Center(child: Text('No Route Found')),
       ),
     );
   }

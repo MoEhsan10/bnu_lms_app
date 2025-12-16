@@ -1,21 +1,17 @@
+
 const String imagePath = "assets/images";
 const String jsonPath = "assets/json";
 const String iconsPath = "assets/icons";
 const String svgPath = "assets/svg_images";
 
-
-class ImagesManager{
-
+class ImagesManager {
   static const String bnuLogo = "$imagePath/bnu_logo_splash.png";
   static const String profileImage = "$imagePath/profile_image.png";
-
 }
 
-
-class IconsManager{
-
+class IconsManager {
   // Home
-  static const String headphone = "$iconsPath/headphone.png";
+  static const String ai = "$iconsPath/artificial-intelligence.png";
   static const String notification = "$iconsPath/notification.png";
   static const String profile = "$iconsPath/user.png";
   static const String message = "$iconsPath/message.png";
@@ -40,11 +36,18 @@ class IconsManager{
   static const String clock = "$iconsPath/clock.png";
   static const String check = "$iconsPath/check.png";
   static const String arrowRight = "$iconsPath/arrow_right.png";
+
+  // Profile
+  static const String editProfile = "$iconsPath/edit_profile.png";
+  static const String password = "$iconsPath/password.png";
+  static const String helpCenter = "$iconsPath/help_center.png";
+  static const String contactSupport = "$iconsPath/contact_support.png";
+  static const String transcript = "$iconsPath/overlay.png";
+  static const String academicProgress = "$iconsPath/academic_progress.png";
+  static const String tuitionPayment = "$iconsPath/tutition_payment.png";
+  static const String certificates = "$iconsPath/certificates.png";
+  static const String report = "$iconsPath/report.png";
+  static const String advisingSessions = "$iconsPath/help_center.png";
 }
 
-
-
-class SvgManager{
-
-
-}
+class SvgManager {}
