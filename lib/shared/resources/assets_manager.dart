@@ -17,7 +17,7 @@ class IconsManager {
   static const String message = "$iconsPath/message.png";
   static const String courses = "$iconsPath/courses.png";
   static const String grades = "$iconsPath/test.png";
-  static const String quiz = "$iconsPath/quizzes.png";
+  static const String quiz = "$iconsPath/updated_quiz_icon.png";
   static const String calendar = "$iconsPath/calendar.png";
   static const String warning = "$iconsPath/warning.png";
   static const String attendance = "$iconsPath/qr-code.png";

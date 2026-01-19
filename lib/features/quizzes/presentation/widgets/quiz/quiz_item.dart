@@ -36,7 +36,7 @@ class QuizItem extends StatelessWidget {
         case QuizStatus.active:
           return "Start Quiz";
         case QuizStatus.dueSoon:
-          return "Resume";
+          return null;
         case QuizStatus.completed:
           return "View Results";
         case QuizStatus.missed:

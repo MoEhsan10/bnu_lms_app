@@ -2,6 +2,7 @@ import 'package:bnu_lms_app/shared/resources/colors_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../shared/providers/theme_provider.dart';
@@ -13,6 +14,7 @@ class PaymentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLight = themeProvider.isLightTheme();
+    final localizations = AppLocalizations.of(context)!;
 
     return GestureDetector(
       onTap: () {},
@@ -46,7 +48,7 @@ class PaymentCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Tuition Payments',
+                    localizations.tuitionPayments,
                     style: isLight
                         ? AppLightTextStyles.labelLarge.copyWith(
                       fontWeight: FontWeight.w600,
@@ -57,7 +59,7 @@ class PaymentCard extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    'View payment history and upcoming fees',
+                    localizations.tuitionPaymentsDesc,
                     style: isLight
                         ? AppLightTextStyles.bodySmall.copyWith(
                       color: ColorsManager.grayMedium,
@@ -88,7 +90,7 @@ class AdvisingSessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLight = themeProvider.isLightTheme();
-
+    final localizations = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () {},
       child: Container(
@@ -121,7 +123,7 @@ class AdvisingSessionCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Advising Sessions',
+                    localizations.advisingSessions,
                     style: isLight
                         ? AppLightTextStyles.labelLarge.copyWith(
                       fontWeight: FontWeight.w600,
@@ -132,7 +134,7 @@ class AdvisingSessionCard extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    'Schedule and manage academic advising',
+                    localizations.advisingSessionsDesc,
                     style: isLight
                         ? AppLightTextStyles.bodySmall.copyWith(
                       color: ColorsManager.grayMedium,

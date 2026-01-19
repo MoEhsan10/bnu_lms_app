@@ -47,11 +47,11 @@ class _HomeTabState extends State<HomeTab> {
 
   List<Map<String, dynamic>> getCategoryItems(AppLocalizations localizations) {
     return [
-      {
-        'icon': IconsManager.courses,
-        'title': localizations.courses,
-        'route': Routes.courses,
-      },
+      // {
+      //   'icon': IconsManager.courses,
+      //   'title': localizations.courses,
+      //   'route': Routes.courses,
+      // },
       {
         'icon': IconsManager.calendar,
         'title': localizations.calendar,
@@ -72,11 +72,11 @@ class _HomeTabState extends State<HomeTab> {
         'title': localizations.attendance,
         'route': Routes.attendance,
       },
-      {
-        'icon': IconsManager.gate,
-        'title': localizations.entrance,
-        'route': Routes.entrance,
-      },
+      // {
+      //   'icon': IconsManager.gate,
+      //   'title': localizations.entrance,
+      //   'route': Routes.entrance,
+      // },
     ];
   }
 

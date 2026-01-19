@@ -1,6 +1,7 @@
 import 'package:bnu_lms_app/shared/resources/assets_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../widget/profile_action_card.dart';
 import '../widget/profile_header.dart';
 import '../widget/profile_menu_section.dart';
@@ -16,15 +17,17 @@ class ProfileTab extends StatefulWidget {
 class _ProfileTabState extends State<ProfileTab> {
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       child: Padding(
         padding: REdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const ProfileHeaderCard(
+             ProfileHeaderCard(
               name: 'Mohamed',
-              department: 'CS and Engineering',
+              department: localizations.computerScience,
               studentId: '123456',
               year: 3,
               profileImage: ImagesManager.profileImage,
@@ -37,32 +40,32 @@ class _ProfileTabState extends State<ProfileTab> {
             const AdvisingSessionCard(),
             SizedBox(height: 24.h),
             ProfileMenuSection(
-              title: 'Account',
+              title: localizations.account,
               items: [
                 ProfileMenuItem(
                   icon: IconsManager.editProfile,
-                  label: 'Edit Profile',
+                  label: localizations.editProfile,
                   onTap: () {},
                 ),
                 ProfileMenuItem(
                   icon: IconsManager.password,
-                  label: 'Change Password',
+                  label: localizations.changePassword,
                   onTap: () {},
                 ),
               ],
             ),
             SizedBox(height: 20.h),
             ProfileMenuSection(
-              title: 'Support',
+              title: localizations.support,
               items: [
                 ProfileMenuItem(
                   icon: IconsManager.helpCenter,
-                  label: 'Help Center',
+                  label: localizations.helpCenter,
                   onTap: () {},
                 ),
                 ProfileMenuItem(
                   icon: IconsManager.contactSupport,
-                  label: 'Contact Support',
+                  label: localizations.contactSupport,
                   onTap: () {},
                 ),
               ],
