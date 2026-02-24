@@ -96,7 +96,7 @@ class QuizzesScreen extends StatelessWidget {
                         SizedBox(height: 10.h),
                         QuizItem(
                           title: "Quiz 1",
-                          status: QuizStatus.dueSoon,
+                          status: QuizStatus.completed,
                           subtitle: "Object Oriented Programming",
                           date: "Oct 27, 2024",
                           duration: "10 min",
@@ -105,9 +105,9 @@ class QuizzesScreen extends StatelessWidget {
                         SizedBox(height: 10.h),
                         QuizItem(
                           title: "Midterm 2 Exam",
-                          status: QuizStatus.completed,
+                          status: QuizStatus.dueSoon,
                           subtitle: "Database Systems",
-                          date: "Oct 15, 2024",
+                          date: "Oct 30, 2024",
                           duration: "60 min",
                           questionsCount: "40 Questions",
                         ),
