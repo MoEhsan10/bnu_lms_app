@@ -5,8 +5,9 @@ import 'package:bnu_lms_app/shared/resources/colors_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../../shared/providers/theme_provider.dart';
-import '../../../data/forums_data.dart';
+
+import '../../../../../../shared/providers/theme_provider.dart';
+import '../../../../data/forums_data.dart';
 import '../widgets/fourms/forum_card.dart';
 import '../widgets/fourms/forum_search.dart';
 

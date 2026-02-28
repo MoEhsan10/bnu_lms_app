@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../../../shared/config/theme/app_dark_text_styles.dart';
-import '../../../../../../shared/config/theme/app_light_text_styles.dart';
-import '../../../../../../shared/providers/theme_provider.dart';
-import '../../../../../../shared/resources/colors_manager.dart';
+import '../../../../../../../shared/config/theme/app_dark_text_styles.dart';
+import '../../../../../../../shared/config/theme/app_light_text_styles.dart';
+import '../../../../../../../shared/providers/theme_provider.dart';
+import '../../../../../../../shared/resources/colors_manager.dart';
+
+
 
 class ForumAnswerCard extends StatelessWidget {
   final String authorName;

@@ -1,30 +1,31 @@
-import 'package:bnu_lms_app/features/courses/presentation/doctor/presentation/screens/doctor_courses_tab.dart';
-import 'package:bnu_lms_app/features/profile/doctor/presentation/screens/doctor_profile_tab.dart';
+import 'package:bnu_lms_app/features/home/presentation/ta/presentation/screens/ta_home_dashboard.dart';
 import 'package:flutter/material.dart';
+
 
 import '../../../../../../l10n/app_localizations.dart';
 import '../../../../../../shared/resources/assets_manager.dart';
+import '../../../../../courses/presentation/doctor/presentation/screens/doctor_courses_tab.dart';
 import '../../../../../forums/presentation/student/presentation/screens/forums_tab.dart';
-import 'doctor_home_dashboard.dart';
+import '../../../../../profile/doctor/presentation/screens/doctor_profile_tab.dart';
+import '../../../../../tasks/ta/presentation/screens/ta_tasks_tab.dart';
 
-
-class DoctorHomeScreen extends StatefulWidget {
-  const DoctorHomeScreen({super.key});
+class TaHomeScreen extends StatefulWidget {
+  const TaHomeScreen({super.key});
 
   @override
-  State<DoctorHomeScreen> createState() => _DoctorHomeScreenState();
+  State<TaHomeScreen> createState() => _TaHomeScreenState();
 }
 
-class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
-
+class _TaHomeScreenState extends State<TaHomeScreen> {
   int selectedIndex = 0;
 
 
   final List<Widget> tabs = [
-    const DoctorHomeDashboard(),
-    const DoctorCoursesTab(),
+    TaHomeDashboard(),
+    DoctorCoursesTab(),
+    TaTasksTab(),
     ForumsTab(),
-    const DoctorProfileTab(),
+    DoctorProfileTab(),
   ];
 
   @override
@@ -49,6 +50,10 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
           BottomNavigationBarItem(
             icon: const ImageIcon(AssetImage(IconsManager.courses)),
             label: localizations.courses,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.task_alt_sharp),
+            label: localizations.tasks,
           ),
           BottomNavigationBarItem(
             icon: const ImageIcon(AssetImage(IconsManager.message)),
