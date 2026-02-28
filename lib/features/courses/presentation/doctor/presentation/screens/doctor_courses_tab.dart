@@ -41,7 +41,7 @@ class DoctorCoursesTab extends StatelessWidget {
                 timeString: 'Today, 10:00 AM',
                 courseIcon: Icons.engineering_outlined,
                 onManageTap: () {
-                  Navigator.pushNamed(context, Routes.doctorCoursesDetails);
+                  Navigator.pushNamed(context, Routes.taCoursesDetails);
                 },
               ),
         

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../../../l10n/app_localizations.dart';
-import '../../../../../../shared/providers/theme_provider.dart';
-import '../../../../../../shared/resources/colors_manager.dart';
+import '../../../../../../../l10n/app_localizations.dart';
+import '../../../../../../../shared/providers/theme_provider.dart';
+import '../../../../../../../shared/resources/colors_manager.dart';
+
 
 
 class ForumSearch extends StatelessWidget {
