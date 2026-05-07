@@ -7,6 +7,8 @@ import '../../../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../../../shared/providers/theme_provider.dart';
 import '../../../../../../shared/resources/colors_manager.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../auth/presentation/cubit/auth_cubit.dart';
 
 class SettingsSection extends StatelessWidget {
   const SettingsSection({super.key});
@@ -44,7 +46,15 @@ class SettingsSection extends StatelessWidget {
               _buildDivider(),
               _buildSettingsItem(context, Icons.help_outline, 'Help Center'),
               _buildDivider(),
-              _buildSettingsItem(context, Icons.logout, 'Log Out', isLogout: true),
+              _buildSettingsItem(
+                context, 
+                Icons.logout, 
+                'Log Out', 
+                isLogout: true,
+                onTap: () async {
+                  await context.read<AuthCubit>().logout();
+                },
+              ),
             ],
           ),
         ),

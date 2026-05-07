@@ -20,8 +20,21 @@ import '../widgets/doctor_courses_details/next_session_section.dart';
 import '../widgets/doctor_courses_details/overview_stats_row.dart';
 
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../../shared/di/injection.dart';
+import '../../../cubit/course_details_cubit/course_details_cubit.dart';
+import '../../../cubit/course_details_cubit/course_details_state.dart';
+import 'package:bnu_lms_app/features/courses/domain/entities/course_entity.dart';
+
 class DoctorCourseDetailsScreen extends StatelessWidget {
-  const DoctorCourseDetailsScreen({super.key});
+  final int courseId;
+  final String courseTitle;
+
+  const DoctorCourseDetailsScreen({
+    required this.courseId,
+    required this.courseTitle,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -60,83 +73,105 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
             ),
           ],
         ),
-        body: Column(
-          children: [
-            // 1. The Shared Header Banner
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-              child: const CourseHeaderCard(
-                title: 'Advanced Data Structures & Algos',
-                courseCode: 'CS302',
-                instructor: 'Dr. Ahmed',
-                icon: Icons.data_object,
-              ),
-            ),
+        body: BlocProvider(
+          create: (context) => getIt<CourseDetailsCubit>()..fetchCourseDetails(courseId),
+          child: BlocBuilder<CourseDetailsCubit, CourseDetailsState>(
+            builder: (context, state) {
+              if (state is CourseDetailsLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is CourseDetailsError) {
+                return Center(child: Text(state.message, style: TextStyle(color: ColorsManager.red)));
+              } else if (state is CourseDetailsLoaded || state is CourseActionLoading || state is CourseActionError) {
+                
+                CourseDetailEntity? course;
+                if (state is CourseDetailsLoaded) course = state.course;
+                if (state is CourseActionLoading) course = state.course;
+                if (state is CourseActionError) course = state.course;
 
-            // 2. The Tab Bar
-            TabBar(
-              isScrollable: true,
-              indicatorColor: ColorsManager.blue,
-              labelColor: ColorsManager.blue,
-              unselectedLabelColor: ColorsManager.grayMedium,
-              labelStyle: AppLightTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700),
-              unselectedLabelStyle: AppLightTextStyles.titleMedium,
-              tabAlignment: TabAlignment.start,
-              dividerColor: Colors.transparent,
-              tabs: const [
-                Tab(text: 'Overview'),
-                Tab(text: 'Students'),
-                Tab(text: 'Assignments'),
-                Tab(text: 'Quizzes'),
-                Tab(text: 'Materials'),
-                Tab(text: 'Attendance'),
-                Tab(text: 'Grades'),
-              ],
-            ),
+                if (course == null) return const SizedBox();
 
-            // 3. The Tab Content (Scrollable)
-            Expanded(
-              child: TabBarView(
-                children: [
-                  // 1. Overview Tab Content
-                  SingleChildScrollView(
-                    padding: EdgeInsets.all(20.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const OverviewStatsRow(),
-                        SizedBox(height: 24.h),
-                        const AboutCourseSection(),
-                        SizedBox(height: 24.h),
-                        const LearningOutcomesSection(),
-                        SizedBox(height: 24.h),
-                        const NextSessionSection(),
-                        SizedBox(height: 80.h), // Padding for FAB
+                return Column(
+                  children: [
+                    // 1. The Shared Header Banner
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                      child: CourseHeaderCard(
+                        title: course.title,
+                        courseCode: 'CS302', // backend missing this, keeping placeholder
+                        instructor: course.instructorName,
+                        icon: Icons.data_object,
+                      ),
+                    ),
+
+                    // 2. The Tab Bar
+                    TabBar(
+                      isScrollable: true,
+                      indicatorColor: ColorsManager.blue,
+                      labelColor: ColorsManager.blue,
+                      unselectedLabelColor: ColorsManager.grayMedium,
+                      labelStyle: AppLightTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700),
+                      unselectedLabelStyle: AppLightTextStyles.titleMedium,
+                      tabAlignment: TabAlignment.start,
+                      dividerColor: Colors.transparent,
+                      tabs: const [
+                        Tab(text: 'Overview'),
+                        Tab(text: 'Students'),
+                        Tab(text: 'Assignments'),
+                        Tab(text: 'Quizzes'),
+                        Tab(text: 'Materials'),
+                        Tab(text: 'Attendance'),
+                        Tab(text: 'Grades'),
                       ],
                     ),
-                  ),
 
-                  // 2. Students Tab
-                  const CourseStudentsTab(),
+                    // 3. The Tab Content (Scrollable)
+                    Expanded(
+                      child: TabBarView(
+                        children: [
+                          // 1. Overview Tab Content
+                          SingleChildScrollView(
+                            padding: EdgeInsets.all(20.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const OverviewStatsRow(),
+                                SizedBox(height: 24.h),
+                                const AboutCourseSection(),
+                                SizedBox(height: 24.h),
+                                const LearningOutcomesSection(),
+                                SizedBox(height: 24.h),
+                                const NextSessionSection(),
+                                SizedBox(height: 80.h), // Padding for FAB
+                              ],
+                            ),
+                          ),
 
-                  // 3. Assignments Tab
-                  const CourseAssignmentsTab(),
+                          // 2. Students Tab
+                          const CourseStudentsTab(),
 
-                  // 4. Quizzes Tab
-                  const CourseQuizzesTab(),
+                          // 3. Assignments Tab
+                          CourseAssignmentsTab(),
 
-                  // 5. Materials Tab
-                  const CourseMaterialsTab(),
+                          // 4. Quizzes Tab
+                          const CourseQuizzesTab(),
 
-                  // 6. Attendance Tab
-                  const CourseAttendanceTab(),
+                          // 5. Materials Tab (Pass the course to this one so we can show modules)
+                          const CourseMaterialsTab(),
 
-                  // 7. Grades Tab
-                  const CourseGradesTab(),
-                ],
-              ),
-            ),
-          ],
+                          // 6. Attendance Tab
+                          const CourseAttendanceTab(),
+
+                          // 7. Grades Tab
+                          const CourseGradesTab(),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return const SizedBox();
+            },
+          ),
         ),
         // Floating Action Button
       ),

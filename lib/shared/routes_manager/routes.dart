@@ -19,6 +19,8 @@ class Routes {
   static const String entrance = "/entrance";
   static const String forumsDetails = "/forumsDetails";
 
+
+
   // -- Student Quizzes --
   static const String quizzes = "/quizzes";
   static const String quizDetails = "/quizDetails";

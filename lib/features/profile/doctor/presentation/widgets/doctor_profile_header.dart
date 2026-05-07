@@ -8,7 +8,14 @@ import '../../../../../../shared/providers/theme_provider.dart';
 import '../../../../../../shared/resources/colors_manager.dart';
 
 class DoctorProfileHeader extends StatelessWidget {
-  const DoctorProfileHeader({super.key});
+  final String name;
+  final String department;
+  
+  const DoctorProfileHeader({
+    required this.name,
+    required this.department,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +55,7 @@ class DoctorProfileHeader extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
         Text(
-          'Dr. Aris Thorne',
+          name,
           style: isLight
               ? AppLightTextStyles.headlineLarge.copyWith(fontWeight: FontWeight.bold)
               : AppDarkTextStyles.headlineLarge.copyWith(fontWeight: FontWeight.bold),
@@ -64,7 +71,7 @@ class DoctorProfileHeader extends StatelessWidget {
         ),
         SizedBox(height: 4.h),
         Text(
-          'Computer Science Department',
+          department,
           style: isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium,
         ),
       ],
