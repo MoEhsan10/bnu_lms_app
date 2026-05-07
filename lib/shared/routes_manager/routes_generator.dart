@@ -29,8 +29,7 @@ import '../../features/settings/presentation/screens/settings_screen.dart';
 
 class RoutesGenerator {
   static Route<dynamic>? getRoute(RouteSettings settings) {
-    // Extract args once here if you want to keep the switch cases cleaner
-    final args = settings.arguments as Map<String, dynamic>?;
+    final args = settings.arguments;
 
     switch (settings.name) {
       // -------------------------
@@ -75,7 +74,7 @@ class RoutesGenerator {
       // FORUMS ROUTES
       // -------------------------
       case Routes.forumsDetails:
-        final forumTitle = args?['forumTitle'] as String? ?? 'Forum Discussion';
+        final forumTitle = (args as Map<String, dynamic>?)?['forumTitle'] as String? ?? 'Forum Discussion';
         return MaterialPageRoute(
           builder: (_) => ForumsDetailsScreen(forumTitle: forumTitle),
         );
@@ -84,14 +83,16 @@ class RoutesGenerator {
       // COURSE ROUTES
       // -------------------------
       case Routes.coursesDetails:
-        if (args == null) return _unDefinedRoute();
+        final courseArgs = args as Map<String, dynamic>?;
+        if (courseArgs == null || !courseArgs.containsKey('courseId')) return _unDefinedRoute();
 
         return MaterialPageRoute(
           builder: (_) => CourseDetailsScreen(
-            courseTitle: args['courseTitle'] as String? ?? 'Unknown Course',
-            instructor: args['instructor'] as String? ?? 'Unknown Instructor',
-            courseCode: args['courseCode'] as String? ?? 'N/A',
-            icon: args['icon'] as IconData? ?? Icons.computer,
+            courseId: courseArgs['courseId'] as int,
+            courseTitle: courseArgs['courseTitle'] as String? ?? 'Unknown Course',
+            instructor: courseArgs['instructor'] as String? ?? 'Unknown Instructor',
+            courseCode: courseArgs['courseCode'] as String? ?? 'N/A',
+            icon: courseArgs['icon'] as IconData? ?? Icons.computer,
           ),
         );
 
@@ -102,20 +103,24 @@ class RoutesGenerator {
         return MaterialPageRoute(builder: (_) => const DoctorHomeScreen());
 
       case Routes.doctorCoursesDetails:
+        final doctorCourseArgs = args as Map<String, dynamic>?;
+        if (doctorCourseArgs == null || !doctorCourseArgs.containsKey('courseId')) return _unDefinedRoute();
         return MaterialPageRoute(
-          builder: (_) => const DoctorCourseDetailsScreen(),
+          builder: (_) => DoctorCourseDetailsScreen(
+            courseId: doctorCourseArgs['courseId'] as int,
+            courseTitle: doctorCourseArgs['courseTitle'] as String? ?? 'Unknown Course',
+          ),
         );
 
-      case Routes.doctorQuestionDetails: // Fixed duplicate case name
-        if (args == null || !args.containsKey('questionData')) {
+      case Routes.doctorQuestionDetails: 
+        final questionArgs = args as Map<String, dynamic>?;
+        if (questionArgs == null || !questionArgs.containsKey('questionData')) {
           return _unDefinedRoute();
         }
 
         return MaterialPageRoute(
           builder: (_) => DoctorQuestionDetailsScreen(
-            questionData:
-                args['questionData']
-                    as Map<String, dynamic>, // Fixed syntax error
+            questionData: questionArgs['questionData'] as Map<String, dynamic>,
           ),
         );
 
@@ -126,7 +131,14 @@ class RoutesGenerator {
         return MaterialPageRoute(builder: (_) => const TaHomeScreen());
 
       case Routes.taCoursesDetails:
-        return MaterialPageRoute(builder: (_) => const TaCourseDetailsScreen());
+        final taCourseArgs = args as Map<String, dynamic>?;
+        if (taCourseArgs == null || !taCourseArgs.containsKey('courseId')) return _unDefinedRoute();
+        return MaterialPageRoute(
+          builder: (_) => TaCourseDetailsScreen(
+            courseId: taCourseArgs['courseId'] as int,
+            courseTitle: taCourseArgs['courseTitle'] as String? ?? 'Unknown Course',
+          )
+        );
 
       case Routes.taAssignmentGrades:
         return MaterialPageRoute(

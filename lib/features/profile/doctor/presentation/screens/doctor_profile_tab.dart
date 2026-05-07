@@ -14,6 +14,14 @@ import '../widgets/my_courses_section.dart';
 import '../widgets/office_hours_card.dart';
 import '../widgets/settings_section.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../../shared/di/injection.dart';
+import '../../../presentation/cubit/profile_cubit.dart';
+import '../../../presentation/cubit/profile_state.dart';
+import '../../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../../auth/presentation/cubit/auth_state.dart';
+import '../../../../../../shared/routes_manager/routes.dart';
+
 class DoctorProfileTab extends StatelessWidget {
   const DoctorProfileTab({super.key});
 
@@ -22,45 +30,72 @@ class DoctorProfileTab extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLight = themeProvider.isLightTheme();
 
-    return SafeArea(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // 1. Custom Header (Removed the Row to perfectly center the title)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-            child: Center(
-              child: Text(
-                'Profile',
-                style: isLight ? AppLightTextStyles.headlineLarge : AppDarkTextStyles.headlineLarge,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => getIt<ProfileCubit>()..fetchProfile()),
+        BlocProvider(create: (context) => getIt<AuthCubit>()),
+      ],
+      child: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is AuthUnauthenticated) {
+            Navigator.pushNamedAndRemoveUntil(context, Routes.login, (route) => false);
+          }
+        },
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // 1. Header
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                child: Center(
+                  child: Text(
+                    'Profile',
+                    style: isLight ? AppLightTextStyles.headlineLarge : AppDarkTextStyles.headlineLarge,
+                  ),
+                ),
               ),
-            ),
-          ),
-
-          // Added .h here just in case AppSizes.largeSpacing is a raw double
-          SizedBox(height: AppSizes.largeSpacing.h),
-
-          // 2. Scrollable Body
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 0),
-              child: Column(
-                children: [
-                  const DoctorProfileHeader(),
-                  SizedBox(height: 24.h),
-                  const ContactAndStats(),
-                  SizedBox(height: 32.h),
-                  const MyCoursesSection(),
-                  SizedBox(height: 24.h),
-                  const OfficeHoursCard(),
-                  SizedBox(height: 32.h),
-                  const SettingsSection(),
-                  SizedBox(height: 40.h), // Bottom padding
-                ],
+    
+              SizedBox(height: AppSizes.largeSpacing.h),
+    
+              // 2. Body
+              Expanded(
+                child: BlocBuilder<ProfileCubit, ProfileState>(
+                  builder: (context, state) {
+                    if (state is ProfileLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is ProfileError) {
+                      return Center(child: Text(state.message));
+                    } else if (state is ProfileLoaded) {
+                      final profile = state.profile;
+                      return SingleChildScrollView(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 0),
+                        child: Column(
+                          children: [
+                            DoctorProfileHeader(
+                              name: profile.fullName,
+                              department: profile.faculty,
+                            ),
+                            SizedBox(height: 24.h),
+                            const ContactAndStats(),
+                            SizedBox(height: 32.h),
+                            const MyCoursesSection(),
+                            SizedBox(height: 24.h),
+                            const OfficeHoursCard(),
+                            SizedBox(height: 32.h),
+                            const SettingsSection(),
+                            SizedBox(height: 40.h),
+                          ],
+                        ),
+                      );
+                    }
+                    return const SizedBox();
+                  },
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

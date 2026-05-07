@@ -1,3 +1,4 @@
+import 'package:bnu_lms_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:bnu_lms_app/shared/config/theme/app_theme.dart';
 import 'package:bnu_lms_app/shared/providers/language_provider.dart';
 import 'package:bnu_lms_app/shared/providers/theme_provider.dart';
@@ -6,11 +7,14 @@ import 'package:bnu_lms_app/shared/routes_manager/routes_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'features/home/presentation/ta/presentation/screens/ta_home_screen.dart';
 import 'l10n/app_localizations.dart';
 
 
-void main() {
+import 'package:bnu_lms_app/shared/di/injection.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await configureDependencies();
   runApp(
     MultiProvider(
       providers: [
@@ -36,14 +40,14 @@ class BNU extends StatelessWidget {
       splitScreenMode: true,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: const TaHomeScreen(),
+        home: const LoginScreen(),
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: themeProvider.currentTheme,
         locale: Locale(languageProvider.currentLanguage),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        initialRoute: Routes.taDashboard,
+        initialRoute: Routes.login,
         onGenerateRoute: RoutesGenerator.getRoute,
       ),
     );

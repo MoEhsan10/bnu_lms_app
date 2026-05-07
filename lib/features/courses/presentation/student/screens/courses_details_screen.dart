@@ -8,17 +8,23 @@ import '../../../../../shared/providers/theme_provider.dart';
 import '../widgets/courses_details/assignment_item_card.dart';
 import '../widgets/courses_details/course_description_section.dart';
 import '../../shared_widgets/course_header_card.dart';
-import '../widgets/courses_details/learning_outcomes_section.dart';
 import '../widgets/courses_details/upcoming_event_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../shared/di/injection.dart';
+import '../../cubit/course_details_cubit/course_details_cubit.dart';
+import '../../cubit/course_details_cubit/course_details_state.dart';
+import 'package:bnu_lms_app/features/courses/domain/entities/course_entity.dart';
 
 
 class CourseDetailsScreen extends StatefulWidget {
+  final int courseId;
   final String courseTitle;
   final String instructor;
   final String courseCode;
   final IconData icon;
 
   const CourseDetailsScreen({
+    required this.courseId,
     required this.courseTitle,
     required this.instructor,
     this.courseCode = 'SWE-301',
@@ -134,26 +140,48 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
           ),
         ],
       ),
-      body: Column(
-        children: [
-          CourseHeaderCard(
-            title: widget.courseTitle,
-            instructor: widget.instructor,
-            courseCode: widget.courseCode,
-            icon: widget.icon,
-          ),
-          _buildTabBar(isLight),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildOverviewTab(isLight),
-                _buildAssignmentsTab(isLight),
-                _buildUpcomingTab(isLight),
-              ],
-            ),
-          ),
-        ],
+      body: BlocProvider(
+        create: (context) => getIt<CourseDetailsCubit>()..fetchCourseDetails(widget.courseId),
+        child: BlocBuilder<CourseDetailsCubit, CourseDetailsState>(
+          builder: (context, state) {
+            if (state is CourseDetailsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is CourseDetailsError) {
+              return Center(child: Text(state.message, style: TextStyle(color: ColorsManager.red)));
+            } else if (state is CourseDetailsLoaded || state is CourseActionLoading || state is CourseActionError) {
+              
+              CourseDetailEntity? course;
+              if (state is CourseDetailsLoaded) course = state.course;
+              if (state is CourseActionLoading) course = state.course;
+              if (state is CourseActionError) course = state.course;
+              
+              if (course == null) return const SizedBox();
+
+              return Column(
+                children: [
+                  CourseHeaderCard(
+                    title: course.title,
+                    instructor: course.instructorName,
+                    courseCode: widget.courseCode,
+                    icon: widget.icon,
+                  ),
+                  _buildTabBar(isLight),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildOverviewTab(isLight, course),
+                        _buildAssignmentsTab(isLight),
+                        _buildUpcomingTab(isLight), // TODO: replace with real API later
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }
+            return const SizedBox();
+          },
+        ),
       ),
     );
   }
@@ -183,15 +211,41 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
     );
   }
 
-  Widget _buildOverviewTab(bool isLight) {
+  Widget _buildOverviewTab(bool isLight, CourseDetailEntity course) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 24.h),
-          CourseDescriptionSection(description: courseDescription),
+          CourseDescriptionSection(description: course.description.isEmpty ? courseDescription : course.description),
           SizedBox(height: 32.h),
-          LearningOutcomesSection(outcomes: learningOutcomes),
+          
+          Padding(
+            padding: REdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'Modules',
+              style: isLight
+                  ? AppLightTextStyles.headlineSmall.copyWith(fontWeight: FontWeight.bold)
+                  : AppDarkTextStyles.headlineSmall.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ),
+          SizedBox(height: 16.h),
+          
+          if (course.modules.isEmpty)
+             Padding(
+              padding: REdgeInsets.symmetric(horizontal: 16),
+              child: Text('No modules available yet.', style: TextStyle(color: ColorsManager.grayDark)),
+            ),
+
+          ...course.modules.map((module) => ExpansionTile(
+                title: Text(module.title, style: TextStyle(fontWeight: FontWeight.w600)),
+                children: module.lessons.map((lesson) => ListTile(
+                      title: Text(lesson.title),
+                      leading: Icon(Icons.play_circle_outline, color: ColorsManager.blue),
+                      subtitle: Text('${lesson.contents.length} attachments'),
+                    )).toList(),
+              )),
+              
           SizedBox(height: 24.h),
         ],
       ),

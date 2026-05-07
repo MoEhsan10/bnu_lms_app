@@ -9,6 +9,10 @@ import '../../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../../shared/providers/theme_provider.dart';
 import '../../../../../shared/resources/assets_manager.dart';
 import '../../../../../shared/resources/colors_manager.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../shared/di/injection.dart';
+import '../../../../profile/presentation/cubit/profile_cubit.dart';
+import '../../../../profile/presentation/cubit/profile_state.dart';
 
 
 class HomeHeader extends StatelessWidget {
@@ -20,47 +24,67 @@ class HomeHeader extends StatelessWidget {
     final isLight = themeProvider.isLightTheme();
     final localizations = AppLocalizations.of(context)!;
 
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 24.r,
-          backgroundColor: ColorsManager.blue,
-          child: ClipOval(
-            child: Image.asset(
-              ImagesManager.profileImage,
-              fit: BoxFit.cover,
-              width: 48.w,
-              height: 48.h,
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(Icons.person);
-              },
+    return BlocProvider(
+      create: (context) => getIt<ProfileCubit>()..fetchProfile(),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 24.r,
+            backgroundColor: ColorsManager.blue,
+            child: ClipOval(
+              child: Image.asset(
+                ImagesManager.profileImage,
+                fit: BoxFit.cover,
+                width: 48.w,
+                height: 48.h,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.person);
+                },
+              ),
             ),
           ),
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                localizations.welcomeBack,
-                style: isLight
-                    ? AppLightTextStyles.labelMedium.copyWith(
-                        color: ColorsManager.blue,
-                      )
-                    : AppDarkTextStyles.labelMedium.copyWith(
-                        color: ColorsManager.blue,
-                      ),
-              ),
-              Text(
-                'Mohamed',
-                style: isLight
-                    ? AppLightTextStyles.labelLarge
-                    : AppDarkTextStyles.labelLarge,
-              ),
-            ],
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  localizations.welcomeBack,
+                  style: isLight
+                      ? AppLightTextStyles.labelMedium.copyWith(
+                          color: ColorsManager.blue,
+                        )
+                      : AppDarkTextStyles.labelMedium.copyWith(
+                          color: ColorsManager.blue,
+                        ),
+                ),
+                BlocBuilder<ProfileCubit, ProfileState>(
+                  builder: (context, state) {
+                    if (state is ProfileLoaded) {
+                      return Text(
+                        state.profile.firstName,
+                        style: isLight
+                            ? AppLightTextStyles.labelLarge
+                            : AppDarkTextStyles.labelLarge,
+                      );
+                    } else if (state is ProfileLoading) {
+                      return SizedBox(
+                        height: 20.h,
+                        width: 80.w,
+                        child: const LinearProgressIndicator(),
+                      );
+                    }
+                    return Text(
+                      'Welcome',
+                      style: isLight
+                          ? AppLightTextStyles.labelLarge
+                          : AppDarkTextStyles.labelLarge,
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
         Row(
           children: [
             GestureDetector(
@@ -79,6 +103,7 @@ class HomeHeader extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
+    ),
+  );
+}
 }

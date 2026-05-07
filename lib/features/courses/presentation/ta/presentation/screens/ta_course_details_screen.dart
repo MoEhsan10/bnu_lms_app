@@ -24,7 +24,14 @@ import '../../../doctor/presentation/widgets/courses_details_tabs/course_grades_
 import '../widgets/course_details/ta_course_assignments_tab.dart';
 
 class TaCourseDetailsScreen extends StatelessWidget {
-  const TaCourseDetailsScreen({super.key});
+  final int courseId;
+  final String courseTitle;
+
+  const TaCourseDetailsScreen({
+    required this.courseId,
+    required this.courseTitle,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,8 +75,8 @@ class TaCourseDetailsScreen extends StatelessWidget {
             // 1. The Header Banner (Fixed at Top)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-              child: const CourseHeaderCard(
-                title: 'Data Structures (Section B)',
+              child: CourseHeaderCard(
+                title: courseTitle,
                 courseCode: 'CS101',
                 instructor: 'Lead: Dr. Mitchell',
                 icon: Icons.code,
