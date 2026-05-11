@@ -1,0 +1,40 @@
+// lib/features/auth/presentation/cubit/auth_cubit.dart
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
+import '../../domain/use_cases/login_use_case.dart';
+import '../../domain/use_cases/logout_use_case.dart';
+import 'auth_state.dart';
+import '../../../../shared/services/signalr_service.dart';
+
+@lazySingleton
+class AuthCubit extends Cubit<AuthState> {
+  final LoginUseCase _loginUseCase;
+  final LogoutUseCase _logoutUseCase;
+  final SignalRService _signalRService;
+
+  AuthCubit(this._loginUseCase, this._logoutUseCase, this._signalRService) : super(const AuthInitial());
+
+  Future<void> login({
+    required String email,
+    required String password,
+  }) async {
+    emit(const AuthLoading());
+
+    final result = await _loginUseCase(email: email, password: password);
+
+    // fold: Left → AuthFailure | Right → AuthSuccess
+    result.fold(
+      (failure) => emit(AuthFailure(failure.message)),
+      (auth) {
+        _signalRService.init(auth.token);
+        emit(AuthSuccess(auth));
+      },
+    );
+  }
+
+  Future<void> logout() async {
+    await _logoutUseCase();
+    emit(const AuthUnauthenticated());
+  }
+}
