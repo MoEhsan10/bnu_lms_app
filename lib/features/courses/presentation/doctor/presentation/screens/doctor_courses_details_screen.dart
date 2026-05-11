@@ -150,7 +150,7 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
                           const CourseStudentsTab(),
 
                           // 3. Assignments Tab
-                          CourseAssignmentsTab(),
+                          CourseAssignmentsTab(courseId: course.id),
 
                           // 4. Quizzes Tab
                           const CourseQuizzesTab(),

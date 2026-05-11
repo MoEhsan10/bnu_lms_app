@@ -1,15 +1,15 @@
-import 'package:bnu_lms_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:bnu_lms_app/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:bnu_lms_app/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:bnu_lms_app/shared/config/theme/app_theme.dart';
 import 'package:bnu_lms_app/shared/providers/language_provider.dart';
 import 'package:bnu_lms_app/shared/providers/theme_provider.dart';
 import 'package:bnu_lms_app/shared/routes_manager/routes.dart';
 import 'package:bnu_lms_app/shared/routes_manager/routes_generator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'l10n/app_localizations.dart';
-
-
 import 'package:bnu_lms_app/shared/di/injection.dart';
 
 void main() async {
@@ -21,7 +21,13 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
       ],
-      child: const BNU(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthCubit>(create: (_) => getIt<AuthCubit>()),
+          BlocProvider<ProfileCubit>(create: (_) => getIt<ProfileCubit>()),
+        ],
+        child: const BNU(),
+      ),
     ),
   );
 }
@@ -40,7 +46,6 @@ class BNU extends StatelessWidget {
       splitScreenMode: true,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: const LoginScreen(),
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: themeProvider.currentTheme,

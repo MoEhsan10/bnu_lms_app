@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../../../../shared/providers/theme_provider.dart';
-import '../widgets/courses_details/assignment_item_card.dart';
+import '../../../../assignments/presentation/tabs/student_assignments_tab.dart';
 import '../widgets/courses_details/course_description_section.dart';
 import '../../shared_widgets/course_header_card.dart';
 import '../widgets/courses_details/upcoming_event_card.dart';
@@ -14,6 +14,7 @@ import '../../../../../shared/di/injection.dart';
 import '../../cubit/course_details_cubit/course_details_cubit.dart';
 import '../../cubit/course_details_cubit/course_details_state.dart';
 import 'package:bnu_lms_app/features/courses/domain/entities/course_entity.dart';
+
 
 
 class CourseDetailsScreen extends StatefulWidget {
@@ -50,26 +51,6 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
     'Implement and test large-scale software systems.',
   ];
 
-  final List<Map<String, dynamic>> assignments = [
-    {
-      'title': 'Project Phase 1',
-      'dueDate': 'Nov 20, 2024',
-      'status': 'Pending',
-      'statusColor': Colors.orange,
-    },
-    {
-      'title': 'Design Pattern Report',
-      'dueDate': 'Nov 15, 2024',
-      'status': 'Submitted',
-      'statusColor': ColorsManager.green,
-    },
-    {
-      'title': 'Midterm Exam',
-      'dueDate': 'Nov 10, 2024',
-      'status': 'Completed',
-      'statusColor': ColorsManager.blue,
-    },
-  ];
 
   final List<Map<String, dynamic>> upcomingEvents = [
     {
@@ -171,7 +152,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
                       controller: _tabController,
                       children: [
                         _buildOverviewTab(isLight, course),
-                        _buildAssignmentsTab(isLight),
+                        StudentAssignmentsTab(courseId: course.id),
                         _buildUpcomingTab(isLight), // TODO: replace with real API later
                       ],
                     ),
@@ -252,38 +233,6 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
     );
   }
 
-  Widget _buildAssignmentsTab(bool isLight) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: REdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 16.h),
-            Text(
-              'All Assignments',
-              style: isLight
-                  ? AppLightTextStyles.headlineSmall.copyWith(
-                fontWeight: FontWeight.bold,
-              )
-                  : AppDarkTextStyles.headlineSmall.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 16.h),
-            ...assignments.map((assignment) {
-              return AssignmentItemCard(
-                title: assignment['title'],
-                dueDate: assignment['dueDate'],
-                status: assignment['status'],
-                statusColor: assignment['statusColor'],
-              );
-            }),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildUpcomingTab(bool isLight) {
     return SingleChildScrollView(

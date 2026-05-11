@@ -8,12 +8,17 @@ import '../../../../../../l10n/app_localizations.dart';
 import '../../../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../../../shared/providers/theme_provider.dart';
+import '../../../../../auth/domain/entities/auth_entity.dart';
+import '../../../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../../../auth/presentation/cubit/auth_state.dart';
 import '../../../../../home/presentation/doctor/presentation/widgets/doctor_course_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../../shared/di/injection.dart';
 import '../../../../../../shared/resources/colors_manager.dart';
 import '../../../cubit/courses_cubit/courses_cubit.dart';
 import '../../../cubit/courses_cubit/courses_state.dart';
+
+
 
 class DoctorCoursesTab extends StatelessWidget {
   const DoctorCoursesTab({super.key});
@@ -72,26 +77,36 @@ class _DoctorCoursesTabView extends StatelessWidget {
                     );
                   }
 
-                  return ListView.separated(
-                    padding: REdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    itemCount: courses.length,
-                    separatorBuilder: (context, index) => SizedBox(height: 16.h),
-                    itemBuilder: (context, index) {
-                      final course = courses[index];
-                      return DoctorCourseCard(
-                        academicYear: 'Academic Year 2024/25',
-                        courseName: course.title,
-                        studentsCount: 'Manage Course', // Placeholder
-                        timeString: course.instructorName, // Using instructor space to show your name
-                        courseIcon: Icons.engineering_outlined,
-                        onManageTap: () {
-                          Navigator.pushNamed(
-                            context, 
-                            Routes.taCoursesDetails, // Or a specific Doctor routes
-                            arguments: {
-                              'courseId': course.id,
-                              'courseTitle': course.title,
-                            }
+                  return BlocBuilder<AuthCubit, AuthState>(
+                    builder: (context, authState) {
+                      UserRole role = UserRole.unknown;
+                      if (authState is AuthSuccess) {
+                        role = authState.auth.role;
+                      }
+
+                      return ListView.separated(
+                        padding: REdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        itemCount: courses.length,
+                        separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                        itemBuilder: (context, index) {
+                          final course = courses[index];
+                          return DoctorCourseCard(
+                            academicYear: 'Academic Year 2024/25',
+                            courseName: course.title,
+                            studentsCount: 'Manage Course', // Placeholder
+                            timeString: course.instructorName, // Using instructor space to show your name
+                            courseIcon: Icons.engineering_outlined,
+                            onManageTap: () {
+                              final route = role == UserRole.ta ? Routes.taCoursesDetails : Routes.doctorCoursesDetails;
+                              Navigator.pushNamed(
+                                context, 
+                                route,
+                                arguments: {
+                                  'courseId': course.id,
+                                  'courseTitle': course.title,
+                                }
+                              );
+                            },
                           );
                         },
                       );
