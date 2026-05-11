@@ -19,6 +19,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String email,
     required String password,
   }) async {
+    print("DEBUG: AuthCubit.login triggered for $email");
     emit(const AuthLoading());
 
     final result = await _loginUseCase(email: email, password: password);
@@ -34,7 +35,15 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> logout() async {
+    // 1. Clear local storage/tokens via the use case
     await _logoutUseCase();
-    emit(const AuthUnauthenticated());
+    
+    // 2. Clear SignalR connection if needed
+    // _signalRService.stop(); // Optional but good practice
+
+    // 3. Only emit if not closed
+    if (!isClosed) {
+      emit(const AuthUnauthenticated());
+    }
   }
 }

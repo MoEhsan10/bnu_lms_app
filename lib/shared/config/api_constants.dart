@@ -38,6 +38,14 @@ class ApiConstants {
   // ─── Attendance Endpoints ─────────────────────────────────────────────────
   static const String attendance = '$baseUrl/attendance';
 
+  // ─── Assignment Endpoints (must stay under [baseUrl] — missing `api` or a double slash → 404) ──
+  static String assignmentCourseList(int courseId) => '$baseUrl/Assignment/course/$courseId';
+  static String assignmentDetail(int assignmentId) => '$baseUrl/Assignment/$assignmentId';
+  static String get assignmentCreate => '$baseUrl/Assignment/create';
+  static String assignmentSubmit(int assignmentId) => '$baseUrl/Assignment/$assignmentId/submit';
+  static String assignmentSubmissions(int assignmentId) => '$baseUrl/Assignment/$assignmentId/submissions';
+  static String submissionGrade(int submissionId) => '$baseUrl/Assignment/submission/$submissionId/grade';
+
   // ─── Local Storage Keys ────────────────────────────────────────────────────
   static const String tokenKey = 'jwt_token';
 }

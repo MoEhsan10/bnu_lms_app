@@ -23,13 +23,13 @@ class AssignmentRemoteDataSourceImpl implements AssignmentRemoteDataSource {
 
   @override
   Future<List<AssignmentModel>> getAssignmentsByCourse(int courseId) async {
-    final response = await dio.get('${ApiConstants.baseUrl}/Assignment/course/$courseId');
+    final response = await dio.get(ApiConstants.assignmentCourseList(courseId));
     return (response.data as List).map((json) => AssignmentModel.fromJson(json)).toList();
   }
 
   @override
   Future<AssignmentModel> getAssignmentDetail(int assignmentId) async {
-    final response = await dio.get('${ApiConstants.baseUrl}/Assignment/$assignmentId');
+    final response = await dio.get(ApiConstants.assignmentDetail(assignmentId));
     return AssignmentModel.fromJson(response.data);
   }
 
@@ -50,38 +50,60 @@ class AssignmentRemoteDataSourceImpl implements AssignmentRemoteDataSource {
       ));
     }
 
-    // DEBUG: Confirm it's multipart and show full URL
-    print("FULL REQUEST URL: ${ApiConstants.baseUrl}/Assignment/create");
-    print("Content-Type being sent: multipart/form-data; boundary=${formData.boundary}");
-
     final response = await dio.post(
-      '${ApiConstants.baseUrl}/Assignment/create', 
+      ApiConstants.assignmentCreate,
       data: formData,
-      options: Options(
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      ),
     );
-    return response.data as int;
+    return _parseCreatedAssignmentId(response.data);
+  }
+
+  /// API returns `{ "id": n }` (camelCase JSON); tolerate plain int for older builds.
+  int _parseCreatedAssignmentId(dynamic data) {
+    if (data is int) return data;
+    if (data is Map) {
+      final map = Map<String, dynamic>.from(data);
+      final v = map['id'] ?? map['Id'];
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+    }
+    throw FormatException('Unexpected create assignment response: $data');
   }
 
   @override
   Future<void> submitAssignment(int assignmentId, Map<String, dynamic> submissionData) async {
-    await dio.post('${ApiConstants.baseUrl}/Assignment/$assignmentId/submit', data: submissionData);
+    final formData = FormData.fromMap(submissionData);
+
+    if (submissionData.containsKey('filePath') && submissionData['filePath'] != null) {
+      String path = submissionData['filePath'];
+      formData.files.add(MapEntry(
+        'file',
+        await MultipartFile.fromFile(path, filename: path.split('/').last),
+      ));
+    }
+
+    await dio.post(
+      ApiConstants.assignmentSubmit(assignmentId),
+      data: formData,
+      options: Options(
+        headers: {'Content-Type': 'multipart/form-data'},
+      ),
+    );
   }
 
   @override
   Future<List<SubmissionModel>> getSubmissions(int assignmentId) async {
-    final response = await dio.get('${ApiConstants.baseUrl}/Assignment/$assignmentId/submissions');
+    final response = await dio.get(ApiConstants.assignmentSubmissions(assignmentId));
     return (response.data as List).map((json) => SubmissionModel.fromJson(json)).toList();
   }
 
   @override
   Future<void> gradeSubmission(int submissionId, double grade, String feedback) async {
-    await dio.post('${ApiConstants.baseUrl}/Assignment/submission/$submissionId/grade', data: {
-      'grade': grade,
-      'feedback': feedback,
-    });
+    await dio.patch(
+      ApiConstants.submissionGrade(submissionId),
+      data: <String, dynamic>{
+        'grade': grade,
+        'feedback': feedback,
+      },
+    );
   }
 }

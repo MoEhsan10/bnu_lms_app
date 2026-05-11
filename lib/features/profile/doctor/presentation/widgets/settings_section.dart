@@ -53,6 +53,13 @@ class SettingsSection extends StatelessWidget {
                 isLogout: true,
                 onTap: () async {
                   await context.read<AuthCubit>().logout();
+                  if (context.mounted) {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context, 
+                      Routes.login, 
+                      (route) => false,
+                    );
+                  }
                 },
               ),
             ],

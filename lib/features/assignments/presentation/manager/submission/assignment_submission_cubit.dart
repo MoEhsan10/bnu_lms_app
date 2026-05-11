@@ -15,6 +15,11 @@ class AssignmentSubmissionCubit extends Cubit<AssignmentSubmissionState> {
     required String? url,
     required String? comment,
   }) async {
+    if ((filePath == null || filePath.isEmpty) && (url == null || url.isEmpty)) {
+      emit(const AssignmentSubmissionState.error("Please provide either a file or a URL."));
+      return;
+    }
+
     emit(const AssignmentSubmissionState.loading());
 
     final submissionData = {
