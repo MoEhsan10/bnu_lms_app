@@ -7,9 +7,14 @@ import '../../../../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../../../../shared/providers/theme_provider.dart';
 import '../../../../../../../shared/resources/colors_manager.dart';
+import '../../../../../../assignments/presentation/screens/create_assignment_screen.dart';
+import '../../../../../../../shared/resources/color_manager.dart';
+import '../../../../../../../shared/resources/app_text_styles.dart';
+
 
 class TaCourseAssignmentsTab extends StatelessWidget {
-  const TaCourseAssignmentsTab({super.key});
+  final int courseId;
+  const TaCourseAssignmentsTab({super.key, required this.courseId});
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +23,25 @@ class TaCourseAssignmentsTab extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.all(20.w),
       children: [
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CreateAssignmentScreen(courseId: courseId)),
+              );
+            },
+            icon: const Icon(Icons.add, color: Colors.white),
+            label: Text('Create Assignment', style: AppTextStyles.buttonText),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorManager.primary,
+              padding: EdgeInsets.symmetric(vertical: 14.h),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+            ),
+          ),
+        ),
+        SizedBox(height: 16.h),
         _buildSectionHeader(isLight, 'Active Tasks'),
         SizedBox(height: 16.h),
 

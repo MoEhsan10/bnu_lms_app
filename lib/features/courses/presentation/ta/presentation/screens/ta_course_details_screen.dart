@@ -117,7 +117,7 @@ class TaCourseDetailsScreen extends StatelessWidget {
                   const CourseStudentsTab(),
 
                   // 3. Assignments (Custom TA Version with Grading Actions)
-                  const TaCourseAssignmentsTab(),
+                  TaCourseAssignmentsTab(courseId: courseId),
 
                   // 4. Quizzes (Reused)
                   const CourseQuizzesTab(),
