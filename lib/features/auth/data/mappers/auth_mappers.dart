@@ -10,6 +10,8 @@ extension AuthMapper on AuthModel {
         expiration: DateTime.parse(expiration),
         email:      email,
         role:       _parseRole(role),
+        firstName:  firstName,
+        lastName:   lastName,
       );
 
   UserRole _parseRole(String raw) => switch (raw.toLowerCase()) {

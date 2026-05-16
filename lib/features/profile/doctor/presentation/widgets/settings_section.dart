@@ -7,7 +7,6 @@ import '../../../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../../../shared/providers/theme_provider.dart';
 import '../../../../../../shared/resources/colors_manager.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../auth/presentation/cubit/auth_cubit.dart';
 
 class SettingsSection extends StatelessWidget {

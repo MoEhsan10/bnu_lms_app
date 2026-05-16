@@ -11,6 +11,8 @@ class AssignmentModel {
   final String? instructorName;
   final double? grade;
   final String? feedback;
+  final String? filePath;
+  final int? attempts;
 
   AssignmentModel({
     required this.id,
@@ -23,6 +25,8 @@ class AssignmentModel {
     this.instructorName,
     this.grade,
     this.feedback,
+    this.filePath,
+    this.attempts,
   });
 
   factory AssignmentModel.fromJson(Map<String, dynamic> json) {
@@ -31,12 +35,14 @@ class AssignmentModel {
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : DateTime.now(),
-      maxPoints: (json['maxPoints'] as num?)?.toDouble() ?? 0.0,
-      status: json['status'] as String? ?? 'Upcoming',
+      maxPoints: (json['points'] as num?)?.toDouble() ?? (json['maxPoints'] as num?)?.toDouble() ?? 0.0,
+      status: json['isSubmitted'] == true ? 'Submitted' : 'Pending',
       courseId: json['courseId'] as int?,
       instructorName: json['instructorName'] as String?,
       grade: (json['grade'] as num?)?.toDouble(),
       feedback: json['feedback'] as String?,
+      filePath: json['filePath'] as String?,
+      attempts: json['attempts'] as int?,
     );
   }
 
@@ -52,6 +58,8 @@ class AssignmentModel {
       'instructorName': instructorName,
       'grade': grade,
       'feedback': feedback,
+      'filePath': filePath,
+      'attempts': attempts,
     };
   }
 
@@ -67,6 +75,8 @@ class AssignmentModel {
       instructorName: instructorName,
       grade: grade,
       feedback: feedback,
+      filePath: filePath,
+      attempts: attempts ?? 0,
     );
   }
 }

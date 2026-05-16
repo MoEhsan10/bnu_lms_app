@@ -9,9 +9,9 @@ import '../../../../../../shared/providers/theme_provider.dart';
 import '../../../../../../shared/resources/assets_manager.dart';
 import '../../../../../../shared/resources/colors_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../../../shared/di/injection.dart';
-import '../../../../../profile/presentation/cubit/profile_cubit.dart';
-import '../../../../../profile/presentation/cubit/profile_state.dart';
+import '../../../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../../../auth/presentation/cubit/auth_state.dart';
+
 
 class DoctorDashboardHeader extends StatelessWidget {
   const DoctorDashboardHeader({super.key});
@@ -22,9 +22,7 @@ class DoctorDashboardHeader extends StatelessWidget {
     final isLight = themeProvider.isLightTheme();
     final localizations = AppLocalizations.of(context)!;
 
-    return BlocProvider(
-      create: (context) => getIt<ProfileCubit>()..fetchProfile(),
-      child: Row(
+    return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           CircleAvatar(
@@ -44,14 +42,14 @@ class DoctorDashboardHeader extends StatelessWidget {
           ),
           SizedBox(width: 12.w),
           Expanded(
-            child: BlocBuilder<ProfileCubit, ProfileState>(
+            child: BlocBuilder<AuthCubit, AuthState>(
               builder: (context, state) {
                 String name = 'Welcome';
-                String department = '';
 
-                if (state is ProfileLoaded) {
-                  name = state.profile.fullName;
-                  department = state.profile.faculty;
+
+                if (state is AuthSuccess) {
+                  name = "${state.auth.firstName} ${state.auth.lastName}";
+
                 }
 
                 return Column(
@@ -68,26 +66,13 @@ class DoctorDashboardHeader extends StatelessWidget {
                         color: ColorsManager.blue,
                       ),
                     ),
-                    if (state is ProfileLoading)
-                      SizedBox(
-                        height: 20.h,
-                        width: 80.w,
-                        child: const LinearProgressIndicator(),
-                      )
-                    else ...[
-                      Text(
-                        name,
-                        style: isLight
-                            ? AppLightTextStyles.labelLarge
-                            : AppDarkTextStyles.labelLarge,
-                      ),
-                      Text(
-                        department.isNotEmpty ? department : 'BNU Faculty',
-                        style: isLight
-                            ? AppLightTextStyles.labelLarge
-                            : AppDarkTextStyles.labelLarge,
-                      ),
-                    ],
+                    Text(
+                      name,
+                      style: isLight
+                          ? AppLightTextStyles.labelLarge
+                          : AppDarkTextStyles.labelLarge,
+                    ),
+
                   ],
                 );
               },
@@ -111,7 +96,6 @@ class DoctorDashboardHeader extends StatelessWidget {
         //   ],
         // ),
       ],
-    ),
-  );
-}
+    );
+  }
 }

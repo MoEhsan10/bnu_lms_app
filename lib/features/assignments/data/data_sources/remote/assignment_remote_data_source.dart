@@ -35,26 +35,30 @@ class AssignmentRemoteDataSourceImpl implements AssignmentRemoteDataSource {
 
   @override
   Future<int> createAssignment(int courseId, Map<String, dynamic> assignmentData) async {
-    // Add courseId to the map so it's included in FormData
-    final Map<String, dynamic> dataWithCourse = Map.from(assignmentData);
-    dataWithCourse['courseId'] = courseId;
+    // filePath is local-only — strip it before building the server payload
+    final String? filePath = assignmentData['filePath'] as String?;
+    final Map<String, dynamic> serverFields = Map.from(assignmentData)..remove('filePath');
+    serverFields['courseId'] = courseId;
 
-    final formData = FormData.fromMap(dataWithCourse);
+    final formData = FormData.fromMap(serverFields);
 
-    // If filePath is present, add it as a file
-    if (dataWithCourse.containsKey('filePath') && dataWithCourse['filePath'] != null) {
-      String path = dataWithCourse['filePath'];
+    // Only attach file as MultipartFile if a real path was selected
+    if (filePath != null && filePath.isNotEmpty) {
       formData.files.add(MapEntry(
         'file',
-        await MultipartFile.fromFile(path, filename: path.split('/').last),
+        await MultipartFile.fromFile(filePath, filename: filePath.split('/').last),
       ));
     }
 
-    final response = await dio.post(
-      ApiConstants.assignmentCreate,
-      data: formData,
-    );
-    return _parseCreatedAssignmentId(response.data);
+    try {
+      final response = await dio.post(
+        ApiConstants.assignmentCreate,
+        data: formData,
+      );
+      return _parseCreatedAssignmentId(response.data);
+    } on DioException catch (e) {
+      rethrow;
+    }
   }
 
   /// API returns `{ "id": n }` (camelCase JSON); tolerate plain int for older builds.
@@ -71,23 +75,28 @@ class AssignmentRemoteDataSourceImpl implements AssignmentRemoteDataSource {
 
   @override
   Future<void> submitAssignment(int assignmentId, Map<String, dynamic> submissionData) async {
-    final formData = FormData.fromMap(submissionData);
+    // filePath is local-only — strip it before building the server payload
+    final String? filePath = submissionData['filePath'] as String?;
+    final Map<String, dynamic> serverFields = Map.from(submissionData)..remove('filePath');
 
-    if (submissionData.containsKey('filePath') && submissionData['filePath'] != null) {
-      String path = submissionData['filePath'];
+    final formData = FormData.fromMap(serverFields);
+
+    // Only attach file as MultipartFile if a real path was selected
+    if (filePath != null && filePath.isNotEmpty) {
       formData.files.add(MapEntry(
         'file',
-        await MultipartFile.fromFile(path, filename: path.split('/').last),
+        await MultipartFile.fromFile(filePath, filename: filePath.split('/').last),
       ));
     }
 
-    await dio.post(
-      ApiConstants.assignmentSubmit(assignmentId),
-      data: formData,
-      options: Options(
-        headers: {'Content-Type': 'multipart/form-data'},
-      ),
-    );
+    try {
+      await dio.post(
+        ApiConstants.assignmentSubmit(assignmentId),
+        data: formData,
+      );
+    } on DioException catch (e) {
+      rethrow;
+    }
   }
 
   @override

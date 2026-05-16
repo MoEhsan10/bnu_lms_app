@@ -11,6 +11,8 @@ class AssignmentEntity extends Equatable {
   final String? instructorName;
   final double? grade;
   final String? feedback;
+  final String? filePath;
+  final int attempts;
 
   const AssignmentEntity({
     required this.id,
@@ -23,8 +25,10 @@ class AssignmentEntity extends Equatable {
     this.instructorName,
     this.grade,
     this.feedback,
+    this.filePath,
+    this.attempts = 0,
   });
 
   @override
-  List<Object?> get props => [id, title, description, dueDate, maxPoints, status, grade];
+  List<Object?> get props => [id, title, description, dueDate, maxPoints, status, grade, filePath, attempts];
 }

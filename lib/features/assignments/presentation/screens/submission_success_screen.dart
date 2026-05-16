@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../shared/resources/app_text_styles.dart';
-import '../../../../shared/resources/color_manager.dart';
+import 'package:provider/provider.dart';
+import '../../../../shared/config/theme/app_dark_text_styles.dart';
+import '../../../../shared/config/theme/app_light_text_styles.dart';
+import '../../../../shared/providers/theme_provider.dart';
+import '../../../../shared/resources/colors_manager.dart';
 
 class SubmissionSuccessScreen extends StatelessWidget {
   const SubmissionSuccessScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isLight = themeProvider.isLightTheme();
+
     return Scaffold(
-      backgroundColor: ColorManager.background,
+      backgroundColor: isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground,
       body: Padding(
         padding: EdgeInsets.all(24.w),
         child: Column(
@@ -20,13 +26,13 @@ class SubmissionSuccessScreen extends StatelessWidget {
             SizedBox(height: 32.h),
             Text(
               'Submission Successful!',
-              style: AppTextStyles.titleLarge.copyWith(fontSize: 24.sp),
+              style: (isLight ? AppLightTextStyles.headlineSmall : AppDarkTextStyles.headlineSmall).copyWith(fontSize: 24.sp),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 12.h),
             Text(
               'Your assignment has been submitted successfully. You can view your submission status in the assignments tab.',
-              style: AppTextStyles.bodyMedium.copyWith(color: ColorManager.textSecondary),
+              style: (isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium).copyWith(color: ColorsManager.grayMedium),
               textAlign: TextAlign.center,
             ),
             const Spacer(),
@@ -46,12 +52,12 @@ class _SuccessIcon extends StatelessWidget {
       width: 120.w,
       height: 120.w,
       decoration: BoxDecoration(
-        color: ColorManager.success.withValues(alpha: 0.1),
+        color: ColorsManager.green.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       child: Icon(
         Icons.check_circle_outline,
-        color: ColorManager.success,
+        color: ColorsManager.green,
         size: 80.sp,
       ),
     );
@@ -61,20 +67,23 @@ class _SuccessIcon extends StatelessWidget {
 class _ReturnButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          // Navigate back to Assignments tab (this might require a specific route or pop until)
           Navigator.popUntil(context, (route) => route.isFirst);
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: ColorManager.primary,
+          backgroundColor: ColorsManager.blue,
           padding: EdgeInsets.symmetric(vertical: 16.h),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
           elevation: 0,
         ),
-        child: Text('Return to Assignments', style: AppTextStyles.buttonText),
+        child: Text(
+          'Return to Assignments', 
+          style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(color: Colors.white)
+        ),
       ),
     );
   }

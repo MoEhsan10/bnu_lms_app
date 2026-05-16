@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:file_picker/file_picker.dart';
-import '../../../../shared/resources/app_text_styles.dart';
-import '../../../../shared/resources/color_manager.dart';
+import 'package:provider/provider.dart';
+import '../../../../shared/config/theme/app_dark_text_styles.dart';
+import '../../../../shared/config/theme/app_light_text_styles.dart';
+import '../../../../shared/providers/theme_provider.dart';
+import '../../../../shared/resources/colors_manager.dart';
 import '../../../../shared/di/injection.dart';
 import '../../domain/entities/assignment_entity.dart';
 import '../manager/submission/assignment_submission_cubit.dart';
@@ -35,6 +38,9 @@ class _SubmitAssignmentScreenState extends State<SubmitAssignmentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isLight = themeProvider.isLightTheme();
+
     return BlocProvider(
       create: (context) => getIt<AssignmentSubmissionCubit>(),
       child: BlocConsumer<AssignmentSubmissionCubit, AssignmentSubmissionState>(
@@ -48,7 +54,7 @@ class _SubmitAssignmentScreenState extends State<SubmitAssignmentScreen> {
             },
             error: (message) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(message), backgroundColor: ColorManager.error),
+                SnackBar(content: Text(message), backgroundColor: ColorsManager.red),
               );
             },
             orElse: () {},
@@ -56,14 +62,17 @@ class _SubmitAssignmentScreenState extends State<SubmitAssignmentScreen> {
         },
         builder: (context, state) {
           return Scaffold(
-            backgroundColor: ColorManager.background,
+            backgroundColor: isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground,
             appBar: AppBar(
-              title: Text('Submit Assignment', style: AppTextStyles.titleLarge),
+              title: Text(
+                'Submit Assignment', 
+                style: isLight ? AppLightTextStyles.headlineSmall : AppDarkTextStyles.headlineSmall
+              ),
               centerTitle: true,
               elevation: 0,
               backgroundColor: Colors.transparent,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: ColorManager.textPrimary),
+                icon: Icon(Icons.arrow_back_ios, color: isLight ? ColorsManager.black : ColorsManager.white),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -123,7 +132,11 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(title, style: AppTextStyles.labelSmall.copyWith(fontWeight: FontWeight.bold));
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
+    return Text(
+      title, 
+      style: (isLight ? AppLightTextStyles.labelSmall : AppDarkTextStyles.labelSmall).copyWith(fontWeight: FontWeight.bold)
+    );
   }
 }
 
@@ -135,28 +148,29 @@ class _FileUploadArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 24.h),
         decoration: BoxDecoration(
-          color: ColorManager.cardBackground,
+          color: isLight ? ColorsManager.white : ColorsManager.darkSurface,
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: ColorManager.primary.withValues(alpha: 0.3), style: BorderStyle.solid),
+          border: Border.all(color: ColorsManager.blue.withValues(alpha: 0.3), style: BorderStyle.solid),
         ),
         child: Column(
           children: [
-            Icon(Icons.cloud_upload_outlined, color: ColorManager.primary, size: 40.sp),
+            Icon(Icons.cloud_upload_outlined, color: ColorsManager.blue, size: 40.sp),
             SizedBox(height: 12.h),
             Text(
               filePath != null ? filePath!.split('/').last : 'Tap to browse files',
-              style: AppTextStyles.bodyMedium.copyWith(color: ColorManager.primary),
+              style: (isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium).copyWith(color: ColorsManager.blue),
             ),
             if (filePath == null)
               Text(
                 'Maximum file size: 50MB',
-                style: AppTextStyles.bodySmall.copyWith(fontSize: 10.sp),
+                style: (isLight ? AppLightTextStyles.bodySmall : AppDarkTextStyles.bodySmall).copyWith(fontSize: 10.sp),
               ),
           ],
         ),
@@ -178,25 +192,27 @@ class _CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return TextField(
       controller: controller,
       maxLines: maxLines,
+      style: TextStyle(color: isLight ? ColorsManager.black : ColorsManager.white),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: AppTextStyles.bodyMedium.copyWith(color: ColorManager.textSecondary.withValues(alpha: 0.5)),
+        hintStyle: (isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium).copyWith(color: ColorsManager.grayMedium),
         filled: true,
-        fillColor: ColorManager.cardBackground,
+        fillColor: isLight ? ColorsManager.white : ColorsManager.darkSurface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: ColorManager.borderColor),
+          borderSide: isLight ? BorderSide(color: ColorsManager.grayMedium.withValues(alpha: 0.1)) : BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: ColorManager.borderColor),
+          borderSide: isLight ? BorderSide(color: ColorsManager.grayMedium.withValues(alpha: 0.1)) : BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: ColorManager.primary),
+          borderSide: const BorderSide(color: ColorsManager.blue),
         ),
       ),
     );
@@ -211,12 +227,13 @@ class _SubmitButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: ColorManager.primary,
+          backgroundColor: ColorsManager.blue,
           padding: EdgeInsets.symmetric(vertical: 16.h),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
           elevation: 0,
@@ -227,7 +244,10 @@ class _SubmitButton extends StatelessWidget {
                 width: 20,
                 child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
               )
-            : Text('Submit Now', style: AppTextStyles.buttonText),
+            : Text(
+                'Submit Now', 
+                style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(color: Colors.white)
+              ),
       ),
     );
   }

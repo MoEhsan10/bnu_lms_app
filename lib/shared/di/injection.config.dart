@@ -106,9 +106,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1038.LoginUseCase>(
       () => _i1038.LoginUseCase(gh<_i787.AuthRepository>()),
     );
-    gh.factory<_i407.AssignmentsCubit>(
-      () => _i407.AssignmentsCubit(gh<_i928.AssignmentRepository>()),
-    );
     gh.factory<_i733.GradingCubit>(
       () => _i733.GradingCubit(gh<_i928.AssignmentRepository>()),
     );
@@ -130,6 +127,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i749.CourseRepository>(
       () => _i657.CourseRepositoryImpl(gh<_i598.CourseRemoteDataSource>()),
+    );
+    gh.factory<_i407.AssignmentsCubit>(
+      () => _i407.AssignmentsCubit(
+        gh<_i928.AssignmentRepository>(),
+        gh<_i320.SignalRService>(),
+      ),
     );
     gh.factory<_i633.StudentAssignmentsCubit>(
       () => _i633.StudentAssignmentsCubit(

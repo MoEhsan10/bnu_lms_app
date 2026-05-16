@@ -9,14 +9,20 @@ import '../manager/instructor/grading_state.dart';
 
 class GradingScreen extends StatefulWidget {
   final int submissionId;
+  final int assignmentId;
   final String studentName;
   final DateTime submissionDate;
+  final double? initialGrade;
+  final String? initialFeedback;
 
   const GradingScreen({
     super.key,
     required this.submissionId,
+    required this.assignmentId,
     required this.studentName,
     required this.submissionDate,
+    this.initialGrade,
+    this.initialFeedback,
   });
 
   @override
@@ -24,8 +30,22 @@ class GradingScreen extends StatefulWidget {
 }
 
 class _GradingScreenState extends State<GradingScreen> {
-  final TextEditingController _scoreController = TextEditingController();
-  final TextEditingController _feedbackController = TextEditingController();
+  late final TextEditingController _scoreController;
+  late final TextEditingController _feedbackController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scoreController = TextEditingController(text: widget.initialGrade?.toString() ?? '');
+    _feedbackController = TextEditingController(text: widget.initialFeedback ?? '');
+  }
+
+  @override
+  void dispose() {
+    _scoreController.dispose();
+    _feedbackController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +55,7 @@ class _GradingScreenState extends State<GradingScreen> {
         listener: (context, state) {
           state.maybeWhen(
             success: () {
-              Navigator.pop(context);
+              Navigator.pop(context, true);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Grade Submitted!'), backgroundColor: ColorManager.success),
               );

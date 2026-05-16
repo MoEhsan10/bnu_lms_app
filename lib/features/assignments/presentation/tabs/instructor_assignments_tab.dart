@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../shared/resources/app_text_styles.dart';
-import '../../../../shared/resources/color_manager.dart';
+import 'package:provider/provider.dart';
+import '../../../../shared/config/theme/app_dark_text_styles.dart';
+import '../../../../shared/config/theme/app_light_text_styles.dart';
+import '../../../../shared/providers/theme_provider.dart';
+import '../../../../shared/resources/colors_manager.dart';
 import '../../../../shared/di/injection.dart';
 import '../manager/instructor/assignments_cubit.dart';
 import '../manager/instructor/assignments_state.dart';
-import '../screens/create_assignment_screen.dart';
 import '../../domain/entities/assignment_entity.dart';
+import '../screens/assignment_submissions_screen.dart';
+import '../screens/create_assignment_screen.dart';
 
 class InstructorAssignmentsTab extends StatelessWidget {
   final int courseId;
@@ -16,6 +20,9 @@ class InstructorAssignmentsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isLight = themeProvider.isLightTheme();
+
     return BlocProvider(
       create: (context) => getIt<AssignmentsCubit>()..getAssignments(courseId),
       child: BlocBuilder<AssignmentsCubit, AssignmentsState>(
@@ -34,35 +41,59 @@ class InstructorAssignmentsTab extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CreateAssignmentScreen(courseId: courseId),
+                            builder: (_) => BlocProvider.value(
+                              value: context.read<AssignmentsCubit>(),
+                              child: CreateAssignmentScreen(courseId: courseId),
+                            ),
                           ),
                         ).then((_) => context.read<AssignmentsCubit>().getAssignments(courseId));
                       },
                       icon: const Icon(Icons.add, color: Colors.white),
-                      label: Text('Create Assignment', style: AppTextStyles.buttonText),
+                      label: Text(
+                        'Create Assignment', 
+                        style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(color: Colors.white)
+                      ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorManager.primary,
+                        backgroundColor: ColorsManager.blue,
                         padding: EdgeInsets.symmetric(vertical: 14.h),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                       ),
                     ),
                   ),
                   SizedBox(height: 24.h),
-                  Text('Course Assignments', style: AppTextStyles.titleMedium),
+                  Text(
+                    'Course Assignments', 
+                    style: isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium
+                  ),
                   SizedBox(height: 16.h),
                   Expanded(
                     child: state.maybeWhen(
                       loading: () => const Center(child: CircularProgressIndicator()),
                       success: (assignments) => assignments.isEmpty 
-                        ? const Center(child: Text("No assignments yet"))
+                        ? Center(
+                            child: Text(
+                              "No assignments yet", 
+                              style: isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium
+                            )
+                          )
                         : ListView.builder(
                             itemCount: assignments.length,
                             itemBuilder: (context, index) {
                               return _buildInstructorAssignmentCard(context, assignments[index]);
                             },
                           ),
-                      error: (message) => Center(child: Text(message)),
-                      orElse: () => const Center(child: Text("Initializing...")),
+                      error: (message) => Center(
+                        child: Text(
+                          message, 
+                          style: (isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium).copyWith(color: ColorsManager.red)
+                        )
+                      ),
+                      orElse: () => Center(
+                        child: Text(
+                          "Initializing...", 
+                          style: isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium
+                        )
+                      ),
                     ),
                   ),
                 ],
@@ -75,13 +106,14 @@ class InstructorAssignmentsTab extends StatelessWidget {
   }
 
   Widget _buildInstructorAssignmentCard(BuildContext context, AssignmentEntity assignment) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: ColorManager.cardBackground,
+        color: isLight ? ColorsManager.white : ColorsManager.darkSurface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: ColorManager.borderColor, width: 1.w),
+        border: Border.all(color: isLight ? ColorsManager.grayMedium.withValues(alpha: 0.1) : ColorsManager.blue.withValues(alpha: 0.1), width: 1.w),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,16 +121,25 @@ class InstructorAssignmentsTab extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(assignment.title, style: AppTextStyles.titleMedium),
-              Icon(Icons.more_vert, color: ColorManager.textSecondary, size: 20.sp),
+              Text(
+                assignment.title, 
+                style: isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium
+              ),
+              Icon(Icons.more_vert, color: ColorsManager.grayMedium, size: 20.sp),
             ],
           ),
           SizedBox(height: 12.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Due: ${assignment.dueDate.day} ${_getMonth(assignment.dueDate.month)}', style: AppTextStyles.bodySmall),
-              Text('Submitted: --/--', style: AppTextStyles.labelSmall.copyWith(color: ColorManager.primary)),
+              Text(
+                'Due: ${assignment.dueDate.day} ${_getMonth(assignment.dueDate.month)}', 
+                style: isLight ? AppLightTextStyles.bodySmall : AppDarkTextStyles.bodySmall
+              ),
+              Text(
+                'Submitted: --/--', 
+                style: (isLight ? AppLightTextStyles.labelSmall : AppDarkTextStyles.labelSmall).copyWith(color: ColorsManager.blue)
+              ),
             ],
           ),
           SizedBox(height: 16.h),
@@ -106,14 +147,22 @@ class InstructorAssignmentsTab extends StatelessWidget {
             width: double.infinity,
             child: OutlinedButton(
               onPressed: () {
-                // TODO: Navigate to SubmissionsListScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AssignmentSubmissionsScreen(assignmentId: assignment.id),
+                  ),
+                );
               },
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: ColorManager.primary),
+                side: const BorderSide(color: ColorsManager.blue),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
                 padding: EdgeInsets.symmetric(vertical: 10.h),
               ),
-              child: Text('View Submissions', style: AppTextStyles.labelSmall.copyWith(color: ColorManager.primary)),
+              child: Text(
+                'View Submissions', 
+                style: (isLight ? AppLightTextStyles.labelSmall : AppDarkTextStyles.labelSmall).copyWith(color: ColorsManager.blue)
+              ),
             ),
           ),
         ],

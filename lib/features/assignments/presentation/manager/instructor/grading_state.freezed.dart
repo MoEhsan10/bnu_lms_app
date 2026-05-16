@@ -55,13 +55,14 @@ extension GradingStatePatterns on GradingState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _Success value)?  success,TResult Function( _Error value)?  error,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _Success value)?  success,TResult Function( _SubmissionsLoaded value)?  submissionsLoaded,TResult Function( _Error value)?  error,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case _Loading() when loading != null:
 return loading(_that);case _Success() when success != null:
-return success(_that);case _Error() when error != null:
+return success(_that);case _SubmissionsLoaded() when submissionsLoaded != null:
+return submissionsLoaded(_that);case _Error() when error != null:
 return error(_that);case _:
   return orElse();
 
@@ -80,13 +81,14 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _Success value)  success,required TResult Function( _Error value)  error,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _Success value)  success,required TResult Function( _SubmissionsLoaded value)  submissionsLoaded,required TResult Function( _Error value)  error,}){
 final _that = this;
 switch (_that) {
 case _Initial():
 return initial(_that);case _Loading():
 return loading(_that);case _Success():
-return success(_that);case _Error():
+return success(_that);case _SubmissionsLoaded():
+return submissionsLoaded(_that);case _Error():
 return error(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -104,13 +106,14 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _Success value)?  success,TResult? Function( _Error value)?  error,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _Success value)?  success,TResult? Function( _SubmissionsLoaded value)?  submissionsLoaded,TResult? Function( _Error value)?  error,}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case _Loading() when loading != null:
 return loading(_that);case _Success() when success != null:
-return success(_that);case _Error() when error != null:
+return success(_that);case _SubmissionsLoaded() when submissionsLoaded != null:
+return submissionsLoaded(_that);case _Error() when error != null:
 return error(_that);case _:
   return null;
 
@@ -128,12 +131,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  success,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  success,TResult Function( List<SubmissionEntity> submissions)?  submissionsLoaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loading() when loading != null:
 return loading();case _Success() when success != null:
-return success();case _Error() when error != null:
+return success();case _SubmissionsLoaded() when submissionsLoaded != null:
+return submissionsLoaded(_that.submissions);case _Error() when error != null:
 return error(_that.message);case _:
   return orElse();
 
@@ -152,12 +156,13 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  success,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  success,required TResult Function( List<SubmissionEntity> submissions)  submissionsLoaded,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case _Loading():
 return loading();case _Success():
-return success();case _Error():
+return success();case _SubmissionsLoaded():
+return submissionsLoaded(_that.submissions);case _Error():
 return error(_that.message);case _:
   throw StateError('Unexpected subclass');
 
@@ -175,12 +180,13 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  success,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  success,TResult? Function( List<SubmissionEntity> submissions)?  submissionsLoaded,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loading() when loading != null:
 return loading();case _Success() when success != null:
-return success();case _Error() when error != null:
+return success();case _SubmissionsLoaded() when submissionsLoaded != null:
+return submissionsLoaded(_that.submissions);case _Error() when error != null:
 return error(_that.message);case _:
   return null;
 
@@ -284,6 +290,78 @@ String toString() {
 
 
 
+
+/// @nodoc
+
+
+class _SubmissionsLoaded implements GradingState {
+  const _SubmissionsLoaded(final  List<SubmissionEntity> submissions): _submissions = submissions;
+  
+
+ final  List<SubmissionEntity> _submissions;
+ List<SubmissionEntity> get submissions {
+  if (_submissions is EqualUnmodifiableListView) return _submissions;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_submissions);
+}
+
+
+/// Create a copy of GradingState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SubmissionsLoadedCopyWith<_SubmissionsLoaded> get copyWith => __$SubmissionsLoadedCopyWithImpl<_SubmissionsLoaded>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubmissionsLoaded&&const DeepCollectionEquality().equals(other._submissions, _submissions));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_submissions));
+
+@override
+String toString() {
+  return 'GradingState.submissionsLoaded(submissions: $submissions)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SubmissionsLoadedCopyWith<$Res> implements $GradingStateCopyWith<$Res> {
+  factory _$SubmissionsLoadedCopyWith(_SubmissionsLoaded value, $Res Function(_SubmissionsLoaded) _then) = __$SubmissionsLoadedCopyWithImpl;
+@useResult
+$Res call({
+ List<SubmissionEntity> submissions
+});
+
+
+
+
+}
+/// @nodoc
+class __$SubmissionsLoadedCopyWithImpl<$Res>
+    implements _$SubmissionsLoadedCopyWith<$Res> {
+  __$SubmissionsLoadedCopyWithImpl(this._self, this._then);
+
+  final _SubmissionsLoaded _self;
+  final $Res Function(_SubmissionsLoaded) _then;
+
+/// Create a copy of GradingState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? submissions = null,}) {
+  return _then(_SubmissionsLoaded(
+null == submissions ? _self._submissions : submissions // ignore: cast_nullable_to_non_nullable
+as List<SubmissionEntity>,
+  ));
+}
+
+
+}
 
 /// @nodoc
 

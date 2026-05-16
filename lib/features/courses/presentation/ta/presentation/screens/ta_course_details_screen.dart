@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../../../shared/providers/theme_provider.dart';
 import '../../../../../../shared/resources/colors_manager.dart';
+import '../../../../../../shared/di/injection.dart';
 
 // Shared Widgets
+import '../../../../../assignments/presentation/manager/instructor/assignments_cubit.dart';
 import '../../../shared_widgets/course_header_card.dart';
 
 // TA Specific Overview (Or reuse Doctor if identical)
@@ -20,7 +23,7 @@ import '../../../doctor/presentation/widgets/courses_details_tabs/course_materia
 import '../../../doctor/presentation/widgets/courses_details_tabs/course_attendance_tab.dart';
 import '../../../doctor/presentation/widgets/courses_details_tabs/course_grades_tab.dart';
 
-// The New Assignments Tab (Code provided below)
+// The New Assignments Tab
 import '../widgets/course_details/ta_course_assignments_tab.dart';
 
 class TaCourseDetailsScreen extends StatelessWidget {
@@ -117,7 +120,10 @@ class TaCourseDetailsScreen extends StatelessWidget {
                   const CourseStudentsTab(),
 
                   // 3. Assignments (Custom TA Version with Grading Actions)
-                  TaCourseAssignmentsTab(courseId: courseId),
+                  BlocProvider(
+                    create: (context) => getIt<AssignmentsCubit>()..getAssignments(courseId),
+                    child: TaCourseAssignmentsTab(courseId: courseId),
+                  ),
 
                   // 4. Quizzes (Reused)
                   const CourseQuizzesTab(),

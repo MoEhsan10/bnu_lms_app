@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../shared/resources/app_text_styles.dart';
-import '../../../../shared/resources/color_manager.dart';
+import 'package:provider/provider.dart';
+import '../../../../shared/config/theme/app_dark_text_styles.dart';
+import '../../../../shared/config/theme/app_light_text_styles.dart';
+import '../../../../shared/providers/theme_provider.dart';
+import '../../../../shared/resources/colors_manager.dart';
 import '../../../../shared/di/injection.dart';
 import '../manager/student/student_assignments_cubit.dart';
 import '../manager/student/student_assignments_state.dart';
@@ -17,6 +20,9 @@ class StudentAssignmentsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isLight = themeProvider.isLightTheme();
+
     return BlocProvider(
       create: (context) => getIt<StudentAssignmentsCubit>()..getAssignments(courseId),
       child: BlocBuilder<StudentAssignmentsCubit, StudentAssignmentsState>(
@@ -26,10 +32,15 @@ class StudentAssignmentsTab extends StatelessWidget {
             success: (assignments) => RefreshIndicator(
               onRefresh: () => context.read<StudentAssignmentsCubit>().fetchAssignments(courseId),
               child: assignments.isEmpty 
-                ? ListView( // Use ListView even when empty to allow RefreshIndicator to work
+                ? ListView( 
                     children: [
                       SizedBox(height: 100.h),
-                      const Center(child: Text("No assignments yet")),
+                      Center(
+                        child: Text(
+                          "No assignments yet", 
+                          style: isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium
+                        )
+                      ),
                     ],
                   )
                 : ListView.builder(
@@ -40,8 +51,18 @@ class StudentAssignmentsTab extends StatelessWidget {
                     },
                   ),
             ),
-            error: (message) => Center(child: Text(message)),
-            orElse: () => const Center(child: Text("Initializing...")),
+            error: (message) => Center(
+              child: Text(
+                message, 
+                style: (isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium).copyWith(color: ColorsManager.red)
+              )
+            ),
+            orElse: () => Center(
+              child: Text(
+                "Initializing...", 
+                style: isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium
+              )
+            ),
           );
         },
       ),
@@ -49,7 +70,7 @@ class StudentAssignmentsTab extends StatelessWidget {
   }
 
   Widget _buildStudentAssignmentCard(BuildContext context, AssignmentEntity assignment) {
-    bool isPending = assignment.status.toLowerCase() == 'pending' || assignment.status.toLowerCase() == 'upcoming';
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     bool isGraded = assignment.status.toLowerCase() == 'graded' || assignment.status.toLowerCase() == 'completed';
 
     return GestureDetector(
@@ -70,16 +91,18 @@ class StudentAssignmentsTab extends StatelessWidget {
         margin: EdgeInsets.only(bottom: 16.h),
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: ColorManager.cardBackground,
+          color: isLight ? ColorsManager.white : ColorsManager.darkSurface,
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: ColorManager.borderColor),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          border: Border.all(color: isLight ? ColorsManager.grayMedium.withValues(alpha: 0.1) : ColorsManager.blue.withValues(alpha: 0.1)),
+          boxShadow: isLight 
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ] 
+            : [],
         ),
         child: Row(
           children: [
@@ -89,16 +112,19 @@ class StudentAssignmentsTab extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(assignment.title, style: AppTextStyles.titleMedium),
+                  Text(
+                    assignment.title, 
+                    style: isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium
+                  ),
                   SizedBox(height: 4.h),
                   Text(
                     'Due: ${assignment.dueDate.day}/${assignment.dueDate.month}/${assignment.dueDate.year}',
-                    style: AppTextStyles.bodySmall,
+                    style: isLight ? AppLightTextStyles.bodySmall : AppDarkTextStyles.bodySmall
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, size: 16, color: ColorManager.textSecondary),
+            Icon(Icons.arrow_forward_ios, size: 16, color: ColorsManager.grayMedium),
           ],
         ),
       ),
@@ -113,21 +139,22 @@ class _StatusIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     Color color;
     switch (status.toLowerCase()) {
       case 'pending':
       case 'upcoming':
-        color = ColorManager.warning;
+        color = ColorsManager.yellow;
         break;
       case 'submitted':
-        color = ColorManager.primary;
+        color = ColorsManager.blue;
         break;
       case 'graded':
       case 'completed':
-        color = ColorManager.success;
+        color = ColorsManager.green;
         break;
       default:
-        color = ColorManager.textSecondary;
+        color = ColorsManager.grayMedium;
     }
 
     return Container(

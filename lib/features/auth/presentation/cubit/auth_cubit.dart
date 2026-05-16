@@ -19,7 +19,6 @@ class AuthCubit extends Cubit<AuthState> {
     required String email,
     required String password,
   }) async {
-    print("DEBUG: AuthCubit.login triggered for $email");
     emit(const AuthLoading());
 
     final result = await _loginUseCase(email: email, password: password);

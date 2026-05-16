@@ -9,6 +9,15 @@ class GradingCubit extends Cubit<GradingState> {
 
   GradingCubit(this._repository) : super(const GradingState.initial());
 
+  Future<void> getSubmissions(int assignmentId) async {
+    emit(const GradingState.loading());
+    final result = await _repository.getSubmissions(assignmentId);
+    result.fold(
+      (failure) => emit(GradingState.error(failure.message)),
+      (submissions) => emit(GradingState.submissionsLoaded(submissions)),
+    );
+  }
+
   Future<void> gradeSubmission({
     required int submissionId,
     required double grade,

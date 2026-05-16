@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../shared/resources/app_text_styles.dart';
-import '../../../../shared/resources/color_manager.dart';
+import 'package:provider/provider.dart';
+import '../../../../shared/config/theme/app_dark_text_styles.dart';
+import '../../../../shared/config/theme/app_light_text_styles.dart';
+import '../../../../shared/providers/theme_provider.dart';
+import '../../../../shared/resources/colors_manager.dart';
 import '../../domain/entities/assignment_entity.dart';
 
 class AssignmentResultScreen extends StatelessWidget {
@@ -11,15 +14,21 @@ class AssignmentResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isLight = themeProvider.isLightTheme();
+
     return Scaffold(
-      backgroundColor: ColorManager.background,
+      backgroundColor: isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground,
       appBar: AppBar(
-        title: Text('Assignment Results', style: AppTextStyles.titleLarge),
+        title: Text(
+          'Assignment Results', 
+          style: isLight ? AppLightTextStyles.headlineSmall : AppDarkTextStyles.headlineSmall
+        ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: ColorManager.textPrimary),
+          icon: Icon(Icons.arrow_back_ios, color: isLight ? ColorsManager.black : ColorsManager.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -31,16 +40,6 @@ class AssignmentResultScreen extends StatelessWidget {
             _GradeCircle(grade: assignment.grade ?? 0, maxPoints: assignment.maxPoints),
             SizedBox(height: 32.h),
             _FeedbackCard(feedback: assignment.feedback ?? "No feedback provided yet."),
-            SizedBox(height: 24.h),
-            const _OriginalityReport(percentage: 5), // Mock data
-            SizedBox(height: 24.h),
-            _SectionTitle(title: 'Mastery Progress'),
-            SizedBox(height: 16.h),
-            const _MasteryProgressBar(label: 'Understanding', value: 0.85, color: Colors.blue),
-            SizedBox(height: 12.h),
-            const _MasteryProgressBar(label: 'Execution', value: 0.95, color: Colors.green),
-            SizedBox(height: 12.h),
-            const _MasteryProgressBar(label: 'Originality', value: 0.90, color: Colors.orange),
           ],
         ),
       ),
@@ -56,6 +55,7 @@ class _GradeCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -65,19 +65,20 @@ class _GradeCircle extends StatelessWidget {
           child: CircularProgressIndicator(
             value: grade / maxPoints,
             strokeWidth: 12.w,
-            backgroundColor: ColorManager.primary.withValues(alpha: 0.1),
-            valueColor: const AlwaysStoppedAnimation<Color>(ColorManager.primary),
+            backgroundColor: ColorsManager.blue.withValues(alpha: 0.1),
+            valueColor: const AlwaysStoppedAnimation<Color>(ColorsManager.blue),
           ),
         ),
         Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               '${grade.toInt()}',
-              style: AppTextStyles.titleLarge.copyWith(fontSize: 40.sp, fontWeight: FontWeight.bold),
+              style: (isLight ? AppLightTextStyles.headlineLarge : AppDarkTextStyles.headlineLarge).copyWith(fontSize: 40.sp, fontWeight: FontWeight.bold),
             ),
             Text(
               'Out of ${maxPoints.toInt()}',
-              style: AppTextStyles.bodySmall,
+              style: isLight ? AppLightTextStyles.bodySmall : AppDarkTextStyles.bodySmall,
             ),
           ],
         ),
@@ -93,28 +94,32 @@ class _FeedbackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: ColorManager.cardBackground,
+        color: isLight ? ColorsManager.white : ColorsManager.darkSurface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: ColorManager.borderColor),
+        border: Border.all(color: isLight ? ColorsManager.grayMedium.withValues(alpha: 0.1) : ColorsManager.blue.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.comment_outlined, color: ColorManager.primary, size: 20),
+              const Icon(Icons.comment_outlined, color: ColorsManager.blue, size: 20),
               SizedBox(width: 8.w),
-              Text('Instructor Feedback', style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                'Instructor Feedback', 
+                style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(fontWeight: FontWeight.bold)
+              ),
             ],
           ),
           SizedBox(height: 12.h),
           Text(
             feedback,
-            style: AppTextStyles.bodyMedium.copyWith(height: 1.5),
+            style: (isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium).copyWith(height: 1.5),
           ),
         ],
       ),
@@ -129,10 +134,11 @@ class _OriginalityReport extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: ColorManager.primary.withValues(alpha: 0.05),
+        color: ColorsManager.blue.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
@@ -140,14 +146,17 @@ class _OriginalityReport extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.verified_user_outlined, color: Colors.green),
+              const Icon(Icons.verified_user_outlined, color: ColorsManager.green),
               SizedBox(width: 8.w),
-              Text('Originality Report', style: AppTextStyles.labelMedium),
+              Text(
+                'Originality Report', 
+                style: isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium
+              ),
             ],
           ),
           Text(
             '$percentage% Similarity',
-            style: AppTextStyles.labelMedium.copyWith(color: Colors.green, fontWeight: FontWeight.bold),
+            style: (isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium).copyWith(color: ColorsManager.green, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -162,9 +171,13 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return Align(
       alignment: Alignment.centerLeft,
-      child: Text(title, style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
+      child: Text(
+        title, 
+        style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(fontWeight: FontWeight.bold)
+      ),
     );
   }
 }
@@ -178,14 +191,15 @@ class _MasteryProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: AppTextStyles.bodySmall),
-            Text('${(value * 100).toInt()}%', style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.bold)),
+            Text(label, style: isLight ? AppLightTextStyles.bodySmall : AppDarkTextStyles.bodySmall),
+            Text('${(value * 100).toInt()}%', style: (isLight ? AppLightTextStyles.bodySmall : AppDarkTextStyles.bodySmall).copyWith(fontWeight: FontWeight.bold)),
           ],
         ),
         SizedBox(height: 6.h),

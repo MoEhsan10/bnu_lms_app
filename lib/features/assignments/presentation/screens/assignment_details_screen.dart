@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../shared/resources/app_text_styles.dart';
-import '../../../../shared/resources/color_manager.dart';
+import 'package:provider/provider.dart';
+import '../../../../shared/config/theme/app_dark_text_styles.dart';
+import '../../../../shared/config/theme/app_light_text_styles.dart';
+import '../../../../shared/providers/theme_provider.dart';
+import '../../../../shared/resources/colors_manager.dart';
 import '../../domain/entities/assignment_entity.dart';
 import 'submit_assignment_screen.dart';
 
@@ -10,17 +13,33 @@ class AssignmentDetailsScreen extends StatelessWidget {
 
   const AssignmentDetailsScreen({super.key, required this.assignment});
 
+  String _getTimeLeft(DateTime dueDate) {
+    final now = DateTime.now();
+    final difference = dueDate.difference(now);
+    if (difference.isNegative) return "Deadline Passed";
+    if (difference.inDays > 0) return "${difference.inDays} Days Left";
+    if (difference.inHours > 0) return "${difference.inHours} Hours Left";
+    if (difference.inMinutes > 0) return "${difference.inMinutes} Mins Left";
+    return "Due Now";
+  }
+
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isLight = themeProvider.isLightTheme();
+
     return Scaffold(
-      backgroundColor: ColorManager.background,
+      backgroundColor: isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground,
       appBar: AppBar(
-        title: Text('Assignment Details', style: AppTextStyles.titleLarge),
+        title: Text(
+          'Assignment Details', 
+          style: isLight ? AppLightTextStyles.headlineSmall : AppDarkTextStyles.headlineSmall
+        ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: ColorManager.textPrimary),
+          icon: Icon(Icons.arrow_back, color: isLight ? ColorsManager.black : ColorsManager.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -29,45 +48,31 @@ class AssignmentDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeaderSection(),
+            _buildHeaderSection(context),
             SizedBox(height: 24.h),
-            _buildSectionTitle('Instructions'),
+            _buildSectionTitle(context, 'Instructions'),
             SizedBox(height: 12.h),
-            _buildInstructionsSection(),
+            _buildInstructionsSection(context),
+            if (assignment.filePath != null && assignment.filePath!.isNotEmpty) ...[
+              SizedBox(height: 24.h),
+              _buildSectionTitle(context, 'Reference Materials'),
+              SizedBox(height: 12.h),
+              _buildReferenceMaterialsSection(context),
+            ],
+            if (assignment.grade != null) ...[
+              SizedBox(height: 24.h),
+              _buildGradedCard(context),
+            ],
             SizedBox(height: 24.h),
-            _buildSectionTitle('Reference Materials'),
+            _buildSectionTitle(context, 'Submission Status'),
             SizedBox(height: 12.h),
-            _buildReferenceMaterialsSection(),
+            _buildSubmissionStatusSection(context),
             SizedBox(height: 24.h),
-            _buildSectionTitle('Submission Status'),
+            _buildSectionTitle(context, 'Instructor'),
             SizedBox(height: 12.h),
-            _buildSubmissionStatusSection(),
-            SizedBox(height: 24.h),
-            _buildSectionTitle('Instructor'),
-            SizedBox(height: 12.h),
-            _buildInstructorSection(),
-            SizedBox(height: 24.h),
-            _buildSectionTitle('Grading Rubric'),
-            SizedBox(height: 12.h),
-            _buildGradingRubricSection(),
+            _buildInstructorSection(context),
             SizedBox(height: 40.h),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SubmitAssignmentScreen(assignment: assignment)),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorManager.primary,
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                ),
-                child: Text('Proceed to Submission', style: AppTextStyles.buttonText),
-              ),
-            ),
+            _buildSubmissionAction(context),
             SizedBox(height: 20.h),
           ],
         ),
@@ -75,31 +80,44 @@ class AssignmentDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(title, style: AppTextStyles.titleMedium);
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
+    return Text(
+      title, 
+      style: isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium
+    );
   }
 
-  Widget _buildHeaderSection() {
+  Widget _buildHeaderSection(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return Container(
       padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(color: ColorManager.cardBackground, borderRadius: BorderRadius.circular(16.r)),
+      decoration: BoxDecoration(
+        color: isLight ? ColorsManager.white : ColorsManager.darkSurface, 
+        borderRadius: BorderRadius.circular(16.r)
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: Text(assignment.title, style: AppTextStyles.titleLarge)),
+              Expanded(
+                child: Text(
+                  assignment.title, 
+                  style: isLight ? AppLightTextStyles.headlineSmall : AppDarkTextStyles.headlineSmall
+                )
+              ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: (assignment.status.toLowerCase() == 'pending' ? Colors.orange : ColorManager.success).withValues(alpha: 0.1), 
+                  color: (assignment.status.toLowerCase() == 'pending' ? ColorsManager.yellow : ColorsManager.green).withValues(alpha: 0.1), 
                   borderRadius: BorderRadius.circular(8.r)
                 ),
                 child: Text(
                   assignment.status, 
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: assignment.status.toLowerCase() == 'pending' ? Colors.orange : ColorManager.success
+                  style: (isLight ? AppLightTextStyles.labelSmall : AppDarkTextStyles.labelSmall).copyWith(
+                    color: assignment.status.toLowerCase() == 'pending' ? ColorsManager.yellow : ColorsManager.green
                   )
                 ),
               ),
@@ -108,14 +126,17 @@ class AssignmentDetailsScreen extends StatelessWidget {
           SizedBox(height: 12.h),
           Row(
             children: [
-              Icon(Icons.calendar_today, size: 16.sp, color: ColorManager.textSecondary),
+              Icon(Icons.calendar_today, size: 16.sp, color: ColorsManager.grayMedium),
               SizedBox(width: 8.w),
               Text(
                 'Due: ${assignment.dueDate.day}/${assignment.dueDate.month}, ${assignment.dueDate.hour}:${assignment.dueDate.minute}', 
-                style: AppTextStyles.bodyMedium
+                style: isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium
               ),
               const Spacer(),
-              Text('${assignment.maxPoints} Points', style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: ColorManager.primary)),
+              Text(
+                '${assignment.maxPoints} Points', 
+                style: (isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium).copyWith(fontWeight: FontWeight.bold, color: ColorsManager.blue)
+              ),
             ],
           ),
         ],
@@ -123,98 +144,239 @@ class AssignmentDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInstructionsSection() {
+  Widget _buildGradedCard(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: ColorManager.primary.withValues(alpha: 0.05),
-        border: Border(left: BorderSide(color: ColorManager.primary, width: 4.w)),
+        color: ColorsManager.blue.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: ColorsManager.blue),
       ),
-      child: Text(
-        assignment.description,
-        style: AppTextStyles.bodyMedium,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.stars_rounded, color: ColorsManager.blue, size: 28.sp),
+              SizedBox(width: 8.w),
+              Text(
+                'Graded',
+                style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(color: ColorsManager.blue),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            'Your Grade: ${assignment.grade} / ${assignment.maxPoints}',
+            style: (isLight ? AppLightTextStyles.headlineSmall : AppDarkTextStyles.headlineSmall).copyWith(fontWeight: FontWeight.bold),
+          ),
+          if (assignment.feedback != null && assignment.feedback!.isNotEmpty) ...[
+            SizedBox(height: 12.h),
+            Text(
+              'Instructor Feedback:',
+              style: (isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium).copyWith(fontWeight: FontWeight.bold, color: ColorsManager.grayMedium),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              assignment.feedback!,
+              style: isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium,
+            ),
+          ]
+        ],
       ),
     );
   }
 
-  Widget _buildReferenceMaterialsSection() {
+  Widget _buildInstructionsSection(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: ColorsManager.blue.withValues(alpha: 0.05),
+        border: Border(left: BorderSide(color: ColorsManager.blue, width: 4.w)),
+      ),
+      child: Text(
+        assignment.description,
+        style: isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium,
+      ),
+    );
+  }
+
+  Widget _buildReferenceMaterialsSection(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
+    final fileName = assignment.filePath?.split('/').last ?? 'Reference_Material.pdf';
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      tileColor: ColorManager.cardBackground,
+      tileColor: isLight ? ColorsManager.white : ColorsManager.darkSurface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      leading: Icon(Icons.picture_as_pdf, color: Colors.redAccent, size: 30.sp),
-      title: Text('Requirements_Doc.pdf', style: AppTextStyles.bodyMedium),
-      subtitle: Text('2.4 MB', style: AppTextStyles.labelSmall),
-      trailing: const Icon(Icons.download_rounded, color: ColorManager.primary),
+      leading: Icon(Icons.picture_as_pdf, color: ColorsManager.red, size: 30.sp),
+      title: Text(
+        fileName, 
+        style: isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium
+      ),
+      subtitle: Text(
+        'Tap to download', 
+        style: isLight ? AppLightTextStyles.labelSmall : AppDarkTextStyles.labelSmall
+      ),
+      trailing: const Icon(Icons.download_rounded, color: ColorsManager.blue),
       onTap: () {},
     );
   }
 
-  Widget _buildSubmissionStatusSection() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatusCard('Attempts', '0 / 2', Icons.replay),
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: _buildStatusCard('Time Left', '3 Days', Icons.timer_outlined),
-        ),
-      ],
+  Widget _buildSubmissionStatusSection(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: _buildStatusCard(context, 'Time Left', _getTimeLeft(assignment.dueDate), Icons.timer_outlined),
     );
   }
 
-  Widget _buildStatusCard(String title, String value, IconData icon) {
+  Widget _buildStatusCard(BuildContext context, String title, String value, IconData icon) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return Container(
       padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(color: ColorManager.cardBackground, borderRadius: BorderRadius.circular(12.r)),
+      decoration: BoxDecoration(
+        color: isLight ? ColorsManager.white : ColorsManager.darkSurface, 
+        borderRadius: BorderRadius.circular(12.r)
+      ),
       child: Column(
         children: [
-          Icon(icon, color: ColorManager.primary, size: 24.sp),
+          Icon(icon, color: ColorsManager.blue, size: 24.sp),
           SizedBox(height: 8.h),
-          Text(title, style: AppTextStyles.labelSmall.copyWith(color: ColorManager.textSecondary)),
+          Text(
+            title, 
+            style: (isLight ? AppLightTextStyles.labelSmall : AppDarkTextStyles.labelSmall).copyWith(color: ColorsManager.grayMedium)
+          ),
           SizedBox(height: 4.h),
-          Text(value, style: AppTextStyles.titleMedium),
+          Text(
+            value, 
+            style: isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildInstructorSection() {
+  Widget _buildInstructorSection(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     return ListTile(
       contentPadding: EdgeInsets.all(12.w),
-      tileColor: ColorManager.cardBackground,
+      tileColor: isLight ? ColorsManager.white : ColorsManager.darkSurface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      leading: CircleAvatar(radius: 24.r, backgroundColor: ColorManager.primary.withValues(alpha: 0.2), child: const Icon(Icons.person, color: ColorManager.primary)),
-      title: Text(assignment.instructorName ?? 'Dr. Mitchell', style: AppTextStyles.titleMedium),
-      subtitle:  Text('Lead Instructor', style: AppTextStyles.labelSmall),
-      trailing: IconButton(icon: const Icon(Icons.mail_outline, color: ColorManager.primary), onPressed: () {}),
-    );
-  }
-
-  Widget _buildGradingRubricSection() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(color: ColorManager.cardBackground, borderRadius: BorderRadius.circular(12.r)),
-      child: Column(
-        children: [
-          _buildRubricRow('Code Quality', '10 pts'),
-          SizedBox(height: 12.h),
-          _buildRubricRow('Documentation', '5 pts'),
-          SizedBox(height: 12.h),
-          _buildRubricRow('Timely Submission', '5 pts'),
-        ],
+      leading: CircleAvatar(
+        radius: 24.r, 
+        backgroundColor: ColorsManager.blue.withValues(alpha: 0.2), 
+        child: const Icon(Icons.person, color: ColorsManager.blue)
+      ),
+      title: Text(
+        assignment.instructorName ?? 'Unknown Instructor', 
+        style: isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium
+      ),
+      subtitle:  Text(
+        'Lead Instructor', 
+        style: isLight ? AppLightTextStyles.labelSmall : AppDarkTextStyles.labelSmall
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.mail_outline, color: ColorsManager.blue), 
+        onPressed: () {}
       ),
     );
   }
 
-  Widget _buildRubricRow(String criteria, String points) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(criteria, style: AppTextStyles.bodyMedium),
-        Text(points, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: ColorManager.primary)),
-      ],
+  Widget _buildSubmissionAction(BuildContext context) {
+    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
+    final isDeadlinePassed = DateTime.now().isAfter(assignment.dueDate);
+    final isSubmitted = assignment.status.toLowerCase() == 'submitted';
+
+    if (assignment.grade != null) {
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: ColorsManager.blue.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: ColorsManager.blue),
+        ),
+        child: Column(
+          children: [
+            Icon(Icons.stars_rounded, color: ColorsManager.blue, size: 32.sp),
+            SizedBox(height: 8.h),
+            Text(
+              'Assignment Graded',
+              style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(color: ColorsManager.blue),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (isSubmitted) {
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: ColorsManager.green.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: ColorsManager.green),
+        ),
+        child: Column(
+          children: [
+            Icon(Icons.check_circle, color: ColorsManager.green, size: 32.sp),
+            SizedBox(height: 8.h),
+            Text(
+              'Assignment Submitted Successfully',
+              style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(color: ColorsManager.green),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (isDeadlinePassed) {
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: ColorsManager.red.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: ColorsManager.red),
+        ),
+        child: Column(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: ColorsManager.red, size: 32.sp),
+            SizedBox(height: 8.h),
+            Text(
+              'Submission Closed: Deadline has passed.',
+              style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(color: ColorsManager.red),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SubmitAssignmentScreen(assignment: assignment)),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ColorsManager.blue,
+          padding: EdgeInsets.symmetric(vertical: 14.h),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+        ),
+        child: Text(
+          'Proceed to Submission', 
+          style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(color: Colors.white)
+        ),
+      ),
     );
   }
 }

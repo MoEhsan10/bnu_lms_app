@@ -1,5 +1,6 @@
 import 'package:bnu_lms_app/shared/routes_manager/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
@@ -9,10 +10,8 @@ import '../../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../../shared/providers/theme_provider.dart';
 import '../../../../../shared/resources/assets_manager.dart';
 import '../../../../../shared/resources/colors_manager.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../../shared/di/injection.dart';
-import '../../../../profile/presentation/cubit/profile_cubit.dart';
-import '../../../../profile/presentation/cubit/profile_state.dart';
+import '../../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../../auth/presentation/cubit/auth_state.dart';
 
 
 class HomeHeader extends StatelessWidget {
@@ -24,10 +23,8 @@ class HomeHeader extends StatelessWidget {
     final isLight = themeProvider.isLightTheme();
     final localizations = AppLocalizations.of(context)!;
 
-    return BlocProvider(
-      create: (context) => getIt<ProfileCubit>()..fetchProfile(),
-      child: Row(
-        children: [
+    return Row(
+      children: [
           CircleAvatar(
             radius: 24.r,
             backgroundColor: ColorsManager.blue,
@@ -58,20 +55,14 @@ class HomeHeader extends StatelessWidget {
                           color: ColorsManager.blue,
                         ),
                 ),
-                BlocBuilder<ProfileCubit, ProfileState>(
+                BlocBuilder<AuthCubit, AuthState>(
                   builder: (context, state) {
-                    if (state is ProfileLoaded) {
+                    if (state is AuthSuccess) {
                       return Text(
-                        state.profile.firstName,
+                        state.auth.firstName,
                         style: isLight
                             ? AppLightTextStyles.labelLarge
                             : AppDarkTextStyles.labelLarge,
-                      );
-                    } else if (state is ProfileLoading) {
-                      return SizedBox(
-                        height: 20.h,
-                        width: 80.w,
-                        child: const LinearProgressIndicator(),
                       );
                     }
                     return Text(
@@ -103,7 +94,6 @@ class HomeHeader extends StatelessWidget {
           ],
         ),
       ],
-    ),
-  );
-}
+    );
+  }
 }
