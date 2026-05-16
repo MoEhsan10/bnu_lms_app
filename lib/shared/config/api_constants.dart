@@ -46,6 +46,9 @@ class ApiConstants {
   static String assignmentSubmissions(int assignmentId) => '$baseUrl/Assignment/$assignmentId/submissions';
   static String submissionGrade(int submissionId) => '$baseUrl/Assignment/submission/$submissionId/grade';
 
+  // ─── Calendar Endpoints ───────────────────────────────────────────────────
+  static const String calendar = '$baseUrl/Calendar';
+
   // ─── Local Storage Keys ────────────────────────────────────────────────────
   static const String tokenKey = 'jwt_token';
 }
