@@ -36,6 +36,14 @@ import '../../features/auth/domain/repositories/auth_repository.dart' as _i787;
 import '../../features/auth/domain/use_cases/login_use_case.dart' as _i1038;
 import '../../features/auth/domain/use_cases/logout_use_case.dart' as _i698;
 import '../../features/auth/presentation/cubit/auth_cubit.dart' as _i117;
+import '../../features/calendar/data/data_sources/calendar_remote_data_source.dart'
+    as _i816;
+import '../../features/calendar/data/repositories/calendar_repository_impl.dart'
+    as _i712;
+import '../../features/calendar/domain/repositories/calendar_repository.dart'
+    as _i241;
+import '../../features/calendar/presentation/cubit/calendar_cubit.dart'
+    as _i131;
 import '../../features/courses/data/data_sources/remote/course_remote_data_source.dart'
     as _i598;
 import '../../features/courses/data/repositories/course_repository_impl.dart'
@@ -95,6 +103,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1042.AssignmentRemoteDataSource>(
       () => _i1042.AssignmentRemoteDataSourceImpl(gh<_i361.Dio>()),
     );
+    gh.lazySingleton<_i816.CalendarRemoteDataSource>(
+      () => _i816.CalendarRemoteDataSourceImpl(gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i241.CalendarRepository>(
+      () => _i712.CalendarRepositoryImpl(gh<_i816.CalendarRemoteDataSource>()),
+    );
     gh.lazySingleton<_i698.LogoutUseCase>(
       () => _i698.LogoutUseCase(gh<_i787.AuthRepository>()),
     );
@@ -124,6 +138,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i598.CourseRemoteDataSource>(
       () => _i598.CourseRemoteDataSourceImpl(gh<_i361.Dio>()),
+    );
+    gh.factory<_i131.CalendarCubit>(
+      () => _i131.CalendarCubit(gh<_i241.CalendarRepository>()),
     );
     gh.lazySingleton<_i749.CourseRepository>(
       () => _i657.CourseRepositoryImpl(gh<_i598.CourseRemoteDataSource>()),
