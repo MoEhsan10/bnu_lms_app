@@ -28,6 +28,16 @@ import '../../features/assignments/presentation/manager/student/student_assignme
     as _i633;
 import '../../features/assignments/presentation/manager/submission/assignment_submission_cubit.dart'
     as _i957;
+import '../../features/attendance/data/data_sources/remote/attendance_remote_data_source.dart'
+    as _i913;
+import '../../features/attendance/data/repositories/attendance_repository_impl.dart'
+    as _i719;
+import '../../features/attendance/domain/repositories/attendance_repository.dart'
+    as _i477;
+import '../../features/attendance/presentation/cubit/instructor_attendance_cubit.dart'
+    as _i666;
+import '../../features/attendance/presentation/cubit/student_attendance_cubit.dart'
+    as _i386;
 import '../../features/auth/data/data_sources/remote/auth_remote_data_source.dart'
     as _i432;
 import '../../features/auth/data/repositories/auth_repository_impl.dart'
@@ -106,8 +116,16 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i816.CalendarRemoteDataSource>(
       () => _i816.CalendarRemoteDataSourceImpl(gh<_i361.Dio>()),
     );
+    gh.lazySingleton<_i913.AttendanceRemoteDataSource>(
+      () => _i913.AttendanceRemoteDataSourceImpl(gh<_i361.Dio>()),
+    );
     gh.lazySingleton<_i241.CalendarRepository>(
       () => _i712.CalendarRepositoryImpl(gh<_i816.CalendarRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i477.AttendanceRepository>(
+      () => _i719.AttendanceRepositoryImpl(
+        gh<_i913.AttendanceRemoteDataSource>(),
+      ),
     );
     gh.lazySingleton<_i698.LogoutUseCase>(
       () => _i698.LogoutUseCase(gh<_i787.AuthRepository>()),
@@ -138,6 +156,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i598.CourseRemoteDataSource>(
       () => _i598.CourseRemoteDataSourceImpl(gh<_i361.Dio>()),
+    );
+    gh.factory<_i666.InstructorAttendanceCubit>(
+      () => _i666.InstructorAttendanceCubit(gh<_i477.AttendanceRepository>()),
+    );
+    gh.factory<_i386.StudentAttendanceCubit>(
+      () => _i386.StudentAttendanceCubit(gh<_i477.AttendanceRepository>()),
     );
     gh.factory<_i131.CalendarCubit>(
       () => _i131.CalendarCubit(gh<_i241.CalendarRepository>()),

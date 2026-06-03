@@ -159,7 +159,7 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
                           const CourseMaterialsTab(),
 
                           // 6. Attendance Tab
-                          const CourseAttendanceTab(),
+                          CourseAttendanceTab(courseId: course.id),
 
                           // 7. Grades Tab
                           const CourseGradesTab(),

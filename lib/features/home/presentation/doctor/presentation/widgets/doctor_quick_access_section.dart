@@ -9,6 +9,8 @@ import '../../../../../../shared/providers/theme_provider.dart';
 import '../../../../../../shared/resources/app_sizes.dart';
 import 'quick_action_card.dart';
 
+import '../../../../../attendance/presentation/screens/instructor_attendance_screen.dart';
+
 class DoctorQuickAccessSection extends StatelessWidget {
   const DoctorQuickAccessSection({super.key});
 
@@ -37,7 +39,17 @@ class DoctorQuickAccessSection extends StatelessWidget {
                 QuickActionCard(
                   icon: Icons.how_to_reg_outlined,
                   label: 'Take Attendance',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const InstructorAttendanceScreen(
+                          courseId: 1, // Default placeholder
+                          lectureId: 1,
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 SizedBox(width: 16.w),
                 QuickActionCard(

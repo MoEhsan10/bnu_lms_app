@@ -132,7 +132,7 @@ class TaCourseDetailsScreen extends StatelessWidget {
                   const CourseMaterialsTab(),
 
                   // 6. Attendance (Reused)
-                  const CourseAttendanceTab(),
+                  CourseAttendanceTab(courseId: courseId),
 
                   // 7. Grades (Reused)
                   const CourseGradesTab(),
