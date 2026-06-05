@@ -22,6 +22,7 @@ import 'package:bnu_lms_app/features/quizzes/presentation/screens/quizzes_screen
 
 import '../../features/courses/presentation/ta/presentation/screens/ta_course_details_screen.dart';
 import '../../features/forums/presentation/doctor/presentation/screens/doctor_question_details_screen.dart';
+import '../../features/forums/domain/entities/forum_entities.dart';
 import '../../features/forums/presentation/student/presentation/screens/forums_details_screen.dart';
 import '../../features/home/presentation/doctor/presentation/screens/doctor_home_screen.dart';
 import '../../features/home/presentation/student/screen/home_screen.dart';
@@ -114,13 +115,13 @@ class RoutesGenerator {
 
       case Routes.doctorQuestionDetails: 
         final questionArgs = args as Map<String, dynamic>?;
-        if (questionArgs == null || !questionArgs.containsKey('questionData')) {
+        if (questionArgs == null || !questionArgs.containsKey('discussion')) {
           return _unDefinedRoute();
         }
 
         return MaterialPageRoute(
           builder: (_) => DoctorQuestionDetailsScreen(
-            questionData: questionArgs['questionData'] as Map<String, dynamic>,
+            discussion: questionArgs['discussion'] as DiscussionEntity,
           ),
         );
 
