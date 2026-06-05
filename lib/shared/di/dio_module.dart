@@ -20,6 +20,16 @@ abstract class DioModule {
     );
 
     dio.interceptors.add(_AuthInterceptor(storage));
+    
+    // Detailed Network Logging to diagnose 404/payload issues
+    dio.interceptors.add(LogInterceptor(
+      request: true,
+      requestHeader: true,
+      requestBody: true,
+      responseBody: true,
+      error: true,
+    ));
+
     return dio;
   }
 

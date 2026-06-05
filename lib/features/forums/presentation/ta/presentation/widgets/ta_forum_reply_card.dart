@@ -15,6 +15,9 @@ class TaForumReplyCard extends StatelessWidget {
   final int upvotes;
   final bool isSuggestedByTa;
   final bool canSuggestAsAnswer;
+  final VoidCallback? onSuggestAsAnswer;
+  final VoidCallback? onUpvote;
+  final VoidCallback? onDownvote;
 
   const TaForumReplyCard({
     super.key,
@@ -25,6 +28,9 @@ class TaForumReplyCard extends StatelessWidget {
     required this.upvotes,
     this.isSuggestedByTa = false,
     this.canSuggestAsAnswer = false,
+    this.onSuggestAsAnswer,
+    this.onUpvote,
+    this.onDownvote,
   });
 
   @override
@@ -102,9 +108,17 @@ class TaForumReplyCard extends StatelessWidget {
           // Footer: Upvotes & TA Actions
           Row(
             children: [
-              Icon(Icons.thumb_up_alt_outlined, size: 16.sp, color: ColorsManager.grayMedium),
+              GestureDetector(
+                onTap: onUpvote,
+                child: Icon(Icons.arrow_upward, size: 16.sp, color: ColorsManager.grayMedium),
+              ),
               SizedBox(width: 4.w),
-              Text('$upvotes', style: TextStyle(fontSize: 12.sp, color: ColorsManager.grayMedium)),
+              Text('$upvotes', style: TextStyle(fontSize: 12.sp, color: ColorsManager.grayMedium, fontWeight: FontWeight.bold)),
+              SizedBox(width: 4.w),
+              GestureDetector(
+                onTap: onDownvote,
+                child: Icon(Icons.arrow_downward, size: 16.sp, color: ColorsManager.grayMedium),
+              ),
               SizedBox(width: 16.w),
               Icon(Icons.reply, size: 16.sp, color: ColorsManager.grayMedium),
               SizedBox(width: 4.w),
@@ -115,7 +129,7 @@ class TaForumReplyCard extends StatelessWidget {
               // 🔴 THE TA SPECIFIC ACTION BUTTON 🔴
               if (canSuggestAsAnswer)
                 OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: onSuggestAsAnswer ?? () {},
                   icon: Icon(Icons.check_circle_outline, size: 14.sp, color: cyan),
                   label: Text('Suggest as Correct Answer', style: TextStyle(color: cyan, fontSize: 10.sp, fontWeight: FontWeight.bold)),
                   style: OutlinedButton.styleFrom(
