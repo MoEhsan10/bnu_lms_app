@@ -8,7 +8,7 @@ class ApiConstants {
   /// Change this to your PC's local IP when running on a real device.
   /// The .NET API runs on http://localhost:5205 (see launchSettings.json)
   static const String _androidEmulatorHost = '10.0.2.2';
-  static const String _localHost = '192.168.1.6';
+  static const String _localHost = '192.168.1.69';
   static const int _port = 5205;
 
   /// ✅ Physical device on same WiFi → uses PC local IP (192.168.1.6)
@@ -48,6 +48,12 @@ class ApiConstants {
 
   // ─── Calendar Endpoints ───────────────────────────────────────────────────
   static const String calendar = '$baseUrl/Calendar';
+
+  // ─── AI Chat Endpoints ────────────────────────────────────────────────────
+  static const String aiSessions = '$baseUrl/ai/sessions';
+  static String aiSessionMessages(int sessionId) => '$baseUrl/ai/sessions/$sessionId/messages';
+  static const String aiMessage = '$baseUrl/ai/message';
+  static String aiDeleteSession(int sessionId) => '$baseUrl/ai/sessions/$sessionId';
 
   // ─── Local Storage Keys ────────────────────────────────────────────────────
   static const String tokenKey = 'jwt_token';
