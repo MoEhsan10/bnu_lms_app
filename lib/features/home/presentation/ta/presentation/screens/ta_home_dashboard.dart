@@ -11,6 +11,8 @@ import '../../../doctor/presentation/widgets/doctor_dashboard_header.dart';
 import '../widgets/ta_stats_grid.dart';
 import '../widgets/urgent_actions_section.dart';
 import '../widgets/todays_schedule_section.dart';
+import '../../../../../../shared/routes_manager/routes.dart';
+import '../../../../../../shared/config/theme/app_dark_text_styles.dart';
 
 class TaHomeDashboard extends StatelessWidget {
   const TaHomeDashboard({super.key});
@@ -32,6 +34,68 @@ class TaHomeDashboard extends StatelessWidget {
 
               // 2. Stats Grid (Labs, Grading, Forums)
               const TaStatsGrid(),
+
+              SizedBox(height: 16.h),
+
+              // New Full-Width Quiz Creation Card for TA
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, Routes.quizWizard);
+                  },
+                  borderRadius: BorderRadius.circular(16.r),
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(20.w),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF26C6DA), Color(0xFF0097A7)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF26C6DA).withValues(alpha: 0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(12.w),
+                          decoration: BoxDecoration(
+                            color: ColorsManager.white.withValues(alpha: 0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.quiz_rounded, color: ColorsManager.white, size: 28.sp),
+                        ),
+                        SizedBox(width: 16.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Create Assessment',
+                                style: AppDarkTextStyles.titleMedium.copyWith(color: ColorsManager.white, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                'Build a new interactive quiz or exam',
+                                style: AppDarkTextStyles.labelSmall.copyWith(color: ColorsManager.white.withValues(alpha: 0.9)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward_ios, color: ColorsManager.white, size: 16.sp),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
 
               SizedBox(height: AppSizes.largeSpacing),
 

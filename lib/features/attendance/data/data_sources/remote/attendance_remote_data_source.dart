@@ -48,7 +48,7 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
   }) async {
     try {
       final response = await _dio.post(
-        '${ApiConstants.baseUrl}/api/Attendance/session',
+        '${ApiConstants.baseUrl}Attendance/session',
         data: {
           'courseId': courseId,
           'sessionTitle': title,
@@ -72,7 +72,7 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
   }) async {
     try {
       final response = await _dio.post(
-        '${ApiConstants.baseUrl}/api/Attendance/mark',
+        '${ApiConstants.baseUrl}Attendance/mark',
         data: {
           'qrCodeToken': token,
           'deviceId': deviceId,
@@ -93,7 +93,7 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
   @override
   Future<List<AttendanceRecordModel>> getAttendedStudents(int courseId) async {
     try {
-      final response = await _dio.get('${ApiConstants.baseUrl}/api/Attendance/course/$courseId');
+      final response = await _dio.get('${ApiConstants.baseUrl}Attendance/course/$courseId');
       final reports = response.data as List<dynamic>;
       if (reports.isEmpty) return [];
 
@@ -118,7 +118,7 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
   }) async {
     try {
       await _dio.delete(
-        '${ApiConstants.baseUrl}/api/Attendance/record',
+        '${ApiConstants.baseUrl}Attendance/record',
         data: {
           'courseId': courseId,
           'studentId': studentId,
@@ -133,7 +133,7 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
   @override
   Future<List<CourseAttendanceReportModel>> getCourseAttendanceReports(int courseId) async {
     try {
-      final response = await _dio.get('${ApiConstants.baseUrl}/api/Attendance/course/$courseId');
+      final response = await _dio.get('${ApiConstants.baseUrl}Attendance/course/$courseId');
       final reports = response.data as List<dynamic>;
       return reports
           .map((e) => CourseAttendanceReportModel.fromJson(e as Map<String, dynamic>))

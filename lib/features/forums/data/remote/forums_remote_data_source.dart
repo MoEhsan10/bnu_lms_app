@@ -22,7 +22,7 @@ class ForumsRemoteDataSourceImpl implements ForumsRemoteDataSource {
   @override
   Future<List<DiscussionEntity>> getDiscussions(int courseId) async {
     try {
-      final res = await _dio.get('${ApiConstants.baseUrl}/Forum/course/$courseId');
+      final res = await _dio.get('${ApiConstants.baseUrl}Forum/course/$courseId');
       final list = res.data as List<dynamic>;
       return list.map((e) {
         final m = e as Map<String, dynamic>;
@@ -46,7 +46,7 @@ class ForumsRemoteDataSourceImpl implements ForumsRemoteDataSource {
   @override
   Future<List<PostEntity>> getPosts(int discussionId) async {
     try {
-      final res = await _dio.get('${ApiConstants.baseUrl}/Forum/discussion/$discussionId');
+      final res = await _dio.get('${ApiConstants.baseUrl}Forum/discussion/$discussionId');
       final list = res.data as List<dynamic>;
       return list.map((e) {
         final m = e as Map<String, dynamic>;
@@ -79,7 +79,7 @@ class ForumsRemoteDataSourceImpl implements ForumsRemoteDataSource {
   Future<void> createPost(int discussionId, String content) async {
     try {
       await _dio.post(
-        '${ApiConstants.baseUrl}/Forum/discussion/$discussionId/post',
+        '${ApiConstants.baseUrl}Forum/discussion/$discussionId/post',
         data: {'content': content},
       );
     } on DioException catch (e) {
@@ -91,7 +91,7 @@ class ForumsRemoteDataSourceImpl implements ForumsRemoteDataSource {
   Future<void> createComment(int postId, String content) async {
     try {
       await _dio.post(
-        '${ApiConstants.baseUrl}/Forum/post/$postId/comment',
+        '${ApiConstants.baseUrl}Forum/post/$postId/comment',
         data: {'content': content},
       );
     } on DioException catch (e) {
@@ -104,7 +104,7 @@ class ForumsRemoteDataSourceImpl implements ForumsRemoteDataSource {
     if (courseId <= 0) throw Exception('CRITICAL: courseId is invalid ($courseId)');
     try {
       final res = await _dio.post(
-        '${ApiConstants.baseUrl}/Forum/course/$courseId/discussion',
+        '${ApiConstants.baseUrl}Forum/course/$courseId/discussion',
         data: {
           'title': title,
           'content': content,
@@ -120,7 +120,7 @@ class ForumsRemoteDataSourceImpl implements ForumsRemoteDataSource {
   @override
   Future<void> markPostAsCorrect(int postId) async {
     try {
-      await _dio.post('${ApiConstants.baseUrl}/Forum/post/$postId/correct');
+      await _dio.post('${ApiConstants.baseUrl}Forum/post/$postId/correct');
     } on DioException catch (e) {
       throw RemoteException(message: _msg(e));
     }
@@ -130,7 +130,7 @@ class ForumsRemoteDataSourceImpl implements ForumsRemoteDataSource {
   Future<void> votePost(int postId, bool isUpvote) async {
     try {
       await _dio.post(
-        '${ApiConstants.baseUrl}/Forum/post/$postId/vote',
+        '${ApiConstants.baseUrl}Forum/post/$postId/vote',
         data: isUpvote,
         options: Options(contentType: Headers.jsonContentType),
       );
@@ -143,7 +143,7 @@ class ForumsRemoteDataSourceImpl implements ForumsRemoteDataSource {
   Future<void> updateDiscussionStatus(int discussionId, String status) async {
     try {
       await _dio.put(
-        '${ApiConstants.baseUrl}/Forum/discussion/$discussionId/status',
+        '${ApiConstants.baseUrl}Forum/discussion/$discussionId/status',
         data: '"$status"',
         options: Options(contentType: Headers.jsonContentType),
       );

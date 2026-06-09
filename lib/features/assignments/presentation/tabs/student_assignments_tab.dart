@@ -139,7 +139,7 @@ class _StatusIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
+    // final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     Color color;
     switch (status.toLowerCase()) {
       case 'pending':

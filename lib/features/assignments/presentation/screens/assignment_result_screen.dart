@@ -127,92 +127,92 @@ class _FeedbackCard extends StatelessWidget {
   }
 }
 
-class _OriginalityReport extends StatelessWidget {
-  final int percentage;
+// class _OriginalityReport extends StatelessWidget {
+//   final int percentage;
+//
+//   const _OriginalityReport({required this.percentage});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
+//     return Container(
+//       padding: EdgeInsets.all(16.w),
+//       decoration: BoxDecoration(
+//         color: ColorsManager.blue.withValues(alpha: 0.05),
+//         borderRadius: BorderRadius.circular(12.r),
+//       ),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           Row(
+//             children: [
+//               const Icon(Icons.verified_user_outlined, color: ColorsManager.green),
+//               SizedBox(width: 8.w),
+//               Text(
+//                 'Originality Report',
+//                 style: isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium
+//               ),
+//             ],
+//           ),
+//           Text(
+//             '$percentage% Similarity',
+//             style: (isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium).copyWith(color: ColorsManager.green, fontWeight: FontWeight.bold),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
-  const _OriginalityReport({required this.percentage});
+// class _SectionTitle extends StatelessWidget {
+//   final String title;
+//
+//   const _SectionTitle({required this.title});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
+//     return Align(
+//       alignment: Alignment.centerLeft,
+//       child: Text(
+//         title,
+//         style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(fontWeight: FontWeight.bold)
+//       ),
+//     );
+//   }
+// }
 
-  @override
-  Widget build(BuildContext context) {
-    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: ColorsManager.blue.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.verified_user_outlined, color: ColorsManager.green),
-              SizedBox(width: 8.w),
-              Text(
-                'Originality Report', 
-                style: isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium
-              ),
-            ],
-          ),
-          Text(
-            '$percentage% Similarity',
-            style: (isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium).copyWith(color: ColorsManager.green, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  final String title;
-
-  const _SectionTitle({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        title, 
-        style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium).copyWith(fontWeight: FontWeight.bold)
-      ),
-    );
-  }
-}
-
-class _MasteryProgressBar extends StatelessWidget {
-  final String label;
-  final double value;
-  final Color color;
-
-  const _MasteryProgressBar({required this.label, required this.value, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(label, style: isLight ? AppLightTextStyles.bodySmall : AppDarkTextStyles.bodySmall),
-            Text('${(value * 100).toInt()}%', style: (isLight ? AppLightTextStyles.bodySmall : AppDarkTextStyles.bodySmall).copyWith(fontWeight: FontWeight.bold)),
-          ],
-        ),
-        SizedBox(height: 6.h),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4.r),
-          child: LinearProgressIndicator(
-            value: value,
-            minHeight: 8.h,
-            backgroundColor: color.withValues(alpha: 0.1),
-            valueColor: AlwaysStoppedAnimation<Color>(color),
-          ),
-        ),
-      ],
-    );
-  }
-}
+// class _MasteryProgressBar extends StatelessWidget {
+//   final String label;
+//   final double value;
+//   final Color color;
+//
+//   const _MasteryProgressBar({required this.label, required this.value, required this.color});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         Row(
+//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//           children: [
+//             Text(label, style: isLight ? AppLightTextStyles.bodySmall : AppDarkTextStyles.bodySmall),
+//             Text('${(value * 100).toInt()}%', style: (isLight ? AppLightTextStyles.bodySmall : AppDarkTextStyles.bodySmall).copyWith(fontWeight: FontWeight.bold)),
+//           ],
+//         ),
+//         SizedBox(height: 6.h),
+//         ClipRRect(
+//           borderRadius: BorderRadius.circular(4.r),
+//           child: LinearProgressIndicator(
+//             value: value,
+//             minHeight: 8.h,
+//             backgroundColor: color.withValues(alpha: 0.1),
+//             valueColor: AlwaysStoppedAnimation<Color>(color),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }

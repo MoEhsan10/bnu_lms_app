@@ -25,6 +25,7 @@ import '../../../../../../shared/di/injection.dart';
 import '../../../cubit/course_details_cubit/course_details_cubit.dart';
 import '../../../cubit/course_details_cubit/course_details_state.dart';
 import 'package:bnu_lms_app/features/courses/domain/entities/course_entity.dart';
+import '../../../../../quizzes/presentation/cubit/quiz_list_cubit.dart';
 
 class DoctorCourseDetailsScreen extends StatelessWidget {
   final int courseId;
@@ -153,7 +154,10 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
                           CourseAssignmentsTab(courseId: course.id),
 
                           // 4. Quizzes Tab
-                          const CourseQuizzesTab(),
+                          BlocProvider(
+                            create: (_) => getIt<QuizListCubit>()..loadQuizzes(course!.id),
+                            child: CourseQuizzesTab(courseId: course.id),
+                          ),
 
                           // 5. Materials Tab (Pass the course to this one so we can show modules)
                           const CourseMaterialsTab(),

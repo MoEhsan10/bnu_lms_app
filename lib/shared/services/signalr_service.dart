@@ -7,6 +7,7 @@ import 'dart:async';
 class SignalRService {
   HubConnection? _assignmentHubConnection;
   HubConnection? _forumHubConnection;
+  HubConnection? _quizHubConnection;
 
   // Assignments Streams
   final _assignmentController = StreamController<Map<String, dynamic>>.broadcast();
@@ -18,6 +19,9 @@ class SignalRService {
   final _voteUpdateController = StreamController<Map<String, dynamic>>.broadcast();
   final _correctAnswerController = StreamController<Map<String, dynamic>>.broadcast();
 
+  // Quizzes Streams
+  final _newQuizController = StreamController<Map<String, dynamic>>.broadcast();
+
   Stream<Map<String, dynamic>> get assignmentStream => _assignmentController.stream;
   Stream<int> get submissionGradedStream => _submissionGradedController.stream;
 
@@ -26,12 +30,14 @@ class SignalRService {
   Stream<Map<String, dynamic>> get voteUpdateStream => _voteUpdateController.stream;
   Stream<Map<String, dynamic>> get correctAnswerStream => _correctAnswerController.stream;
 
+  Stream<Map<String, dynamic>> get quizStream => _newQuizController.stream;
+
   Future<void> init(String token) async {
     final options = HttpConnectionOptions(accessTokenFactory: () async => token);
 
     // 1. Assignment Hub
     if (_assignmentHubConnection == null) {
-      final assignmentUrl = '${ApiConstants.baseUrl.replaceAll('/api', '')}/assignmentHub';
+      final assignmentUrl = ApiConstants.hubUrl('assignmentHub');
       _assignmentHubConnection = HubConnectionBuilder()
           .withUrl(assignmentUrl, options: options)
           .withAutomaticReconnect()
@@ -59,7 +65,7 @@ class SignalRService {
 
     // 2. Forum Hub
     if (_forumHubConnection == null) {
-      final forumUrl = '${ApiConstants.baseUrl.replaceAll('/api', '')}/forumHub';
+      final forumUrl = ApiConstants.hubUrl('forumHub');
       print('🌐 FORUMS SIGNALR: Attempting to connect to $forumUrl');
 
       _forumHubConnection = HubConnectionBuilder()
@@ -110,6 +116,35 @@ class SignalRService {
         print('❌ FORUMS SIGNALR: Connection Failed! Error: $e');
       }
     }
+
+    // 3. Quiz Hub
+    if (_quizHubConnection == null) {
+      final quizUrl = ApiConstants.hubUrl('quizHub');
+      print('🌐 QUIZ SIGNALR: Attempting to connect to $quizUrl');
+
+      _quizHubConnection = HubConnectionBuilder()
+          .withUrl(quizUrl, options: options)
+          .withAutomaticReconnect()
+          .build();
+
+      _quizHubConnection!.on('ReceiveNewQuiz', (arguments) {
+        if (arguments != null && arguments.isNotEmpty) {
+          try {
+            print('🔥 QUIZ SIGNALR: Received New Quiz -> ${arguments.first}');
+            _newQuizController.add(Map<String, dynamic>.from(arguments.first as Map));
+          } catch (e) {
+            print('❌ QUIZ PARSE ERROR: $e');
+          }
+        }
+      });
+
+      try {
+        await _quizHubConnection!.start();
+        print('✅ QUIZ SIGNALR: Connected Successfully!');
+      } catch (e) {
+        print('❌ QUIZ SIGNALR: Connection Failed! Error: $e');
+      }
+    }
   }
 
   Future<void> joinCourse(int courseId) async {
@@ -128,6 +163,13 @@ class SignalRService {
     } else {
       print('❌ FORUMS SIGNALR: Could not join group $courseId! State is ${_forumHubConnection?.state}');
     }
+
+    if (_quizHubConnection?.state == HubConnectionState.Connected) {
+      await _quizHubConnection!.invoke('JoinCourseGroup', args: [courseId.toString()]);
+      print('✅ QUIZ SIGNALR: Joined group $courseId successfully.');
+    } else {
+      print('❌ QUIZ SIGNALR: Could not join group $courseId! State is ${_quizHubConnection?.state}');
+    }
   }
 
   Future<void> leaveCourse(int courseId) async {
@@ -136,6 +178,9 @@ class SignalRService {
     }
     if (_forumHubConnection?.state == HubConnectionState.Connected) {
       await _forumHubConnection!.invoke('LeaveCourseGroup', args: [courseId.toString()]);
+    }
+    if (_quizHubConnection?.state == HubConnectionState.Connected) {
+      await _quizHubConnection!.invoke('LeaveCourseGroup', args: [courseId.toString()]);
     }
   }
 
@@ -148,5 +193,7 @@ class SignalRService {
     _newPostController.close();
     _voteUpdateController.close();
     _correctAnswerController.close();
+    _quizHubConnection?.stop();
+    _newQuizController.close();
   }
 }

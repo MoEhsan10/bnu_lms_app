@@ -1,6 +1,5 @@
 // lib/features/quizzes/presentation/screens/quiz_questions_screen.dart
 
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../shared/resources/colors_manager.dart';
@@ -69,43 +68,20 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
   int _currentIndex = 0;
   final Map<int, int> _answers = {}; // questionIndex → selectedOptionIndex
 
-  // ── Timer ────────────────────────────────────────────────────────────────────
-  static const int _totalSeconds = 20 * 60; // 20 minutes
-  late int _remainingSeconds;
-  Timer? _timer;
-
   @override
   void initState() {
     super.initState();
-    _remainingSeconds = _totalSeconds;
-    _startTimer();
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (_remainingSeconds <= 0) {
-        _timer?.cancel();
-        _submitQuiz();
-        return;
-      }
-      setState(() => _remainingSeconds--);
-    });
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
     super.dispose();
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
-  String get _timeString {
-    final m = (_remainingSeconds ~/ 60).toString().padLeft(2, '0');
-    final s = (_remainingSeconds % 60).toString().padLeft(2, '0');
-    return '$m:$s';
-  }
+  String get _timeString => "--:--";
 
-  double get _timerProgress  => _remainingSeconds / _totalSeconds;
+  double get _timerProgress  => 1.0;
 
   double get _questionProgress => (_currentIndex + 1) / _questions.length;
 
@@ -128,7 +104,6 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
   }
 
   void _submitQuiz() {
-    _timer?.cancel();
     // TODO: emit cubit event with answers map → navigate to results
     Navigator.pop(context);
   }

@@ -85,6 +85,42 @@ import '../../features/profile/domain/repositories/profile_repository.dart'
 import '../../features/profile/domain/use_cases/get_my_profile_use_case.dart'
     as _i763;
 import '../../features/profile/presentation/cubit/profile_cubit.dart' as _i36;
+import '../../features/quizzes/data/data_sources/remote/quiz_remote_data_source.dart'
+    as _i766;
+import '../../features/quizzes/data/data_sources/remote/quiz_signalr_data_source.dart'
+    as _i27;
+import '../../features/quizzes/data/repositories/quiz_repository_impl.dart'
+    as _i983;
+import '../../features/quizzes/domain/repositories/quiz_repository.dart'
+    as _i950;
+import '../../features/quizzes/domain/use_cases/create_quiz_use_case.dart'
+    as _i911;
+import '../../features/quizzes/domain/use_cases/get_quiz_attempts_use_case.dart'
+    as _i0;
+import '../../features/quizzes/domain/use_cases/get_quiz_for_taking_use_case.dart'
+    as _i927;
+import '../../features/quizzes/domain/use_cases/get_quizzes_use_case.dart'
+    as _i306;
+import '../../features/quizzes/domain/use_cases/get_student_attempt_use_case.dart'
+    as _i409;
+import '../../features/quizzes/domain/use_cases/grade_essay_use_case.dart'
+    as _i346;
+import '../../features/quizzes/domain/use_cases/publish_grades_use_case.dart'
+    as _i878;
+import '../../features/quizzes/domain/use_cases/submit_quiz_use_case.dart'
+    as _i829;
+import '../../features/quizzes/domain/use_cases/update_quiz_use_case.dart'
+    as _i107;
+import '../../features/quizzes/presentation/cubit/quiz_attempts_cubit.dart'
+    as _i954;
+import '../../features/quizzes/presentation/cubit/quiz_grading_cubit.dart'
+    as _i534;
+import '../../features/quizzes/presentation/cubit/quiz_list_cubit.dart'
+    as _i621;
+import '../../features/quizzes/presentation/cubit/quiz_results_cubit.dart'
+    as _i688;
+import '../../features/quizzes/presentation/cubit/quiz_taking_cubit.dart'
+    as _i764;
 import '../services/signalr_service.dart' as _i320;
 import 'dio_module.dart' as _i1045;
 
@@ -109,6 +145,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i432.AuthRemoteDataSource>(),
         gh<_i558.FlutterSecureStorage>(),
       ),
+    );
+    gh.lazySingleton<_i27.QuizSignalrDataSource>(
+      () => _i27.QuizSignalrDataSourceImpl(),
+    );
+    gh.lazySingleton<_i766.QuizRemoteDataSource>(
+      () => _i766.QuizRemoteDataSourceImpl(gh<_i361.Dio>()),
     );
     gh.lazySingleton<_i1042.AssignmentRemoteDataSource>(
       () => _i1042.AssignmentRemoteDataSourceImpl(gh<_i361.Dio>()),
@@ -151,11 +193,41 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i320.SignalRService>(),
       ),
     );
+    gh.lazySingleton<_i950.QuizRepository>(
+      () => _i983.QuizRepositoryImpl(gh<_i766.QuizRemoteDataSource>()),
+    );
     gh.lazySingleton<_i683.ProfileRemoteDataSource>(
       () => _i683.ProfileRemoteDataSourceImpl(dio: gh<_i361.Dio>()),
     );
     gh.lazySingleton<_i598.CourseRemoteDataSource>(
       () => _i598.CourseRemoteDataSourceImpl(gh<_i361.Dio>()),
+    );
+    gh.factory<_i911.CreateQuizUseCase>(
+      () => _i911.CreateQuizUseCase(gh<_i950.QuizRepository>()),
+    );
+    gh.factory<_i0.GetQuizAttemptsUseCase>(
+      () => _i0.GetQuizAttemptsUseCase(gh<_i950.QuizRepository>()),
+    );
+    gh.factory<_i927.GetQuizForTakingUseCase>(
+      () => _i927.GetQuizForTakingUseCase(gh<_i950.QuizRepository>()),
+    );
+    gh.factory<_i409.GetStudentAttemptUseCase>(
+      () => _i409.GetStudentAttemptUseCase(gh<_i950.QuizRepository>()),
+    );
+    gh.factory<_i107.UpdateQuizUseCase>(
+      () => _i107.UpdateQuizUseCase(gh<_i950.QuizRepository>()),
+    );
+    gh.lazySingleton<_i306.GetQuizzesUseCase>(
+      () => _i306.GetQuizzesUseCase(gh<_i950.QuizRepository>()),
+    );
+    gh.lazySingleton<_i346.GradeEssayUseCase>(
+      () => _i346.GradeEssayUseCase(gh<_i950.QuizRepository>()),
+    );
+    gh.lazySingleton<_i878.PublishGradesUseCase>(
+      () => _i878.PublishGradesUseCase(gh<_i950.QuizRepository>()),
+    );
+    gh.lazySingleton<_i829.SubmitQuizUseCase>(
+      () => _i829.SubmitQuizUseCase(gh<_i950.QuizRepository>()),
     );
     gh.factory<_i666.InstructorAttendanceCubit>(
       () => _i666.InstructorAttendanceCubit(gh<_i477.AttendanceRepository>()),
@@ -163,8 +235,18 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i386.StudentAttendanceCubit>(
       () => _i386.StudentAttendanceCubit(gh<_i477.AttendanceRepository>()),
     );
+    gh.factory<_i954.QuizAttemptsCubit>(
+      () => _i954.QuizAttemptsCubit(gh<_i0.GetQuizAttemptsUseCase>()),
+    );
     gh.factory<_i131.CalendarCubit>(
       () => _i131.CalendarCubit(gh<_i241.CalendarRepository>()),
+    );
+    gh.factory<_i534.QuizGradingCubit>(
+      () => _i534.QuizGradingCubit(
+        gh<_i346.GradeEssayUseCase>(),
+        gh<_i878.PublishGradesUseCase>(),
+        gh<_i911.CreateQuizUseCase>(),
+      ),
     );
     gh.lazySingleton<_i749.CourseRepository>(
       () => _i657.CourseRepositoryImpl(gh<_i598.CourseRemoteDataSource>()),
@@ -207,6 +289,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i763.GetMyProfileUseCase>(
       () => _i763.GetMyProfileUseCase(gh<_i894.ProfileRepository>()),
     );
+    gh.factory<_i764.QuizTakingCubit>(
+      () => _i764.QuizTakingCubit(
+        gh<_i829.SubmitQuizUseCase>(),
+        gh<_i927.GetQuizForTakingUseCase>(),
+      ),
+    );
     gh.factory<_i382.CoursesCubit>(
       () => _i382.CoursesCubit(
         gh<_i773.GetEnrolledCoursesUseCase>(),
@@ -215,6 +303,15 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i36.ProfileCubit>(
       () => _i36.ProfileCubit(gh<_i763.GetMyProfileUseCase>()),
+    );
+    gh.factory<_i621.QuizListCubit>(
+      () => _i621.QuizListCubit(
+        gh<_i306.GetQuizzesUseCase>(),
+        gh<_i320.SignalRService>(),
+      ),
+    );
+    gh.factory<_i688.QuizResultsCubit>(
+      () => _i688.QuizResultsCubit(gh<_i409.GetStudentAttemptUseCase>()),
     );
     gh.factory<_i445.CourseDetailsCubit>(
       () => _i445.CourseDetailsCubit(

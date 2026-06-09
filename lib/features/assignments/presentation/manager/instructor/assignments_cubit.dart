@@ -32,8 +32,12 @@ class AssignmentsCubit extends Cubit<AssignmentsState> {
     emit(const AssignmentsState.loading());
     final result = await _repository.getAssignmentsByCourse(courseId);
     result.fold(
-      (failure) => emit(AssignmentsState.success(_getDummyAssignments())),
+      (failure) {
+        if (isClosed) return;
+        emit(AssignmentsState.success(_getDummyAssignments()));
+      },
       (assignments) {
+        if (isClosed) return;
         if (assignments.isEmpty) {
           emit(AssignmentsState.success(_getDummyAssignments()));
         } else {
@@ -85,9 +89,13 @@ class AssignmentsCubit extends Cubit<AssignmentsState> {
     final result = await _repository.createAssignment(courseId, assignmentData);
 
     result.fold(
-      (failure) => emit(AssignmentsState.error(failure.message)),
+      (failure) {
+        if (isClosed) return;
+        emit(AssignmentsState.error(failure.message));
+      },
       (_) async {
         await getAssignments(courseId); // Force a refresh
+        if (isClosed) return;
         emit(const AssignmentsState.created());
       },
     );

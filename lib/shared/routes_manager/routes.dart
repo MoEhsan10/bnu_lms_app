@@ -23,10 +23,15 @@ class Routes {
 
   // -- Student Quizzes --
   static const String quizzes = "/quizzes";
+  static const String quizWizard = "/quizWizard";
   static const String quizDetails = "/quizDetails";
   static const String quizQuestions = "/quizQuestions";
   static const String quizResults = "/quizResults";
-
+  static const String studentQuizDashboard = "/studentQuizDashboard";
+  static const String quizIntro = "/quizIntro";
+  static const String activeQuiz = "/activeQuiz";
+  static const String quizSubmit = "/quizSubmit";
+  
   // -- Doctor Features --
   static const String doctorDashboard = '/doctorDashboard';
   static const String doctorCoursesDetails = '/doctorCoursesDetails';

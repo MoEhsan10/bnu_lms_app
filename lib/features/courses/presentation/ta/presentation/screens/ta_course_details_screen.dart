@@ -11,6 +11,7 @@ import '../../../../../../shared/di/injection.dart';
 
 // Shared Widgets
 import '../../../../../assignments/presentation/manager/instructor/assignments_cubit.dart';
+import '../../../../../quizzes/presentation/cubit/quiz_list_cubit.dart';
 import '../../../shared_widgets/course_header_card.dart';
 
 // TA Specific Overview (Or reuse Doctor if identical)
@@ -126,7 +127,10 @@ class TaCourseDetailsScreen extends StatelessWidget {
                   ),
 
                   // 4. Quizzes (Reused)
-                  const CourseQuizzesTab(),
+                  BlocProvider(
+                    create: (_) => getIt<QuizListCubit>()..loadQuizzes(courseId),
+                    child: CourseQuizzesTab(courseId: courseId),
+                  ),
 
                   // 5. Materials (Reused)
                   const CourseMaterialsTab(),
