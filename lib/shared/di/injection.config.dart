@@ -76,6 +76,13 @@ import '../../features/courses/presentation/cubit/course_details_cubit/course_de
     as _i445;
 import '../../features/courses/presentation/cubit/courses_cubit/courses_cubit.dart'
     as _i382;
+import '../../features/grades/data/data_sources/remote/grades_remote_data_source.dart'
+    as _i474;
+import '../../features/grades/data/repositories/grades_repository_impl.dart'
+    as _i118;
+import '../../features/grades/domain/repositories/grades_repository.dart'
+    as _i438;
+import '../../features/grades/presentation/cubit/grades_cubit.dart' as _i254;
 import '../../features/profile/data/data_sources/remote/profile_remote_data_source.dart'
     as _i683;
 import '../../features/profile/data/repositories/profile_repository_impl.dart'
@@ -164,9 +171,26 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i241.CalendarRepository>(
       () => _i712.CalendarRepositoryImpl(gh<_i816.CalendarRemoteDataSource>()),
     );
+    gh.factory<_i474.GradesRemoteDataSource>(
+      () => _i474.GradesRemoteDataSourceImpl(
+        dio: gh<_i361.Dio>(),
+        secureStorage: gh<_i558.FlutterSecureStorage>(),
+      ),
+    );
+    gh.factory<_i438.GradesRepository>(
+      () => _i118.GradesRepositoryImpl(
+        remoteDataSource: gh<_i474.GradesRemoteDataSource>(),
+      ),
+    );
     gh.lazySingleton<_i477.AttendanceRepository>(
       () => _i719.AttendanceRepositoryImpl(
         gh<_i913.AttendanceRemoteDataSource>(),
+      ),
+    );
+    gh.factory<_i254.GradesCubit>(
+      () => _i254.GradesCubit(
+        gh<_i438.GradesRepository>(),
+        gh<_i320.SignalRService>(),
       ),
     );
     gh.lazySingleton<_i698.LogoutUseCase>(

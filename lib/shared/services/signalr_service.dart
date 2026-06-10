@@ -8,6 +8,7 @@ class SignalRService {
   HubConnection? _assignmentHubConnection;
   HubConnection? _forumHubConnection;
   HubConnection? _quizHubConnection;
+  HubConnection? _gradeHubConnection;
 
   // Assignments Streams
   final _assignmentController = StreamController<Map<String, dynamic>>.broadcast();
@@ -22,6 +23,9 @@ class SignalRService {
   // Quizzes Streams
   final _newQuizController = StreamController<Map<String, dynamic>>.broadcast();
 
+  // Grades Streams
+  final _gradeUpdateController = StreamController<Map<String, dynamic>>.broadcast();
+
   Stream<Map<String, dynamic>> get assignmentStream => _assignmentController.stream;
   Stream<int> get submissionGradedStream => _submissionGradedController.stream;
 
@@ -31,6 +35,7 @@ class SignalRService {
   Stream<Map<String, dynamic>> get correctAnswerStream => _correctAnswerController.stream;
 
   Stream<Map<String, dynamic>> get quizStream => _newQuizController.stream;
+  Stream<Map<String, dynamic>> get gradeUpdateStream => _gradeUpdateController.stream;
 
   Future<void> init(String token) async {
     final options = HttpConnectionOptions(accessTokenFactory: () async => token);
@@ -145,6 +150,40 @@ class SignalRService {
         print('❌ QUIZ SIGNALR: Connection Failed! Error: $e');
       }
     }
+
+    // 4. Grade Hub
+    if (_gradeHubConnection == null) {
+      final gradeUrl = ApiConstants.hubUrl('gradeHub');
+      
+      _gradeHubConnection = HubConnectionBuilder()
+          .withUrl(gradeUrl, options: options)
+          .withAutomaticReconnect()
+          .build();
+
+      _gradeHubConnection!.on('ReceiveGradeUpdate', (arguments) {
+        if (arguments != null && arguments.isNotEmpty) {
+          try {
+            _gradeUpdateController.add(Map<String, dynamic>.from(arguments.first as Map));
+          } catch (e) {
+            print('❌ GRADE PARSE ERROR: $e');
+          }
+        }
+      });
+
+      _gradeHubConnection!.on('TermWorkPublished', (arguments) {
+        _gradeUpdateController.add({"event": "TermWorkPublished"});
+      });
+
+      _gradeHubConnection!.on('TermWorkUnlocked', (arguments) {
+        _gradeUpdateController.add({"event": "TermWorkUnlocked"});
+      });
+
+      try {
+        await _gradeHubConnection!.start();
+      } catch (e) {
+        print('❌ GRADE SIGNALR: Connection Failed! Error: $e');
+      }
+    }
   }
 
   Future<void> joinCourse(int courseId) async {
@@ -170,6 +209,10 @@ class SignalRService {
     } else {
       print('❌ QUIZ SIGNALR: Could not join group $courseId! State is ${_quizHubConnection?.state}');
     }
+
+    if (_gradeHubConnection?.state == HubConnectionState.Connected) {
+      await _gradeHubConnection!.invoke('JoinCourseGroup', args: [courseId.toString()]);
+    }
   }
 
   Future<void> leaveCourse(int courseId) async {
@@ -182,6 +225,9 @@ class SignalRService {
     if (_quizHubConnection?.state == HubConnectionState.Connected) {
       await _quizHubConnection!.invoke('LeaveCourseGroup', args: [courseId.toString()]);
     }
+    if (_gradeHubConnection?.state == HubConnectionState.Connected) {
+      await _gradeHubConnection!.invoke('LeaveCourseGroup', args: [courseId.toString()]);
+    }
   }
 
   void dispose() {
@@ -193,7 +239,8 @@ class SignalRService {
     _newPostController.close();
     _voteUpdateController.close();
     _correctAnswerController.close();
-    _quizHubConnection?.stop();
     _newQuizController.close();
+    _gradeHubConnection?.stop();
+    _gradeUpdateController.close();
   }
 }

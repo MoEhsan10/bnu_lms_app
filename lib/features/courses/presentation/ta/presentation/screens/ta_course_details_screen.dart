@@ -22,7 +22,6 @@ import '../../../doctor/presentation/widgets/courses_details_tabs/course_student
 import '../../../doctor/presentation/widgets/courses_details_tabs/course_quizzes_tab.dart';
 import '../../../doctor/presentation/widgets/courses_details_tabs/course_materials_tab.dart';
 import '../../../doctor/presentation/widgets/courses_details_tabs/course_attendance_tab.dart';
-import '../../../doctor/presentation/widgets/courses_details_tabs/course_grades_tab.dart';
 
 // The New Assignments Tab
 import '../widgets/course_details/ta_course_assignments_tab.dart';
@@ -43,7 +42,7 @@ class TaCourseDetailsScreen extends StatelessWidget {
     final isLight = themeProvider.isLightTheme();
 
     return DefaultTabController(
-      length: 7,
+      length: 6,
       child: Scaffold(
         backgroundColor: isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground,
         appBar: AppBar(
@@ -87,6 +86,7 @@ class TaCourseDetailsScreen extends StatelessWidget {
               ),
             ),
 
+
             // 2. The Tab Bar
             TabBar(
               isScrollable: true,
@@ -106,7 +106,6 @@ class TaCourseDetailsScreen extends StatelessWidget {
                 Tab(text: 'Quizzes'),
                 Tab(text: 'Materials'),
                 Tab(text: 'Attendance'),
-                Tab(text: 'Grades'),
               ],
             ),
 
@@ -137,9 +136,6 @@ class TaCourseDetailsScreen extends StatelessWidget {
 
                   // 6. Attendance (Reused)
                   CourseAttendanceTab(courseId: courseId),
-
-                  // 7. Grades (Reused)
-                  const CourseGradesTab(),
                 ],
               ),
             ),

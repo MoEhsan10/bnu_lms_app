@@ -11,6 +11,7 @@ import '../../shared_widgets/course_header_card.dart';
 import '../widgets/courses_details/upcoming_event_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../shared/di/injection.dart';
+import '../../shared_widgets/role_based_grade_navigation_button.dart';
 import '../../cubit/course_details_cubit/course_details_cubit.dart';
 import '../../cubit/course_details_cubit/course_details_state.dart';
 import 'package:bnu_lms_app/features/courses/domain/entities/course_entity.dart';
@@ -145,6 +146,10 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
                     instructor: course.instructorName,
                     courseCode: widget.courseCode,
                     icon: widget.icon,
+                  ),
+                  RoleBasedGradeNavigationButton(
+                    courseId: widget.courseId,
+                    courseTitle: course.title,
                   ),
                   _buildTabBar(isLight),
                   Expanded(
