@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 import 'package:bnu_lms_app/features/quizzes/presentation/cubit/quiz_list_cubit.dart';
 
@@ -129,27 +130,35 @@ class _StudentQuizDashboardScreenState extends State<StudentQuizDashboardScreen>
             );
           }
 
-          return ListView.builder(
-            padding: EdgeInsets.all(20.w),
-            itemCount: filteredQuizzes.length,
-            itemBuilder: (context, index) {
-              final quiz = filteredQuizzes[index];
-              
-              String statusText = 'Live';
-              if (tabType == 'Upcoming') statusText = 'Scheduled';
-              if (tabType == 'Completed') statusText = quiz.areGradesPublished ? 'Graded' : 'Submitted';
-
-              return StudentQuizCard(
-                quiz: quiz,
-                title: quiz.title,
-                courseTitle: quiz.description,
-                status: statusText,
-                date: "${quiz.startDate.day}/${quiz.startDate.month}/${quiz.startDate.year}",
-                duration: '${quiz.durationMinutes} Mins',
-                questionsCount: '${quiz.questionCount} Questions', 
-                actionText: tabType == 'Completed' ? 'View Results' : 'Take Quiz',
-              );
+          return RefreshIndicator(
+            onRefresh: () async {
+              await context.read<QuizListCubit>().loadQuizzes(1); // using 1 as mock courseId for now
             },
+            child: ListView.builder(
+              padding: EdgeInsets.all(20.w),
+              physics: const AlwaysScrollableScrollPhysics(), // Important for RefreshIndicator
+              itemCount: filteredQuizzes.length,
+              itemBuilder: (context, index) {
+                final quiz = filteredQuizzes[index];
+                
+                String statusText = 'Live';
+                if (tabType == 'Upcoming') statusText = 'Scheduled';
+                if (tabType == 'Completed') statusText = quiz.areGradesPublished ? 'Graded' : 'Submitted';
+
+                return StudentQuizCard(
+                  quiz: quiz,
+                  title: quiz.title,
+                  courseTitle: quiz.description,
+                  status: statusText,
+                  date: DateFormat('dd/MM/yyyy hh:mm a').format(quiz.startDate.toLocal()),
+                  duration: '${quiz.durationMinutes} Mins',
+                  questionsCount: '${quiz.questionCount} Questions', 
+                  actionText: tabType == 'Completed' 
+                      ? (quiz.hasAttempted ? 'View Results' : null) 
+                      : 'Take Quiz',
+                );
+              },
+            ),
           );
         }
         return const SizedBox.shrink();

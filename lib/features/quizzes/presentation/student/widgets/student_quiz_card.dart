@@ -22,7 +22,7 @@ class StudentQuizCard extends StatelessWidget {
   final String date;
   final String duration;
   final String questionsCount;
-  final String actionText;
+  final String? actionText;
   final bool isInstructor;
 
   const StudentQuizCard({
@@ -34,7 +34,7 @@ class StudentQuizCard extends StatelessWidget {
     required this.date,
     required this.duration,
     required this.questionsCount,
-    required this.actionText,
+    this.actionText,
     this.isInstructor = false,
   });
 
@@ -172,7 +172,7 @@ class StudentQuizCard extends StatelessWidget {
                 ),
               ],
             ),
-          ] else ...[
+          ] else if (actionText != null) ...[
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -191,7 +191,7 @@ class StudentQuizCard extends StatelessWidget {
                   elevation: 0,
                 ),
                 child: Text(
-                  actionText,
+                  actionText!,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),

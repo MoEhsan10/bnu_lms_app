@@ -126,4 +126,11 @@ class QuizGradingCubit extends Cubit<QuizGradingState> {
     creationQuestions.add(questionData);
     emit(QuizCreationDataUpdated(creationTitle, creationDuration, creationQuestions));
   }
+
+  void removeQuestion(int index) {
+    if (index >= 0 && index < creationQuestions.length) {
+      creationQuestions.removeAt(index);
+      emit(QuizCreationDataUpdated(creationTitle, creationDuration, creationQuestions));
+    }
+  }
 }

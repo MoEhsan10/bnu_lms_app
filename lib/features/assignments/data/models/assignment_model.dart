@@ -34,7 +34,7 @@ class AssignmentModel {
       id: json['id'] as int? ?? 0,
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : DateTime.now(),
+      dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate'].toString().endsWith('Z') ? json['dueDate'] : json['dueDate'] + 'Z').toLocal() : DateTime.now(),
       maxPoints: (json['points'] as num?)?.toDouble() ?? (json['maxPoints'] as num?)?.toDouble() ?? 0.0,
       status: json['isSubmitted'] == true ? 'Submitted' : 'Pending',
       courseId: json['courseId'] as int?,

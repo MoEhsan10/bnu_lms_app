@@ -8,7 +8,7 @@ class ApiConstants {
   /// Change this to your PC's local IP when running on a real device.
   /// The .NET API runs on http://localhost:5205 (see launchSettings.json)
   // static const String _androidEmulatorHost = '10.0.2.2';
-  static const String _localHost = '192.168.1.28';
+  static const String _localHost = '192.168.1.6';
   static const int _port = 5205;
 
   /// ✅ Physical device on same WiFi → uses PC local IP (192.168.1.6)

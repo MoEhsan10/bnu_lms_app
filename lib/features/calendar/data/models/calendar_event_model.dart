@@ -25,7 +25,7 @@ class CalendarEventModel {
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       eventDate: json['eventDate'] != null
-          ? DateTime.parse(json['eventDate'])
+          ? DateTime.parse(json['eventDate'].toString().endsWith('Z') ? json['eventDate'] : json['eventDate'] + 'Z').toLocal()
           : DateTime.now(),
       eventType: json['eventType'] as String? ?? 'Assignment',
       courseId: json['courseId'] as int? ?? 0,

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../../shared/providers/theme_provider.dart';
 import '../../../../../shared/resources/colors_manager.dart';
 import '../../domain/entities/calendar_event_entity.dart';
+import 'package:intl/intl.dart';
 
 class EventCardWidget extends StatelessWidget {
   final CalendarEventEntity event;
@@ -90,6 +91,20 @@ class EventCardWidget extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ],
+          SizedBox(height: 8.h),
+          Row(
+            children: [
+              Icon(Icons.access_time, size: 14.sp, color: ColorsManager.grayMedium),
+              SizedBox(width: 4.w),
+              Text(
+                DateFormat('dd/MM/yyyy hh:mm a').format(event.eventDate.toLocal()),
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: ColorsManager.grayMedium,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -98,7 +113,7 @@ class EventCardWidget extends StatelessWidget {
   Color _typeColor(String type) {
     switch (type) {
       case 'Quiz':
-        return ColorsManager.red;
+        return const Color(0xFF26C6DA);
       case 'Assignment':
         return ColorsManager.blue;
       case 'Lecture':

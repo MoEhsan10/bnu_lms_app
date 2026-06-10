@@ -19,7 +19,7 @@ class ActiveQuizScreen extends StatefulWidget {
   State<ActiveQuizScreen> createState() => _ActiveQuizScreenState();
 }
 
-class _ActiveQuizScreenState extends State<ActiveQuizScreen> {
+class _ActiveQuizScreenState extends State<ActiveQuizScreen> with WidgetsBindingObserver {
   int _selectedOptionIndex = -1;
   final Map<int, int> _answers = {}; // Map of questionId to selectedOptionId
   final Map<int, String> _essayAnswers = {}; // Map of questionId to essay string
@@ -27,20 +27,32 @@ class _ActiveQuizScreenState extends State<ActiveQuizScreen> {
   Timer? _timer;
   int _remainingSeconds = 0;
   bool _timerStarted = false;
+  bool _allowPop = false;
   late TextEditingController _essayController;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _essayController = TextEditingController();
     Future.microtask(() => context.read<QuizTakingCubit>().loadQuiz(widget.quizId));
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _essayController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      if (!_allowPop) {
+        _submitQuiz();
+      }
+    }
   }
 
   void _startTimerIfNeeded(int durationMinutes) {
@@ -65,6 +77,7 @@ class _ActiveQuizScreenState extends State<ActiveQuizScreen> {
   }
 
   void _submitQuiz() {
+    _allowPop = true;
     final cubit = context.read<QuizTakingCubit>();
     if (cubit.quizTakeEntity == null) return;
     
@@ -100,15 +113,29 @@ class _ActiveQuizScreenState extends State<ActiveQuizScreen> {
     var isLight = Provider.of<ThemeProvider>(context).isLightTheme();
     final surfaceColor = isLight ? ColorsManager.white : const Color(0xFF1A2A30);
 
-    return Scaffold(
-      backgroundColor: isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground,
+    return PopScope(
+      canPop: _allowPop,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldSubmit = await _showExitWarning(context, isLight);
+        if (shouldSubmit == true) {
+          _submitQuiz();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground,
       appBar: AppBar(
         backgroundColor: surfaceColor,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.close, color: isLight ? ColorsManager.black : ColorsManager.white),
-          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back, color: isLight ? ColorsManager.black : ColorsManager.white),
+          onPressed: () async {
+            final shouldSubmit = await _showExitWarning(context, isLight);
+            if (shouldSubmit == true) {
+              _submitQuiz();
+            }
+          },
         ),
         title: Column(
           children: [
@@ -137,6 +164,12 @@ class _ActiveQuizScreenState extends State<ActiveQuizScreen> {
         builder: (context, state) {
           final cubit = context.read<QuizTakingCubit>();
           
+          if (state is QuizTakingLoaded && !_timerStarted) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _startTimerIfNeeded(state.quiz.durationMinutes);
+            });
+          }
+
           if (state is QuizTakingInitial || state is QuizTakingSubmitting) {
              return const Center(child: CircularProgressIndicator(color: Color(0xFF26C6DA)));
           }
@@ -173,10 +206,7 @@ class _ActiveQuizScreenState extends State<ActiveQuizScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Section 1: General Knowledge',
-                        style: (isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium).copyWith(color: ColorsManager.grayMedium, fontWeight: FontWeight.bold),
-                      ),
+                      const SizedBox(), // Removed "Section 1" text here
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                         decoration: BoxDecoration(
@@ -297,7 +327,7 @@ class _ActiveQuizScreenState extends State<ActiveQuizScreen> {
           );
         },
       ),
-    );
+    ));
   }
 
   Widget _buildOptionCard(bool isLight, Color surfaceColor, int index, String letter, String text, int optionId, int questionId) {
@@ -360,6 +390,41 @@ class _ActiveQuizScreenState extends State<ActiveQuizScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<bool?> _showExitWarning(BuildContext context, bool isLight) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: isLight ? ColorsManager.white : ColorsManager.darkSurface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          title: Text(
+            'Exit Quiz?',
+            style: isLight ? AppLightTextStyles.titleLarge : AppDarkTextStyles.titleLarge,
+          ),
+          content: Text(
+            'Are you sure you want to exit? Your current answers will be submitted automatically and you cannot return.',
+            style: isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('No', style: TextStyle(color: ColorsManager.grayMedium)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF26C6DA),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+              ),
+              child: const Text('Yes, Submit', style: TextStyle(color: ColorsManager.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 }

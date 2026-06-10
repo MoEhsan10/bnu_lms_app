@@ -35,8 +35,12 @@ class QuizModel {
       courseId: json['courseId'] ?? 0,
       areGradesPublished: json['areGradesPublished'] ?? false,
       isAutoGraded: json['isAutoGraded'] ?? true,
-      startDate: json['startDate'] != null ? DateTime.parse(json['startDate']) : DateTime.now(),
-      endDate: json['endDate'] != null ? DateTime.parse(json['endDate']) : DateTime.now().add(const Duration(days: 1)),
+      startDate: json['startDate'] != null 
+          ? DateTime.parse(json['startDate'].toString().endsWith('Z') ? json['startDate'] : json['startDate'] + 'Z').toLocal() 
+          : DateTime.now(),
+      endDate: json['endDate'] != null 
+          ? DateTime.parse(json['endDate'].toString().endsWith('Z') ? json['endDate'] : json['endDate'] + 'Z').toLocal() 
+          : DateTime.now().add(const Duration(days: 1)),
       durationMinutes: json['durationMinutes'] ?? 0,
       questionCount: json['questionCount'] ?? 0,
       totalMarks: (json['totalMarks'] as num?)?.toDouble() ?? (json['questionCount'] ?? 0) * 10.0,

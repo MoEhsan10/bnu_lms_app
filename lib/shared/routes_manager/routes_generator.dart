@@ -88,10 +88,12 @@ class RoutesGenerator {
       // QUIZ ROUTES
       // -------------------------
       case Routes.quizDetails:
+        final detailArgs = args as Map<String, dynamic>?;
+        if (detailArgs == null || !detailArgs.containsKey('quiz')) return _unDefinedRoute();
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (_) => getIt<QuizGradingCubit>(),
-            child: const QuizDetailsScreen(),
+            child: QuizDetailsScreen(quiz: detailArgs['quiz'] as QuizEntity),
           ),
         );
       case Routes.quizQuestions:

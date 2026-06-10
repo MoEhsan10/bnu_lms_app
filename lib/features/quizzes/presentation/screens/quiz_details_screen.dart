@@ -14,8 +14,12 @@ import '../../../../shared/resources/app_sizes.dart';
 import '../widgets/quiz_details/double_divider.dart';
 import '../widgets/quiz_details/info_item.dart';
 
+import 'package:intl/intl.dart';
+import '../../domain/entities/quiz_entity.dart';
+
 class QuizDetailsScreen extends StatelessWidget {
-  const QuizDetailsScreen({super.key});
+  final QuizEntity quiz;
+  const QuizDetailsScreen({super.key, required this.quiz});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +57,7 @@ class QuizDetailsScreen extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            'Chapter 3: Function',
+                            quiz.title,
                             style: isLight
                                 ? AppLightTextStyles.bodyLarge.copyWith(
                                     fontWeight: FontWeight.bold,
@@ -99,7 +103,7 @@ class QuizDetailsScreen extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        'CS-101 - Dr. A. Smith',
+                        quiz.description,
                         style: isLight
                             ? AppLightTextStyles.bodyMedium
                             : AppDarkTextStyles.bodyMedium,
@@ -113,14 +117,14 @@ class QuizDetailsScreen extends StatelessWidget {
                           Expanded(
                             child: InfoItem(
                               title: 'Due Date',
-                              value: 'Oct 28, 2024',
+                              value: DateFormat('dd/MM/yyyy hh:mm a').format(quiz.startDate.toLocal()),
                               isLight: isLight,
                             ),
                           ),
                           Expanded(
                             child: InfoItem(
                               title: 'Duration',
-                              value: '25',
+                              value: '${quiz.durationMinutes}',
                               isLight: isLight,
                             ),
                           ),
@@ -134,7 +138,7 @@ class QuizDetailsScreen extends StatelessWidget {
                           Expanded(
                             child: InfoItem(
                               title: 'Questions',
-                              value: '25',
+                              value: '${quiz.questionCount}',
                               isLight: isLight,
                             ),
                           ),

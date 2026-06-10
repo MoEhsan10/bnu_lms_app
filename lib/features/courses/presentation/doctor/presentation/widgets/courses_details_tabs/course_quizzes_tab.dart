@@ -10,7 +10,7 @@ import '../../../../../../../shared/resources/colors_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../../quizzes/presentation/cubit/quiz_list_cubit.dart';
 import '../../../../../../quizzes/presentation/student/widgets/student_quiz_card.dart';
-
+import 'package:intl/intl.dart';
 
 class CourseQuizzesTab extends StatefulWidget {
   final int courseId;
@@ -49,33 +49,39 @@ class _CourseQuizzesTabState extends State<CourseQuizzesTab> {
             );
           }
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Active Assessments',
-                      style: isLight ? AppLightTextStyles.headlineSmall : AppDarkTextStyles.headlineSmall,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20.h),
-                ...state.quizzes.map((quiz) => StudentQuizCard(
-                      quiz: quiz,
-                      title: quiz.title,
-                      courseTitle: quiz.description,
-                      status: quiz.areGradesPublished ? 'PUBLISHED' : 'DRAFT',
-                      date: "${quiz.startDate.day}/${quiz.startDate.month}/${quiz.startDate.year}",
-                      duration: '${quiz.durationMinutes} Mins',
-                      questionsCount: '${quiz.questionCount} Questions',
-                      actionText: 'Manage Settings >',
-                      isInstructor: true,
-                    )),
-              ],
+          return RefreshIndicator(
+            onRefresh: () async {
+              await context.read<QuizListCubit>().loadQuizzes(widget.courseId);
+            },
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(20.w),
+              physics: const AlwaysScrollableScrollPhysics(), // Important for RefreshIndicator
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Active Assessments',
+                        style: isLight ? AppLightTextStyles.headlineSmall : AppDarkTextStyles.headlineSmall,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20.h),
+                  ...state.quizzes.map((quiz) => StudentQuizCard(
+                        quiz: quiz,
+                        title: quiz.title,
+                        courseTitle: quiz.description,
+                        status: quiz.areGradesPublished ? 'PUBLISHED' : 'DRAFT',
+                        date: DateFormat('dd/MM/yyyy hh:mm a').format(quiz.startDate.toLocal()),
+                        duration: '${quiz.durationMinutes} Mins',
+                        questionsCount: '${quiz.questionCount} Questions',
+                        actionText: 'Manage Settings >',
+                        isInstructor: true,
+                      )),
+                ],
+              ),
             ),
           );
         }

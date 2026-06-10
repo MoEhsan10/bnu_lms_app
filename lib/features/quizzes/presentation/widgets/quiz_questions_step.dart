@@ -103,19 +103,20 @@ class _QuizQuestionsStepState extends State<QuizQuestionsStep> {
   @override
   Widget build(BuildContext context) {
     var isLight = Provider.of<ThemeProvider>(context).isLightTheme();
-    // final surfaceColor = isLight ? ColorsManager.white : const Color(0xFF1A2A30);
     final inputFillColor = isLight ? ColorsManager.grayMedium.withValues(alpha: 0.1) : const Color(0xFF131F24);
+    final cubit = context.watch<QuizGradingCubit>();
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(24.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildAddedQuestionsList(cubit, isLight, inputFillColor),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Question 1',
+                'Add Question',
                 style: isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium,
               ),
               Container(
@@ -232,15 +233,23 @@ class _QuizQuestionsStepState extends State<QuizQuestionsStep> {
             SizedBox(height: 16.h),
 
             // Options List
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _optionControllers.length,
-              separatorBuilder: (_, __) => SizedBox(height: 12.h),
-              itemBuilder: (context, index) {
-                final letter = String.fromCharCode(65 + index); // A, B, C, D...
-                return _buildOptionItem(isLight, inputFillColor, index, letter, 'Enter option text', controller: _optionControllers[index]);
+            RadioGroup<int>(
+              groupValue: _correctOptionIndex,
+              onChanged: (value) {
+                setState(() {
+                  _correctOptionIndex = value!;
+                });
               },
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _optionControllers.length,
+                separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                itemBuilder: (context, index) {
+                  final letter = String.fromCharCode(65 + index); // A, B, C, D...
+                  return _buildOptionItem(isLight, inputFillColor, index, letter, 'Enter option text', controller: _optionControllers[index]);
+                },
+              ),
             ),
             if (_questionType == 'Multiple Choice') ...[
               SizedBox(height: 16.h),
@@ -399,13 +408,7 @@ class _QuizQuestionsStepState extends State<QuizQuestionsStep> {
         SizedBox(width: 8.w),
         Radio<int>(
           value: index,
-          groupValue: _correctOptionIndex,
           activeColor: const Color(0xFF26C6DA),
-          onChanged: (value) {
-            setState(() {
-              _correctOptionIndex = value!;
-            });
-          },
         ),
         if (_optionControllers.length > 2)
           IconButton(
@@ -424,5 +427,112 @@ class _QuizQuestionsStepState extends State<QuizQuestionsStep> {
           ),
       ],
     );
+  }
+
+  Widget _buildAddedQuestionsList(QuizGradingCubit cubit, bool isLight, Color inputFillColor) {
+    if (cubit.creationQuestions.isEmpty) return const SizedBox();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Added Questions (${cubit.creationQuestions.length})',
+          style: isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium,
+        ),
+        SizedBox(height: 16.h),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: cubit.creationQuestions.length,
+          separatorBuilder: (_, __) => SizedBox(height: 12.h),
+          itemBuilder: (context, index) {
+            final q = cubit.creationQuestions[index];
+            return Container(
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: inputFillColor,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: ColorsManager.grayMedium.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Q${index + 1}: ${q['text']}',
+                          style: (isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium).copyWith(fontWeight: FontWeight.bold),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          '${q['points']} Points | ${q['type']}',
+                          style: (isLight ? AppLightTextStyles.labelSmall : AppDarkTextStyles.labelSmall).copyWith(color: ColorsManager.grayMedium),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.edit, color: ColorsManager.blue, size: 20.sp),
+                    onPressed: () => _editQuestion(index, q, cubit),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete, color: ColorsManager.red, size: 20.sp),
+                    onPressed: () {
+                      setState(() {
+                        cubit.removeQuestion(index);
+                      });
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+        SizedBox(height: 32.h),
+        Divider(color: ColorsManager.grayMedium.withValues(alpha: 0.3)),
+        SizedBox(height: 32.h),
+      ],
+    );
+  }
+
+  void _editQuestion(int index, Map<String, dynamic> q, QuizGradingCubit cubit) {
+    cubit.removeQuestion(index);
+    
+    setState(() {
+      _questionType = q['type'] ?? 'Multiple Choice';
+      _questionTextController.text = q['text'] ?? '';
+      _pointsController.text = (q['points'] ?? 1).toString();
+      _timeLimitController.text = (q['timeLimit'] ?? 30).toString();
+      _imagePath = q['imagePath'];
+      
+      final options = q['options'] as List<Map<String, dynamic>>? ?? [];
+      
+      for (var c in _optionControllers) {
+        c.dispose();
+      }
+      _optionControllers.clear();
+      
+      _correctOptionIndex = 0;
+      
+      if (_questionType != 'Open-ended / Essay') {
+        for (int i = 0; i < options.length; i++) {
+          _optionControllers.add(TextEditingController(text: options[i]['text']));
+          if (options[i]['isCorrect'] == true) {
+            _correctOptionIndex = i;
+          }
+        }
+        while (_optionControllers.length < 2) {
+           _optionControllers.add(TextEditingController());
+        }
+      } else {
+        _optionControllers.add(TextEditingController());
+        _optionControllers.add(TextEditingController());
+        _optionControllers.add(TextEditingController());
+        _optionControllers.add(TextEditingController());
+      }
+    });
   }
 }
