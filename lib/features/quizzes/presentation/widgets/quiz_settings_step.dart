@@ -70,7 +70,9 @@ class _QuizSettingsStepState extends State<QuizSettingsStep> {
               onPrimary: Colors.white, // header text color
               onSurface: Provider.of<ThemeProvider>(context, listen: false).isLightTheme() ? Colors.black : Colors.white, // body text color
             ),
-            dialogBackgroundColor: Provider.of<ThemeProvider>(context, listen: false).isLightTheme() ? Colors.white : const Color(0xFF1A2A30),
+            dialogTheme: DialogThemeData(
+              backgroundColor: Provider.of<ThemeProvider>(context, listen: false).isLightTheme() ? Colors.white : const Color(0xFF1A2A30),
+            ),
           ),
           child: child!,
         );
@@ -88,7 +90,9 @@ class _QuizSettingsStepState extends State<QuizSettingsStep> {
                 primary: const Color(0xFF26C6DA),
                 onSurface: Provider.of<ThemeProvider>(context, listen: false).isLightTheme() ? Colors.black : Colors.white,
               ),
-              dialogBackgroundColor: Provider.of<ThemeProvider>(context, listen: false).isLightTheme() ? Colors.white : const Color(0xFF1A2A30),
+              dialogTheme: DialogThemeData(
+                backgroundColor: Provider.of<ThemeProvider>(context, listen: false).isLightTheme() ? Colors.white : const Color(0xFF1A2A30),
+              ),
             ),
             child: child!,
           );
