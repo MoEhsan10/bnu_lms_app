@@ -11,7 +11,6 @@ import '../../../shared_widgets/course_header_card.dart';
 import '../widgets/doctor_courses_details/about_course_section.dart';
 import '../widgets/courses_details_tabs/course_assignments_tab.dart';
 import '../widgets/courses_details_tabs/course_attendance_tab.dart';
-import '../widgets/courses_details_tabs/course_grades_tab.dart';
 import '../widgets/courses_details_tabs/course_materials_tab.dart';
 import '../widgets/courses_details_tabs/course_quizzes_tab.dart';
 import '../widgets/courses_details_tabs/course_students_tab.dart';
@@ -43,7 +42,7 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
     final isLight = themeProvider.isLightTheme();
 
     return DefaultTabController(
-      length: 7, // Updated to 7 to fit all your tabs
+      length: 6, // Updated to 6
       child: Scaffold(
         backgroundColor: isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground,
         appBar: AppBar(
@@ -104,6 +103,7 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
                       ),
                     ),
 
+
                     // 2. The Tab Bar
                     TabBar(
                       isScrollable: true,
@@ -121,7 +121,6 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
                         Tab(text: 'Quizzes'),
                         Tab(text: 'Materials'),
                         Tab(text: 'Attendance'),
-                        Tab(text: 'Grades'),
                       ],
                     ),
 
@@ -164,9 +163,6 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
 
                           // 6. Attendance Tab
                           CourseAttendanceTab(courseId: course.id),
-
-                          // 7. Grades Tab
-                          const CourseGradesTab(),
                         ],
                       ),
                     ),
