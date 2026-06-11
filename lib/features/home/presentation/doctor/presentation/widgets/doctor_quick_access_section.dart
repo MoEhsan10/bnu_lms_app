@@ -129,8 +129,10 @@ class DoctorQuickAccessSection extends StatelessWidget {
               children: [
                 QuickActionCard(
                   icon: Icons.campaign_outlined,
-                  label: 'Post Update',
-                  onTap: () {},
+                  label: 'Manage Announcements',
+                  onTap: () {
+                    Navigator.pushNamed(context, Routes.manageAnnouncements);
+                  },
                 ),
                 SizedBox(width: 16.w),
                 // Placeholder for balance

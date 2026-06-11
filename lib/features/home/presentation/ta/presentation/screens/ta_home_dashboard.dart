@@ -14,12 +14,16 @@ import '../widgets/urgent_actions_section.dart';
 import '../widgets/todays_schedule_section.dart';
 import '../../../../../../shared/routes_manager/routes.dart';
 import '../../../../../../shared/config/theme/app_dark_text_styles.dart';
+import '../../../../../../shared/config/theme/app_light_text_styles.dart';
 
 class TaHomeDashboard extends StatelessWidget {
   const TaHomeDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isLight = themeProvider.isLightTheme();
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -157,6 +161,70 @@ class TaHomeDashboard extends StatelessWidget {
                           ),
                         ),
                         Icon(Icons.arrow_forward_ios, color: ColorsManager.white, size: 16.sp),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 16.h),
+
+              // Post Announcement Quick Action
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, Routes.manageAnnouncements);
+                  },
+                  borderRadius: BorderRadius.circular(16.r),
+                  child: Container(
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: isLight ? ColorsManager.white : ColorsManager.darkSurface,
+                      borderRadius: BorderRadius.circular(16.r),
+                      border: Border.all(color: ColorsManager.blue.withValues(alpha: 0.1)),
+                      boxShadow: isLight
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : [],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(12.w),
+                          decoration: BoxDecoration(
+                            color: ColorsManager.blue.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.campaign_outlined, color: ColorsManager.blue, size: 24.sp),
+                        ),
+                        SizedBox(width: 16.w),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Manage Announcements',
+                                style: isLight
+                                    ? AppLightTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)
+                                    : AppDarkTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                'View, edit, or broadcast updates',
+                                style: isLight
+                                    ? AppLightTextStyles.labelSmall.copyWith(color: ColorsManager.grayMedium)
+                                    : AppDarkTextStyles.labelSmall.copyWith(color: ColorsManager.darkTextSecondary),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward_ios, color: ColorsManager.grayMedium, size: 16.sp),
                       ],
                     ),
                   ),

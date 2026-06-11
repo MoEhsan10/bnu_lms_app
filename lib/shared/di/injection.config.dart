@@ -83,6 +83,14 @@ import '../../features/grades/data/repositories/grades_repository_impl.dart'
 import '../../features/grades/domain/repositories/grades_repository.dart'
     as _i438;
 import '../../features/grades/presentation/cubit/grades_cubit.dart' as _i254;
+import '../../features/notification/data/data_sources/remote/notification_remote_data_source.dart'
+    as _i696;
+import '../../features/notification/data/repositories/notification_repository_impl.dart'
+    as _i407;
+import '../../features/notification/domain/repositories/notification_repository.dart'
+    as _i630;
+import '../../features/notification/presentation/cubit/notification_cubit.dart'
+    as _i369;
 import '../../features/profile/data/data_sources/remote/profile_remote_data_source.dart'
     as _i683;
 import '../../features/profile/data/repositories/profile_repository_impl.dart'
@@ -147,10 +155,18 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i432.AuthRemoteDataSource>(
       () => _i432.AuthRemoteDataSourceImpl(gh<_i361.Dio>()),
     );
+    gh.lazySingleton<_i696.NotificationRemoteDataSource>(
+      () => _i696.NotificationRemoteDataSourceImpl(dio: gh<_i361.Dio>()),
+    );
     gh.lazySingleton<_i787.AuthRepository>(
       () => _i153.AuthRepositoryImpl(
         gh<_i432.AuthRemoteDataSource>(),
         gh<_i558.FlutterSecureStorage>(),
+      ),
+    );
+    gh.lazySingleton<_i630.NotificationRepository>(
+      () => _i407.NotificationRepositoryImpl(
+        remoteDataSource: gh<_i696.NotificationRemoteDataSource>(),
       ),
     );
     gh.lazySingleton<_i27.QuizSignalrDataSource>(
@@ -185,6 +201,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i477.AttendanceRepository>(
       () => _i719.AttendanceRepositoryImpl(
         gh<_i913.AttendanceRemoteDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i369.NotificationCubit>(
+      () => _i369.NotificationCubit(
+        repository: gh<_i630.NotificationRepository>(),
+        signalRService: gh<_i320.SignalRService>(),
       ),
     );
     gh.factory<_i254.GradesCubit>(

@@ -41,6 +41,11 @@ class ApiConstants {
   // ─── Attendance Endpoints ─────────────────────────────────────────────────
   static const String attendance = '${baseUrl}attendance';
 
+  // ─── Notification Endpoints ───────────────────────────────────────────────────
+  static const String notifications = '${baseUrl}Notification';
+  static const String announcements = '${baseUrl}Announcement';
+  static String courseAnnouncements(int courseId) => '${baseUrl}Announcement/course/$courseId';
+
   // ─── Assignment Endpoints (must stay under [baseUrl] — missing `api` or a double slash → 404) ──
   static String assignmentCourseList(int courseId) => '${baseUrl}Assignment/course/$courseId';
   static String assignmentDetail(int assignmentId) => '${baseUrl}Assignment/$assignmentId';
