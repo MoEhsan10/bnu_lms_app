@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:bnu_lms_app/shared/config/api_constants.dart';
 import 'dart:async';
+import 'dart:convert';
 
 @singleton
 class SignalRService {
@@ -9,6 +10,7 @@ class SignalRService {
   HubConnection? _forumHubConnection;
   HubConnection? _quizHubConnection;
   HubConnection? _gradeHubConnection;
+  HubConnection? _notificationHubConnection;
 
   // Assignments Streams
   final _assignmentController = StreamController<Map<String, dynamic>>.broadcast();
@@ -26,6 +28,11 @@ class SignalRService {
   // Grades Streams
   final _gradeUpdateController = StreamController<Map<String, dynamic>>.broadcast();
 
+  // Notifications Streams
+  final _newNotificationController = StreamController<Map<String, dynamic>>.broadcast();
+  final _announcementUpdatedController = StreamController<Map<String, dynamic>>.broadcast();
+  final _announcementDeletedController = StreamController<int>.broadcast();
+
   Stream<Map<String, dynamic>> get assignmentStream => _assignmentController.stream;
   Stream<int> get submissionGradedStream => _submissionGradedController.stream;
 
@@ -36,13 +43,35 @@ class SignalRService {
 
   Stream<Map<String, dynamic>> get quizStream => _newQuizController.stream;
   Stream<Map<String, dynamic>> get gradeUpdateStream => _gradeUpdateController.stream;
+  Stream<Map<String, dynamic>> get newNotificationStream => _newNotificationController.stream;
+  Stream<Map<String, dynamic>> get announcementUpdatedStream => _announcementUpdatedController.stream;
+  Stream<int> get announcementDeletedStream => _announcementDeletedController.stream;
 
   Future<void> init(String token) async {
     final options = HttpConnectionOptions(accessTokenFactory: () async => token);
 
+    // Extract userId from JWT token claims (sub claim)
+    String? userId;
+    try {
+      final parts = token.split('.');
+      if (parts.length == 3) {
+        final payload = parts[1];
+        final normalized = base64Url.normalize(payload);
+        final decoded = utf8.decode(base64Url.decode(normalized));
+        final Map<String, dynamic> claims = json.decode(decoded);
+        userId = claims['sub'] as String? ??
+                  claims['nameid'] as String? ??
+                  claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] as String?;
+        print('🔑 SIGNALR: Extracted userId from JWT: $userId');
+      }
+    } catch (e) {
+      print('⚠️ SIGNALR: Could not parse userId from JWT: $e');
+    }
+
     // 1. Assignment Hub
     if (_assignmentHubConnection == null) {
       final assignmentUrl = ApiConstants.hubUrl('assignmentHub');
+      print('🌐 ASSIGNMENT SIGNALR: Attempting to connect to $assignmentUrl');
       _assignmentHubConnection = HubConnectionBuilder()
           .withUrl(assignmentUrl, options: options)
           .withAutomaticReconnect()
@@ -65,7 +94,12 @@ class SignalRService {
         }
       });
 
-      await _assignmentHubConnection!.start();
+      try {
+        await _assignmentHubConnection!.start();
+        print('✅ ASSIGNMENT SIGNALR: Connected Successfully!');
+      } catch (e) {
+        print('❌ ASSIGNMENT SIGNALR: Connection Failed! Error: $e');
+      }
     }
 
     // 2. Forum Hub
@@ -154,6 +188,7 @@ class SignalRService {
     // 4. Grade Hub
     if (_gradeHubConnection == null) {
       final gradeUrl = ApiConstants.hubUrl('gradeHub');
+      print('🌐 GRADE SIGNALR: Attempting to connect to $gradeUrl');
       
       _gradeHubConnection = HubConnectionBuilder()
           .withUrl(gradeUrl, options: options)
@@ -180,8 +215,67 @@ class SignalRService {
 
       try {
         await _gradeHubConnection!.start();
+        print('✅ GRADE SIGNALR: Connected Successfully!');
       } catch (e) {
         print('❌ GRADE SIGNALR: Connection Failed! Error: $e');
+      }
+    }
+
+    // 5. Notification Hub
+    if (_notificationHubConnection == null) {
+      final notificationUrl = ApiConstants.hubUrl('notificationHub');
+      print('🌐 NOTIFICATION SIGNALR: Attempting to connect to $notificationUrl');
+      
+      _notificationHubConnection = HubConnectionBuilder()
+          .withUrl(notificationUrl, options: options)
+          .withAutomaticReconnect()
+          .build();
+
+      _notificationHubConnection!.on('ReceiveNotification', (arguments) {
+        if (arguments != null && arguments.isNotEmpty) {
+          try {
+            print('🔔 NOTIFICATION SIGNALR: Received event! Payload: ${arguments.first}');
+            _newNotificationController.add(Map<String, dynamic>.from(arguments.first as Map));
+          } catch (e) {
+            print('❌ NOTIFICATION PARSE ERROR: $e');
+          }
+        }
+      });
+
+      _notificationHubConnection!.on('AnnouncementUpdated', (arguments) {
+        if (arguments != null && arguments.isNotEmpty) {
+          try {
+            print('🔔 NOTIFICATION SIGNALR: Announcement Updated! Payload: ${arguments.first}');
+            _announcementUpdatedController.add(Map<String, dynamic>.from(arguments.first as Map));
+          } catch (e) {
+            print('❌ ANNOUNCEMENT UPDATE PARSE ERROR: $e');
+          }
+        }
+      });
+
+      _notificationHubConnection!.on('AnnouncementDeleted', (arguments) {
+        if (arguments != null && arguments.isNotEmpty) {
+          try {
+            print('🔔 NOTIFICATION SIGNALR: Announcement Deleted! ID: ${arguments.first}');
+            _announcementDeletedController.add(arguments.first as int);
+          } catch (e) {
+            print('❌ ANNOUNCEMENT DELETE PARSE ERROR: $e');
+          }
+        }
+      });
+
+      try {
+        await _notificationHubConnection!.start();
+        print('✅ NOTIFICATION SIGNALR: Connected Successfully!');
+        // CRITICAL: Join the personal group so Clients.Group("User_{id}") reaches this client
+        if (userId != null) {
+          await _notificationHubConnection!.invoke('JoinPersonalGroup', args: [userId]);
+          print('✅ NOTIFICATION SIGNALR: Joined personal group User_$userId');
+        } else {
+          print('⚠️ NOTIFICATION SIGNALR: Could not join personal group – userId is null!');
+        }
+      } catch (e) {
+        print('❌ NOTIFICATION SIGNALR: Connection Failed! Error: $e');
       }
     }
   }
@@ -242,5 +336,9 @@ class SignalRService {
     _newQuizController.close();
     _gradeHubConnection?.stop();
     _gradeUpdateController.close();
+    _notificationHubConnection?.stop();
+    _newNotificationController.close();
+    _announcementUpdatedController.close();
+    _announcementDeletedController.close();
   }
 }

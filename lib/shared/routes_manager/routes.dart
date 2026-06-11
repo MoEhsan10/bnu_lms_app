@@ -8,6 +8,11 @@ class Routes {
   static const String main = '/main'; // Main Layout (Bottom Nav)
   static const String settings = '/settings';
   static const String notifications = '/notifications';
+  static const String notificationDetails = '/notificationDetails';
+  static const String manageAnnouncements = '/manageAnnouncements';
+  static const String sectionAnnouncements = '/sectionAnnouncements';
+  static const String createAnnouncement = '/createAnnouncement';
+  static const String notificationPreferences = '/notificationPreferences';
   static const String aiChat = '/aiChat';
 
   // -- Student Features --

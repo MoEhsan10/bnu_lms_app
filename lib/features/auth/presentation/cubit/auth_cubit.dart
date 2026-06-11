@@ -1,11 +1,11 @@
-// lib/features/auth/presentation/cubit/auth_cubit.dart
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import '../../domain/use_cases/login_use_case.dart';
 import '../../domain/use_cases/logout_use_case.dart';
 import 'auth_state.dart';
 import '../../../../shared/services/signalr_service.dart';
+import '../../../../shared/di/injection.dart';
+import '../../../notification/presentation/cubit/notification_cubit.dart';
 
 @lazySingleton
 class AuthCubit extends Cubit<AuthState> {
@@ -28,6 +28,8 @@ class AuthCubit extends Cubit<AuthState> {
       (failure) => emit(AuthFailure(failure.message)),
       (auth) {
         _signalRService.init(auth.token);
+        // Seed notifications globally so the bell badge updates immediately
+        getIt<NotificationCubit>().getNotifications();
         emit(AuthSuccess(auth));
       },
     );

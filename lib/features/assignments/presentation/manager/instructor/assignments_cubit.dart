@@ -82,7 +82,7 @@ class AssignmentsCubit extends Cubit<AssignmentsState> {
       'title': title,
       'description': description,
       'points': points,
-      'dueDate': dueDate.toIso8601String(),
+      'dueDate': dueDate.toUtc().toIso8601String(),
       if (filePath != null) 'filePath': filePath,
     };
 

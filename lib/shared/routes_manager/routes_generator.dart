@@ -22,6 +22,12 @@ import 'package:bnu_lms_app/features/grades/presentation/student/screens/grades_
 import 'package:bnu_lms_app/features/courses/presentation/cubit/courses_cubit/courses_cubit.dart';
 
 import 'package:bnu_lms_app/features/notification/presentation/screens/notifications_screen.dart';
+import 'package:bnu_lms_app/features/notification/presentation/screens/notification_details_screen.dart';
+import 'package:bnu_lms_app/features/notification/presentation/instructor/screens/instructor_manage_announcements_screen.dart';
+import 'package:bnu_lms_app/features/notification/presentation/ta/screens/ta_section_announcements_screen.dart';
+import 'package:bnu_lms_app/features/notification/presentation/instructor/screens/create_announcement_screen.dart';
+import 'package:bnu_lms_app/features/notification/presentation/screens/notification_preferences_screen.dart';
+import 'package:bnu_lms_app/features/notification/presentation/cubit/notification_cubit.dart';
 import 'package:bnu_lms_app/features/quizzes/presentation/screens/quiz_details_screen.dart';
 import 'package:bnu_lms_app/features/quizzes/presentation/screens/quiz_questions_screen.dart';
 import 'package:bnu_lms_app/features/quizzes/presentation/screens/student_quiz_dashboard_screen.dart';
@@ -53,7 +59,56 @@ class RoutesGenerator {
       case Routes.settings:
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
       case Routes.notifications:
-        return MaterialPageRoute(builder: (_) => const NotificationsScreen());
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: getIt<NotificationCubit>()..getNotifications(),
+            child: const NotificationsScreen(),
+          ),
+        );
+      case Routes.notificationDetails:
+        final notificationArgs = args as Map<String, dynamic>?;
+        if (notificationArgs == null || !notificationArgs.containsKey('notification')) return _unDefinedRoute();
+        return MaterialPageRoute(
+          builder: (_) => NotificationDetailsScreen(
+            notification: notificationArgs['notification'],
+          ),
+        );
+      case Routes.manageAnnouncements:
+        return MaterialPageRoute(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: getIt<NotificationCubit>()),
+              BlocProvider(create: (_) => getIt<CoursesCubit>()),
+            ],
+            child: const InstructorManageAnnouncementsScreen(),
+          ),
+        );
+      case Routes.sectionAnnouncements:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: getIt<NotificationCubit>(),
+            child: const TaSectionAnnouncementsScreen(),
+          ),
+        );
+      case Routes.createAnnouncement:
+        final announcementArgs = args as Map<String, dynamic>?;
+        final editAnnouncement = announcementArgs?['announcement'];
+        return MaterialPageRoute(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: getIt<NotificationCubit>()),
+              BlocProvider.value(value: getIt<CoursesCubit>()),
+            ],
+            child: CreateAnnouncementScreen(editAnnouncement: editAnnouncement),
+          ),
+        );
+      case Routes.notificationPreferences:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: getIt<NotificationCubit>(),
+            child: const NotificationPreferencesScreen(),
+          ),
+        );
       case Routes.login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case Routes.aiChat:
