@@ -50,9 +50,12 @@ class QuizListCubit extends Cubit<QuizListState> {
         if (isClosed) return;
         emit(QuizListError(failure.message));
       },
-      (quizzes) {
+      (quizzes) async {
         if (isClosed) return;
         emit(QuizListLoaded(quizzes));
+        // Join the course group so the hub sends group-targeted events to this client.
+        await signalrService.joinCourse(courseId);
+        listenToRealTimeUpdates(courseId);
       },
     );
   }

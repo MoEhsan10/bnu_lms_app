@@ -18,7 +18,8 @@ class NotificationCubit extends Cubit<NotificationState> {
 
   NotificationCubit({required this.repository, required this.signalRService}) : super(NotificationInitial()) {
     _notificationSub = signalRService.newNotificationStream.listen((event) {
-      if (state is AnnouncementLoaded && _lastCourseId != null) {
+      if (isClosed) return;
+      if (_lastCourseId != null) {
         if (_isManaging) {
           getManageCourseAnnouncements(_lastCourseId!, silent: true);
         } else {
@@ -30,7 +31,8 @@ class NotificationCubit extends Cubit<NotificationState> {
     });
 
     _announcementUpdateSub = signalRService.announcementUpdatedStream.listen((event) {
-      if (state is AnnouncementLoaded && _lastCourseId != null) {
+      if (isClosed) return;
+      if (_lastCourseId != null) {
         if (_isManaging) {
           getManageCourseAnnouncements(_lastCourseId!, silent: true);
         } else {
@@ -40,7 +42,8 @@ class NotificationCubit extends Cubit<NotificationState> {
     });
 
     _announcementDeleteSub = signalRService.announcementDeletedStream.listen((event) {
-      if (state is AnnouncementLoaded && _lastCourseId != null) {
+      if (isClosed) return;
+      if (_lastCourseId != null) {
         if (_isManaging) {
           getManageCourseAnnouncements(_lastCourseId!, silent: true);
         } else {

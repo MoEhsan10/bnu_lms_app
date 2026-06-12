@@ -20,8 +20,9 @@ class GradesCubit extends Cubit<GradesState> {
 
     result.fold(
       (failure) => emit(GradesError(failure.message)),
-      (grades) {
+      (grades) async {
         emit(GradesLoaded(courseGrades: grades));
+        await signalRService.joinCourse(courseId);
         _listenToRealTimeUpdates(courseId);
       },
     );
@@ -34,8 +35,9 @@ class GradesCubit extends Cubit<GradesState> {
 
     result.fold(
       (failure) => emit(GradesError(failure.message)),
-      (grade) {
+      (grade) async {
         emit(GradesLoaded(courseGrades: [], currentStudentGrade: grade));
+        await signalRService.joinCourse(courseId);
         _listenToRealTimeUpdates(courseId, studentId: studentId);
       },
     );

@@ -301,11 +301,14 @@ class SignalRService {
       await _quizHubConnection!.invoke('JoinCourseGroup', args: [courseId.toString()]);
       print('✅ QUIZ SIGNALR: Joined group $courseId successfully.');
     } else {
-      print('❌ QUIZ SIGNALR: Could not join group $courseId! State is ${_quizHubConnection?.state}');
+      print('⚠️ QUIZ SIGNALR: Could not join group $courseId! State is ${_quizHubConnection?.state}');
     }
 
     if (_gradeHubConnection?.state == HubConnectionState.Connected) {
       await _gradeHubConnection!.invoke('JoinCourseGroup', args: [courseId.toString()]);
+      print('✅ GRADE SIGNALR: Joined group $courseId successfully.');
+    } else {
+      print('⚠️ GRADE SIGNALR: Could not join group $courseId! State is ${_gradeHubConnection?.state}');
     }
   }
 
@@ -321,6 +324,9 @@ class SignalRService {
     }
     if (_gradeHubConnection?.state == HubConnectionState.Connected) {
       await _gradeHubConnection!.invoke('LeaveCourseGroup', args: [courseId.toString()]);
+    }
+    if (_quizHubConnection?.state == HubConnectionState.Connected) {
+      await _quizHubConnection!.invoke('LeaveCourseGroup', args: [courseId.toString()]);
     }
   }
 
