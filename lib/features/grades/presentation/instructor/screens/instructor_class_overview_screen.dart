@@ -7,13 +7,14 @@ import '../../cubit/grades_state.dart';
 import 'package:bnu_lms_app/shared/di/injection.dart';
 import 'package:bnu_lms_app/shared/resources/colors_manager.dart';
 import 'package:bnu_lms_app/shared/providers/theme_provider.dart';
+import 'package:bnu_lms_app/shared/config/api_constants.dart';
 import 'package:provider/provider.dart';
 import 'instructor_grading_screen.dart';
 
 class InstructorClassOverviewScreen extends StatefulWidget {
   final CourseSummaryEntity course;
 
-  const InstructorClassOverviewScreen({Key? key, required this.course}) : super(key: key);
+  const InstructorClassOverviewScreen({super.key, required this.course});
 
   @override
   State<InstructorClassOverviewScreen> createState() => _InstructorClassOverviewScreenState();
@@ -211,9 +212,20 @@ class _InstructorClassOverviewScreenState extends State<InstructorClassOverviewS
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             leading: CircleAvatar(
                               radius: 24,
-                              backgroundImage: grade.studentAvatarUrl != null ? NetworkImage(grade.studentAvatarUrl!) : null,
                               backgroundColor: isDarkMode ? ColorsManager.darkBackground : const Color(0xFFF1F5F9),
-                              child: grade.studentAvatarUrl == null ? Icon(Icons.person, color: ColorsManager.blue) : null,
+                              child: ClipOval(
+                                child: grade.studentAvatarUrl != null && grade.studentAvatarUrl!.isNotEmpty
+                                    ? Image.network(
+                                        grade.studentAvatarUrl!.startsWith('http')
+                                            ? grade.studentAvatarUrl!
+                                            : '${ApiConstants.baseUrl.replaceAll('api/', '')}${grade.studentAvatarUrl!.startsWith('/') ? grade.studentAvatarUrl!.substring(1) : grade.studentAvatarUrl!}',
+                                        width: 48,
+                                        height: 48,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => Icon(Icons.person, color: ColorsManager.blue),
+                                      )
+                                    : Icon(Icons.person, color: ColorsManager.blue),
+                              ),
                             ),
                             title: Text(
                               grade.studentName,

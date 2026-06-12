@@ -44,8 +44,8 @@ class DoctorMyCoursesSection extends StatelessWidget {
           DoctorCourseCard(
             academicYear: 'Academic Year 2023/24',
             courseName: 'Advanced Structural Engineering',
-            studentsCount: '120 Students',
-            timeString: 'Today, 10:00 AM',
+            courseCode: 'ENG-402',
+            instructorName: 'Dr. Emily Chen',
             courseIcon: Icons.engineering_outlined,
             onManageTap: () {},
           ),
@@ -53,8 +53,8 @@ class DoctorMyCoursesSection extends StatelessWidget {
           DoctorCourseCard(
             academicYear: 'Academic Year 2023/24',
             courseName: 'Intro to Neural Networks',
-            studentsCount: '85 Students',
-            timeString: 'Tomorrow, 02:00 PM',
+            courseCode: 'CS-501',
+            instructorName: 'Dr. Alan Turing',
             courseIcon: Icons.psychology_outlined,
             onManageTap: () {},
           ),

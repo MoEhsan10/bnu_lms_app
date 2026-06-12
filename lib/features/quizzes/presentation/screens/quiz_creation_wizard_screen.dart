@@ -61,40 +61,20 @@ class _QuizCreationWizardScreenState extends State<QuizCreationWizardScreen> {
           'Create Quiz',
           style: isLight ? AppLightTextStyles.titleLarge : AppDarkTextStyles.titleLarge,
         ),
-        actions: [
-          BlocConsumer<QuizGradingCubit, QuizGradingState>(
-            listener: (context, state) {
-              if (state is QuizGradingSuccess && state.message.contains('Draft')) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message), backgroundColor: const Color(0xFF26C6DA)),
-                );
-              } else if (state is QuizGradingError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message), backgroundColor: ColorsManager.red),
-                );
-              }
-            },
-            builder: (context, state) {
-              final isLoading = state is QuizGradingLoading;
-              return TextButton(
-                onPressed: isLoading ? null : () {
-                  context.read<QuizGradingCubit>().saveDraft();
-                },
-                child: isLoading 
-                  ? SizedBox(width: 16.w, height: 16.w, child: CircularProgressIndicator(strokeWidth: 2, color: isLight ? ColorsManager.black : ColorsManager.white))
-                  : Text(
-                      'Save Draft',
-                      style: (isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium).copyWith(
-                        color: ColorsManager.grayDark,
-                      ),
-                    ),
-              );
-            },
-          ),
-          SizedBox(width: 16.w),
-        ],
       ),
-      body: Column(
+      body: BlocListener<QuizGradingCubit, QuizGradingState>(
+        listener: (context, state) {
+          if (state is QuizGradingSuccess && state.message.contains('Draft')) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message), backgroundColor: const Color(0xFF26C6DA)),
+            );
+          } else if (state is QuizGradingError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message), backgroundColor: ColorsManager.red),
+            );
+          }
+        },
+        child: Column(
         children: [
           _buildStepper(isLight),
           Expanded(
@@ -114,6 +94,7 @@ class _QuizCreationWizardScreenState extends State<QuizCreationWizardScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

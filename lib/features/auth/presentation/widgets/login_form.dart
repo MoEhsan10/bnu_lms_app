@@ -11,6 +11,8 @@ import '../../../../shared/providers/theme_provider.dart';
 import '../../../../shared/resources/colors_manager.dart';
 import '../../../../shared/routes_manager/routes.dart';
 import '../../../../shared/widgets/custom_elevated_button.dart';
+import '../../../../shared/di/injection.dart';
+import '../../../profile/presentation/cubit/profile_cubit.dart';
 import '../../domain/entities/auth_entity.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
@@ -71,6 +73,8 @@ class _LoginFormState extends State<LoginForm> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthSuccess) {
+          // Pre-fetch the profile immediately after successful login so the avatar is ready across all screens!
+          getIt<ProfileCubit>().fetchProfile();
           _navigateByRole(context, state.auth.role);
         } else if (state is AuthFailure) {
           ScaffoldMessenger.of(context).showSnackBar(

@@ -9,6 +9,11 @@ class ProfileEntity extends Equatable {
   final int academicYear;
   final int creditHours;
   final int enrolledCoursesCount;
+  final double? gpa;
+  final int? rank;
+  final String? studentId;
+  final String? role;
+  final String? profilePictureUrl;
 
   const ProfileEntity({
     required this.id,
@@ -19,6 +24,11 @@ class ProfileEntity extends Equatable {
     required this.academicYear,
     required this.creditHours,
     required this.enrolledCoursesCount,
+    this.gpa,
+    this.rank,
+    this.studentId,
+    this.role,
+    this.profilePictureUrl,
   });
 
   String get fullName => '$firstName $lastName';
@@ -33,5 +43,10 @@ class ProfileEntity extends Equatable {
         academicYear,
         creditHours,
         enrolledCoursesCount,
+        gpa,
+        rank,
+        studentId,
+        role,
+        profilePictureUrl,
       ];
 }

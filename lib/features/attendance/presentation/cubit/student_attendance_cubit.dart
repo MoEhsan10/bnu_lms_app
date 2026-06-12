@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:location/location.dart' as loc;
 import 'package:permission_handler/permission_handler.dart';
+import '../../domain/entities/course_attendance_report_entity.dart';
 import '../../domain/repositories/attendance_repository.dart';
 import 'student_attendance_state.dart';
 
@@ -65,28 +66,34 @@ class StudentAttendanceCubit extends Cubit<StudentAttendanceState> {
     }
   }
 
+  /// Loads the student's own attendance dashboard using the dedicated student endpoint.
+  /// The backend returns a flat list of [AttendanceRecordEntity] across all sessions.
+  /// We wrap each record into a synthetic [CourseAttendanceReportEntity] so the existing
+  /// dashboard UI works without changes.
   Future<void> fetchDashboard(int courseId) async {
     emit(const StudentDashboardLoading());
     try {
-      final result = await _repository.getCourseAttendanceReports(courseId);
+      final result = await _repository.getMyAttendanceHistory(courseId);
       result.fold(
         (failure) => emit(StudentDashboardError(failure.message)),
-        (reports) {
-          int present = 0;
-          int absent = 0;
-          for (final r in reports) {
-            for (final rec in r.attendanceRecords) {
-              if (rec.isPresent) {
-                present++;
-              } else {
-                absent++;
-              }
-            }
-          }
-          final total = present + absent;
-          final rate = total > 0 ? (present / total) * 100.0 : 0.0;
+        (records) {
+          // Map each flat record to a lightweight report wrapper the dashboard can render
+          final List<CourseAttendanceReportEntity> syntheticReports = records.map((rec) {
+            return CourseAttendanceReportEntity(
+              sessionId: 0,
+              sessionTitle: rec.sessionTitle.isNotEmpty ? rec.sessionTitle : 'Session',
+              createdAt: rec.scannedAt,
+              attendanceRecords: [rec],
+            );
+          }).toList();
+
+          final int present = records.where((r) => r.isPresent).length;
+          final int absent = records.where((r) => !r.isPresent).length;
+          final int total = present + absent;
+          final double rate = total > 0 ? (present / total) * 100.0 : 0.0;
+
           emit(StudentDashboardLoaded(
-            reports: reports,
+            reports: syntheticReports,
             presentCount: present,
             absentCount: absent,
             attendanceRate: rate,

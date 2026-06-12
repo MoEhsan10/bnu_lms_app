@@ -9,11 +9,10 @@ import '../../../../../../shared/providers/theme_provider.dart';
 
 // Import the extracted widgets
 import '../widgets/doctor_profile_header.dart';
-import '../widgets/contact_and_stats.dart';
-import '../widgets/my_courses_section.dart';
-import '../widgets/office_hours_card.dart';
-import '../widgets/settings_section.dart';
 
+import '../../../student/presentation/widget/profile_menu_section.dart';
+import 'package:bnu_lms_app/shared/resources/assets_manager.dart';
+import '../../../../../l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../presentation/cubit/profile_cubit.dart';
 import '../../../presentation/cubit/profile_state.dart';
@@ -42,6 +41,7 @@ class _DoctorProfileTabState extends State<DoctorProfileTab> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLight = themeProvider.isLightTheme();
+    final localizations = AppLocalizations.of(context)!;
 
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
@@ -83,15 +83,62 @@ class _DoctorProfileTabState extends State<DoctorProfileTab> {
                           DoctorProfileHeader(
                             name: profile.fullName,
                             department: profile.faculty,
+                            role: profile.role ?? 'Instructor',
+                            profilePictureUrl: profile.profilePictureUrl,
                           ),
+
                           SizedBox(height: 24.h),
-                          const ContactAndStats(),
-                          SizedBox(height: 32.h),
-                          const MyCoursesSection(),
-                          SizedBox(height: 24.h),
-                          const OfficeHoursCard(),
-                          SizedBox(height: 32.h),
-                          const SettingsSection(),
+                          ProfileMenuSection(
+                            title: localizations.account,
+                            items: [
+                              ProfileMenuItem(
+                                icon: IconsManager.editProfile,
+                                label: localizations.editProfile,
+                                onTap: () {
+                                  Navigator.pushNamed(context, Routes.editProfile);
+                                },
+                              ),
+                              ProfileMenuItem(
+                                icon: IconsManager.password,
+                                label: localizations.changePassword,
+                                onTap: () {},
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20.h),
+                          ProfileMenuSection(
+                            title: localizations.support,
+                            items: [
+                              ProfileMenuItem(
+                                icon: IconsManager.theme,
+                                label: 'Theme and Language',
+                                onTap: () {
+                                  Navigator.pushNamed(context, Routes.settings);
+                                },
+                              ),
+                              ProfileMenuItem(
+                                icon: IconsManager.helpCenter,
+                                label: localizations.helpCenter,
+                                onTap: () {
+                                  Navigator.pushNamed(context, Routes.helpCenter);
+                                },
+                              ),
+                              ProfileMenuItem(
+                                icon: IconsManager.warning, 
+                                label: 'Log Out',
+                                onTap: () async {
+                                  await context.read<AuthCubit>().logout();
+                                  if (context.mounted) {
+                                    Navigator.pushNamedAndRemoveUntil(
+                                      context, 
+                                      Routes.login, 
+                                      (route) => false,
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
                           SizedBox(height: 40.h),
                         ],
                       ),

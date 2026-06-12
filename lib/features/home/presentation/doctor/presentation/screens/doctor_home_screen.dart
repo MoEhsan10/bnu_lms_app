@@ -6,6 +6,8 @@ import '../../../../../../l10n/app_localizations.dart';
 import '../../../../../../shared/resources/assets_manager.dart';
 import '../../../../../forums/presentation/student/presentation/screens/forums_tab.dart';
 import 'doctor_home_dashboard.dart';
+import '../../../../../../shared/di/injection.dart';
+import '../../../../../profile/presentation/cubit/profile_cubit.dart';
 
 
 class DoctorHomeScreen extends StatefulWidget {
@@ -18,6 +20,13 @@ class DoctorHomeScreen extends StatefulWidget {
 class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
 
   int selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fetch profile so avatar is ready for header immediately
+    Future.microtask(() => getIt<ProfileCubit>().fetchProfile());
+  }
 
 
   final List<Widget> tabs = [

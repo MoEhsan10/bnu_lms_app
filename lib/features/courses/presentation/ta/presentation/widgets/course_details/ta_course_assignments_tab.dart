@@ -106,84 +106,45 @@ class TaCourseAssignmentsTab extends StatelessWidget {
 
   Widget _buildTaAssignmentCard(BuildContext context, AssignmentEntity assignment) {
     final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
-    const cyan = Color(0xFF2FBAD7);
-    final shadowColor = Colors.black.withValues(alpha: 0.05);
-
-    // Determine status
-    final isPastDue = DateTime.now().isAfter(assignment.dueDate);
-    final statusText = isPastDue ? 'PAST DUE' : 'ACTIVE';
-    final statusColor = isPastDue ? ColorsManager.green : Colors.orange;
-
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: isLight ? ColorsManager.white : ColorsManager.darkSurface,
         borderRadius: BorderRadius.circular(16.r),
-        boxShadow: isLight
-            ? [BoxShadow(color: shadowColor, blurRadius: 10, offset: const Offset(0, 4))]
-            : [],
+        border: Border.all(color: isLight ? ColorsManager.grayMedium.withValues(alpha: 0.1) : ColorsManager.blue.withValues(alpha: 0.1), width: 1.w),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Status Tag
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
-                child: Text(
-                  statusText,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              Text(
+                assignment.title, 
+                style: isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium
               ),
-              Icon(Icons.more_horiz, color: ColorsManager.grayMedium, size: 20.sp),
+              Icon(Icons.more_vert, color: ColorsManager.grayMedium, size: 20.sp),
             ],
           ),
           SizedBox(height: 12.h),
-
-          // Title
-          Text(
-            assignment.title,
-            style: (isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium)
-                .copyWith(fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 12.h),
-
-          // Details Row
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Icons.calendar_today_outlined, size: 14.sp, color: ColorsManager.grayMedium),
-              SizedBox(width: 6.w),
               Text(
-                'Due: ${assignment.dueDate.day} ${_getMonth(assignment.dueDate.month)}, ${assignment.dueDate.year}',
-                style: TextStyle(fontSize: 12.sp, color: ColorsManager.grayMedium),
+                'Due: ${assignment.dueDate.day} ${_getMonth(assignment.dueDate.month)}', 
+                style: isLight ? AppLightTextStyles.bodySmall : AppDarkTextStyles.bodySmall
               ),
-              const Spacer(),
               Text(
-                '${assignment.maxPoints.toInt()} Points',
-                style: TextStyle(fontSize: 12.sp, color: cyan, fontWeight: FontWeight.bold),
+                'Submitted: --/--', 
+                style: (isLight ? AppLightTextStyles.labelSmall : AppDarkTextStyles.labelSmall).copyWith(color: ColorsManager.blue)
               ),
             ],
           ),
           SizedBox(height: 16.h),
-
-          Divider(color: ColorsManager.grayMedium.withValues(alpha: 0.1)),
-          SizedBox(height: 12.h),
-
-          // Action Button
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
+            child: OutlinedButton(
               onPressed: () {
                 Navigator.push(
                   context,
@@ -192,16 +153,14 @@ class TaCourseAssignmentsTab extends StatelessWidget {
                   ),
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: cyan,
-                foregroundColor: Colors.white,
-                elevation: 0,
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: ColorsManager.blue),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
                 padding: EdgeInsets.symmetric(vertical: 10.h),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
               ),
               child: Text(
-                'View Submissions',
-                style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold),
+                'View Submissions', 
+                style: (isLight ? AppLightTextStyles.labelSmall : AppDarkTextStyles.labelSmall).copyWith(color: ColorsManager.blue)
               ),
             ),
           ),

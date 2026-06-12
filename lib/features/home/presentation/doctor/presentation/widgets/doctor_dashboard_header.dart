@@ -125,13 +125,7 @@ class DoctorDashboardHeader extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 20.w),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, Routes.settings);
-              },
-              child: const Icon(Icons.settings),
-            ),
+
           ],
         ),
       ],

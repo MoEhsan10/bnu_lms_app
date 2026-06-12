@@ -14,8 +14,7 @@ import '../../../../../assignments/presentation/manager/instructor/assignments_c
 import '../../../../../quizzes/presentation/cubit/quiz_list_cubit.dart';
 import '../../../shared_widgets/course_header_card.dart';
 
-// TA Specific Overview (Or reuse Doctor if identical)
-import '../widgets/course_details/ta_course_overview_tab.dart';
+
 
 // Reused Doctor Tabs (Clean Architecture)
 import '../../../doctor/presentation/widgets/courses_details_tabs/course_students_tab.dart';
@@ -25,6 +24,10 @@ import '../../../doctor/presentation/widgets/courses_details_tabs/course_attenda
 
 // The New Assignments Tab
 import '../widgets/course_details/ta_course_assignments_tab.dart';
+
+import '../../../cubit/course_details_cubit/course_details_cubit.dart';
+import '../../../cubit/course_details_cubit/course_details_state.dart';
+import 'package:bnu_lms_app/features/courses/domain/entities/course_entity.dart';
 
 class TaCourseDetailsScreen extends StatelessWidget {
   final int courseId;
@@ -42,7 +45,7 @@ class TaCourseDetailsScreen extends StatelessWidget {
     final isLight = themeProvider.isLightTheme();
 
     return DefaultTabController(
-      length: 6,
+      length: 5,
       child: Scaffold(
         backgroundColor: isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground,
         appBar: AppBar(
@@ -63,83 +66,93 @@ class TaCourseDetailsScreen extends StatelessWidget {
                 ? AppLightTextStyles.headlineLarge
                 : AppDarkTextStyles.headlineLarge,
           ),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.more_vert_rounded,
-                color: isLight ? ColorsManager.black : ColorsManager.white,
-              ),
-            ),
-          ],
+          actions: [],
         ),
-        body: Column(
-          children: [
-            // 1. The Header Banner (Fixed at Top)
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-              child: CourseHeaderCard(
-                title: courseTitle,
-                courseCode: 'CS101',
-                instructor: 'Lead: Dr. Mitchell',
-                icon: Icons.code,
-              ),
-            ),
+        body: BlocProvider(
+          create: (context) => getIt<CourseDetailsCubit>()..fetchCourseDetails(courseId),
+          child: BlocBuilder<CourseDetailsCubit, CourseDetailsState>(
+            builder: (context, state) {
+              if (state is CourseDetailsLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is CourseDetailsError) {
+                return Center(child: Text(state.message, style: TextStyle(color: ColorsManager.red)));
+              } else if (state is CourseDetailsLoaded || state is CourseActionLoading || state is CourseActionError) {
+                
+                CourseDetailEntity? course;
+                if (state is CourseDetailsLoaded) course = state.course;
+                if (state is CourseActionLoading) course = state.course;
+                if (state is CourseActionError) course = state.course;
+
+                if (course == null) return const SizedBox();
+
+                return Column(
+                  children: [
+                    // 1. The Header Banner (Fixed at Top)
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                      child: CourseHeaderCard(
+                        title: course.title,
+                        courseCode: 'SWE-301',
+                        instructor: course.instructorName,
+                        icon: Icons.code,
+                      ),
+                    ),
 
 
-            // 2. The Tab Bar
-            TabBar(
-              isScrollable: true,
-              indicatorColor: const Color(0xFF2FBAD7), // TA Cyan
-              indicatorWeight: 3,
-              labelColor: const Color(0xFF2FBAD7),
-              unselectedLabelColor: ColorsManager.grayMedium,
-              labelStyle: AppLightTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700, fontSize: 14.sp),
-              unselectedLabelStyle: AppLightTextStyles.titleMedium.copyWith(fontSize: 14.sp),
-              tabAlignment: TabAlignment.start,
-              dividerColor: Colors.transparent,
-              padding: EdgeInsets.symmetric(horizontal: 10.w),
-              tabs: const [
-                Tab(text: 'Overview'),
-                Tab(text: 'Students'),
-                Tab(text: 'Assignments'), // Custom TA Version
-                Tab(text: 'Quizzes'),
-                Tab(text: 'Materials'),
-                Tab(text: 'Attendance'),
-              ],
-            ),
+                    // 2. The Tab Bar
+                    TabBar(
+                      isScrollable: true,
+                      indicatorColor: const Color(0xFF2FBAD7), // TA Cyan
+                      indicatorWeight: 3,
+                      labelColor: const Color(0xFF2FBAD7),
+                      unselectedLabelColor: ColorsManager.grayMedium,
+                      labelStyle: AppLightTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700, fontSize: 14.sp),
+                      unselectedLabelStyle: AppLightTextStyles.titleMedium.copyWith(fontSize: 14.sp),
+                      tabAlignment: TabAlignment.start,
+                      dividerColor: Colors.transparent,
+                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      tabs: const [
+                        Tab(text: 'Students'),
+                        Tab(text: 'Materials'),
+                        Tab(text: 'Attendance'),
+                        Tab(text: 'Assignments'), // Custom TA Version
+                        Tab(text: 'Quizzes'),
+                      ],
+                    ),
 
-            // 3. The Tab Content
-            Expanded(
-              child: TabBarView(
-                children: [
-                  // 1. Overview (Your specific TA Overview with Labs timeline)
-                  const TaCourseOverviewTab(),
+                    // 3. The Tab Content
+                    Expanded(
+                      child: TabBarView(
+                        children: [
+                          // 1. Students (Reused)
+                          CourseStudentsTab(courseId: course.id),
 
-                  // 2. Students (Reused)
-                  const CourseStudentsTab(),
+                          // 2. Materials (Reused)
+                          const CourseMaterialsTab(),
 
-                  // 3. Assignments (Custom TA Version with Grading Actions)
-                  BlocProvider(
-                    create: (context) => getIt<AssignmentsCubit>()..getAssignments(courseId),
-                    child: TaCourseAssignmentsTab(courseId: courseId),
-                  ),
+                          // 3. Attendance (Reused)
+                          CourseAttendanceTab(courseId: course.id),
 
-                  // 4. Quizzes (Reused)
-                  BlocProvider(
-                    create: (_) => getIt<QuizListCubit>()..loadQuizzes(courseId),
-                    child: CourseQuizzesTab(courseId: courseId),
-                  ),
+                          // 4. Assignments (Custom TA Version with Grading Actions)
+                          BlocProvider(
+                            create: (context) => getIt<AssignmentsCubit>()..getAssignments(course!.id),
+                            child: TaCourseAssignmentsTab(courseId: course.id),
+                          ),
 
-                  // 5. Materials (Reused)
-                  const CourseMaterialsTab(),
-
-                  // 6. Attendance (Reused)
-                  CourseAttendanceTab(courseId: courseId),
-                ],
-              ),
-            ),
-          ],
+                          // 5. Quizzes (Reused)
+                          BlocProvider(
+                            create: (_) => getIt<QuizListCubit>()..loadQuizzes(course!.id),
+                            child: CourseQuizzesTab(courseId: course.id),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return const SizedBox();
+            },
+          ),
         ),
 
         // Optional: TA might not have a general "Add" FAB, usually contextual

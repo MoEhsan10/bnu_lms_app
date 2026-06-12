@@ -11,8 +11,8 @@ import '../../../../../../shared/widgets/custom_elevated_button.dart'; // Make s
 class DoctorCourseCard extends StatelessWidget {
   final String academicYear;
   final String courseName;
-  final String studentsCount;
-  final String timeString;
+  final String courseCode;
+  final String instructorName;
   final IconData courseIcon;
   final VoidCallback onManageTap;
 
@@ -20,8 +20,8 @@ class DoctorCourseCard extends StatelessWidget {
     super.key,
     required this.academicYear,
     required this.courseName,
-    required this.studentsCount,
-    required this.timeString,
+    required this.courseCode,
+    required this.instructorName,
     required this.courseIcon,
     required this.onManageTap,
   });
@@ -102,21 +102,25 @@ class DoctorCourseCard extends StatelessWidget {
 
           SizedBox(height: 12.h),
 
-          // Details Row (Students & Time)
+          // Details Row (Code & Instructor)
           Row(
             children: [
-              Icon(Icons.people_outline, size: 16.sp, color: ColorsManager.grayMedium),
+              Icon(Icons.qr_code, size: 16.sp, color: ColorsManager.grayMedium),
               SizedBox(width: 4.w),
               Text(
-                studentsCount,
+                courseCode,
                 style: isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium,
               ),
               SizedBox(width: 16.w),
-              Icon(Icons.access_time, size: 16.sp, color: ColorsManager.grayMedium),
+              Icon(Icons.person_outline, size: 16.sp, color: ColorsManager.grayMedium),
               SizedBox(width: 4.w),
-              Text(
-                timeString,
-                style: isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium,
+              Expanded(
+                child: Text(
+                  instructorName,
+                  style: isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),

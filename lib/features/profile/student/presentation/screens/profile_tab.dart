@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../presentation/cubit/profile_cubit.dart';
 import '../../../presentation/cubit/profile_state.dart';
-import '../widget/profile_action_card.dart';
+
 import '../widget/profile_header.dart';
 import '../widget/profile_menu_section.dart';
 import '../widget/profile_stats.dart';
@@ -57,16 +57,17 @@ class _ProfileTabState extends State<ProfileTab> {
                     ProfileHeaderCard(
                       name: profile.fullName,
                       department: profile.faculty,
-                      studentId: profile.id.length > 8 ? profile.id.substring(0, 8) : profile.id, 
+                      studentId: profile.studentId ?? 'N/A', 
                       year: profile.academicYear,
                       profileImage: ImagesManager.profileImage,
+                      profilePictureUrl: profile.profilePictureUrl,
                     ),
                     SizedBox(height: 24.h),
-                    const ProfileStatsGrid(), 
-                    SizedBox(height: 24.h),
-                    const PaymentCard(),
-                    SizedBox(height: 16.h),
-                    const AdvisingSessionCard(),
+                    ProfileStatsGrid(
+                      gpa: profile.gpa?.toString() ?? 'N/A',
+                      credits: profile.creditHours.toString(),
+                      rank: profile.rank?.toString() ?? 'N/A',
+                    ), 
                     SizedBox(height: 24.h),
                     ProfileMenuSection(
                       title: localizations.account,
@@ -74,12 +75,21 @@ class _ProfileTabState extends State<ProfileTab> {
                         ProfileMenuItem(
                           icon: IconsManager.editProfile,
                           label: localizations.editProfile,
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.pushNamed(context, Routes.editProfile);
+                          },
                         ),
                         ProfileMenuItem(
                           icon: IconsManager.password,
                           label: localizations.changePassword,
                           onTap: () {},
+                        ),
+                        ProfileMenuItem(
+                          icon: IconsManager.theme,
+                          label: 'Theme and Language',
+                          onTap: () {
+                            Navigator.pushNamed(context, Routes.settings);
+                          },
                         ),
                       ],
                     ),
@@ -90,12 +100,9 @@ class _ProfileTabState extends State<ProfileTab> {
                         ProfileMenuItem(
                           icon: IconsManager.helpCenter,
                           label: localizations.helpCenter,
-                          onTap: () {},
-                        ),
-                        ProfileMenuItem(
-                          icon: IconsManager.contactSupport,
-                          label: localizations.contactSupport,
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.pushNamed(context, Routes.helpCenter);
+                          },
                         ),
                         ProfileMenuItem(
                           icon: IconsManager.warning, 

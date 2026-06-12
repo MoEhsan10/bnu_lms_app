@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
@@ -189,17 +190,44 @@ class _QuizSettingsStepState extends State<QuizSettingsStep> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: isLight ? ColorsManager.grayMedium : ColorsManager.grayDark),
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                ),
-                child: Text(
-                  'Save as Draft',
-                  style: (isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium).copyWith(fontWeight: FontWeight.bold),
-                ),
+              BlocBuilder<QuizGradingCubit, QuizGradingState>(
+                builder: (context, state) {
+                  final isLoading = state is QuizGradingLoading;
+                  return OutlinedButton(
+                    onPressed: isLoading ? null : () {
+                      DateTime startDate = DateTime.now();
+                      DateTime endDate = DateTime.now().add(const Duration(days: 1));
+                      
+                      if (_startDateController.text.isNotEmpty) {
+                        try { startDate = DateTime.parse(_startDateController.text.replaceFirst(' ', 'T')); } catch (_) {}
+                      }
+                      if (_endDateController.text.isNotEmpty) {
+                        try { endDate = DateTime.parse(_endDateController.text.replaceFirst(' ', 'T')); } catch (_) {}
+                      }
+
+                      // Update settings first, then save draft
+                      context.read<QuizGradingCubit>().updateQuizSettings(
+                        _titleController.text.trim(), 
+                        _descriptionController.text.trim(),
+                        _durationController.text.trim(),
+                        startDate,
+                        endDate,
+                      );
+                      context.read<QuizGradingCubit>().saveDraft();
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: isLight ? ColorsManager.grayMedium : ColorsManager.grayDark),
+                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                    ),
+                    child: isLoading 
+                      ? SizedBox(width: 16.w, height: 16.w, child: CircularProgressIndicator(strokeWidth: 2, color: isLight ? ColorsManager.black : ColorsManager.white))
+                      : Text(
+                          'Save as Draft',
+                          style: (isLight ? AppLightTextStyles.labelMedium : AppDarkTextStyles.labelMedium).copyWith(fontWeight: FontWeight.bold),
+                        ),
+                  );
+                },
               ),
               ElevatedButton(
                 onPressed: _handleNext,

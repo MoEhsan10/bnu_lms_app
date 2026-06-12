@@ -177,7 +177,7 @@ class _ForumsTabBodyState extends State<_ForumsTabBody> {
         heroTag: null,
         onPressed: () {},
         backgroundColor: ColorsManager.blue,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.campaign, color: Colors.white),
       ),
     );
   }

@@ -101,4 +101,16 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
       return Left(Failure('Failed to fetch course attendance reports: ${e.toString()}'));
     }
   }
+
+  @override
+  Future<Either<Failure, List<AttendanceRecordEntity>>> getMyAttendanceHistory(int courseId) async {
+    try {
+      final models = await _remoteDataSource.getMyAttendanceHistory(courseId);
+      return Right(models);
+    } on RemoteException catch (e) {
+      return Left(Failure(e.message));
+    } catch (e) {
+      return Left(Failure('Failed to fetch attendance history: ${e.toString()}'));
+    }
+  }
 }

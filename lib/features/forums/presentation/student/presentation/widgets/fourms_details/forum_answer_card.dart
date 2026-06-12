@@ -5,6 +5,7 @@ import '../../../../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../../../../shared/providers/theme_provider.dart';
 import '../../../../../../../shared/resources/colors_manager.dart';
+import '../../../../../../../shared/config/api_constants.dart';
 
 
 
@@ -19,6 +20,7 @@ class ForumAnswerCard extends StatelessWidget {
   final VoidCallback? onUpvote;
   final VoidCallback? onDownvote;
   final VoidCallback? onReplyTap;
+  final String? authorAvatarUrl;
 
   const ForumAnswerCard({
     required this.authorName,
@@ -31,6 +33,7 @@ class ForumAnswerCard extends StatelessWidget {
     this.onUpvote,
     this.onDownvote,
     this.onReplyTap,
+    this.authorAvatarUrl,
     super.key,
   });
 
@@ -127,9 +130,24 @@ class ForumAnswerCard extends StatelessWidget {
                             CircleAvatar(
                               radius: 12,
                               backgroundColor: ColorsManager.blue,
-                              child: Text(
-                                authorName.isNotEmpty ? authorName[0].toUpperCase() : 'U',
-                                style: TextStyle(color: ColorsManager.white, fontWeight: FontWeight.bold, fontSize: 10),
+                              child: ClipOval(
+                                child: authorAvatarUrl != null && authorAvatarUrl!.isNotEmpty
+                                    ? Image.network(
+                                        authorAvatarUrl!.startsWith('http')
+                                            ? authorAvatarUrl!
+                                            : '${ApiConstants.baseUrl.replaceAll('api/', '')}${authorAvatarUrl!.startsWith('/') ? authorAvatarUrl!.substring(1) : authorAvatarUrl!}',
+                                        width: 24,
+                                        height: 24,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => Text(
+                                          authorName.isNotEmpty ? authorName[0].toUpperCase() : 'U',
+                                          style: TextStyle(color: ColorsManager.white, fontWeight: FontWeight.bold, fontSize: 10),
+                                        ),
+                                      )
+                                    : Text(
+                                        authorName.isNotEmpty ? authorName[0].toUpperCase() : 'U',
+                                        style: TextStyle(color: ColorsManager.white, fontWeight: FontWeight.bold, fontSize: 10),
+                                      ),
                               ),
                             ),
                             const SizedBox(width: 8),

@@ -7,6 +7,7 @@ import '../../cubit/grades_cubit.dart';
 import 'package:bnu_lms_app/shared/di/injection.dart';
 import 'package:bnu_lms_app/shared/providers/theme_provider.dart';
 import 'package:bnu_lms_app/shared/resources/colors_manager.dart';
+import 'package:bnu_lms_app/shared/config/api_constants.dart';
 import '../../widgets/shared_grades_widgets.dart';
 import '../../ta/screens/ta_term_work_screen.dart';
 
@@ -308,8 +309,20 @@ class _InstructorGradingScreenState extends State<InstructorGradingScreen> {
       children: [
         CircleAvatar(
           radius: 30,
-          backgroundImage: grade.studentAvatarUrl != null ? NetworkImage(grade.studentAvatarUrl!) : null,
-          child: grade.studentAvatarUrl == null ? const Icon(Icons.person, size: 30) : null,
+          backgroundColor: isDarkMode ? ColorsManager.darkBackground : const Color(0xFFF1F5F9),
+          child: ClipOval(
+            child: grade.studentAvatarUrl != null && grade.studentAvatarUrl!.isNotEmpty
+                ? Image.network(
+                    grade.studentAvatarUrl!.startsWith('http')
+                        ? grade.studentAvatarUrl!
+                        : '${ApiConstants.baseUrl.replaceAll('api/', '')}${grade.studentAvatarUrl!.startsWith('/') ? grade.studentAvatarUrl!.substring(1) : grade.studentAvatarUrl!}',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.person, size: 30),
+                  )
+                : const Icon(Icons.person, size: 30),
+          ),
         ),
         const SizedBox(width: 16),
         Expanded(

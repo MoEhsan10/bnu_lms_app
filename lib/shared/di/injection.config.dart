@@ -99,6 +99,8 @@ import '../../features/profile/domain/repositories/profile_repository.dart'
     as _i894;
 import '../../features/profile/domain/use_cases/get_my_profile_use_case.dart'
     as _i763;
+import '../../features/profile/domain/use_cases/upload_profile_picture_use_case.dart'
+    as _i674;
 import '../../features/profile/presentation/cubit/profile_cubit.dart' as _i36;
 import '../../features/quizzes/data/data_sources/remote/quiz_remote_data_source.dart'
     as _i766;
@@ -335,6 +337,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i763.GetMyProfileUseCase>(
       () => _i763.GetMyProfileUseCase(gh<_i894.ProfileRepository>()),
     );
+    gh.lazySingleton<_i674.UploadProfilePictureUseCase>(
+      () => _i674.UploadProfilePictureUseCase(gh<_i894.ProfileRepository>()),
+    );
     gh.factory<_i764.QuizTakingCubit>(
       () => _i764.QuizTakingCubit(
         gh<_i829.SubmitQuizUseCase>(),
@@ -346,9 +351,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i773.GetEnrolledCoursesUseCase>(),
         gh<_i26.GetAssignedCoursesUseCase>(),
       ),
-    );
-    gh.lazySingleton<_i36.ProfileCubit>(
-      () => _i36.ProfileCubit(gh<_i763.GetMyProfileUseCase>()),
     );
     gh.factory<_i621.QuizListCubit>(
       () => _i621.QuizListCubit(
@@ -365,6 +367,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i865.CreateModuleUseCase>(),
         gh<_i113.AddLessonUseCase>(),
         gh<_i448.AddContentUseCase>(),
+      ),
+    );
+    gh.lazySingleton<_i36.ProfileCubit>(
+      () => _i36.ProfileCubit(
+        gh<_i763.GetMyProfileUseCase>(),
+        gh<_i674.UploadProfilePictureUseCase>(),
       ),
     );
     return this;

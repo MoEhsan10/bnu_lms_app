@@ -8,10 +8,9 @@ import '../../../../../shared/providers/theme_provider.dart';
 import '../../../../assignments/presentation/tabs/student_assignments_tab.dart';
 import '../widgets/courses_details/course_description_section.dart';
 import '../../shared_widgets/course_header_card.dart';
-import '../widgets/courses_details/upcoming_event_card.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../shared/di/injection.dart';
-import '../../shared_widgets/role_based_grade_navigation_button.dart';
 import '../../cubit/course_details_cubit/course_details_cubit.dart';
 import '../../cubit/course_details_cubit/course_details_state.dart';
 import 'package:bnu_lms_app/features/courses/domain/entities/course_entity.dart';
@@ -53,27 +52,12 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
   ];
 
 
-  final List<Map<String, dynamic>> upcomingEvents = [
-    {
-      'title': 'Midterm Exam Schedule',
-      'description':
-      'The midterm exam has been scheduled for Nov 15th. Please check the \'Assignments\' tab for more details.',
-      'date': 'Nov 1, 2023',
-      'icon': Icons.event_note,
-    },
-    {
-      'title': 'Project Proposal Submissions',
-      'description':
-      'The deadline for project proposal submission is approaching. Please submit your documents before Oct 28th.',
-      'date': 'Oct 22, 2023',
-      'icon': Icons.assignment_turned_in,
-    },
-  ];
+
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -112,15 +96,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.more_vert,
-              color: isLight ? ColorsManager.black : ColorsManager.darkTextPrimary,
-            ),
-            onPressed: () {},
-          ),
-        ],
+        actions: [],
       ),
       body: BlocProvider(
         create: (context) => getIt<CourseDetailsCubit>()..fetchCourseDetails(widget.courseId),
@@ -147,10 +123,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
                     courseCode: widget.courseCode,
                     icon: widget.icon,
                   ),
-                  RoleBasedGradeNavigationButton(
-                    courseId: widget.courseId,
-                    courseTitle: course.title,
-                  ),
+
                   _buildTabBar(isLight),
                   Expanded(
                     child: TabBarView(
@@ -158,7 +131,6 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
                       children: [
                         _buildOverviewTab(isLight, course),
                         StudentAssignmentsTab(courseId: course.id),
-                        _buildUpcomingTab(isLight), // TODO: replace with real API later
                       ],
                     ),
                   ),
@@ -191,7 +163,6 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
         tabs: const [
           Tab(text: 'Overview'),
           Tab(text: 'Assignments'),
-          Tab(text: 'Upcoming'),
         ],
       ),
     );
@@ -205,70 +176,11 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen>
           SizedBox(height: 24.h),
           CourseDescriptionSection(description: course.description.isEmpty ? courseDescription : course.description),
           SizedBox(height: 32.h),
-          
-          Padding(
-            padding: REdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'Modules',
-              style: isLight
-                  ? AppLightTextStyles.headlineSmall.copyWith(fontWeight: FontWeight.bold)
-                  : AppDarkTextStyles.headlineSmall.copyWith(fontWeight: FontWeight.bold),
-            ),
-          ),
-          SizedBox(height: 16.h),
-          
-          if (course.modules.isEmpty)
-             Padding(
-              padding: REdgeInsets.symmetric(horizontal: 16),
-              child: Text('No modules available yet.', style: TextStyle(color: ColorsManager.grayDark)),
-            ),
-
-          ...course.modules.map((module) => ExpansionTile(
-                title: Text(module.title, style: TextStyle(fontWeight: FontWeight.w600)),
-                children: module.lessons.map((lesson) => ListTile(
-                      title: Text(lesson.title),
-                      leading: Icon(Icons.play_circle_outline, color: ColorsManager.blue),
-                      subtitle: Text('${lesson.contents.length} attachments'),
-                    )).toList(),
-              )),
-              
-          SizedBox(height: 24.h),
         ],
       ),
     );
   }
 
 
-  Widget _buildUpcomingTab(bool isLight) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: REdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 16.h),
-            Text(
-              'Recent Announcements',
-              style: isLight
-                  ? AppLightTextStyles.headlineSmall.copyWith(
-                fontWeight: FontWeight.bold,
-              )
-                  : AppDarkTextStyles.headlineSmall.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 16.h),
-            ...upcomingEvents.map((event) {
-              return UpcomingEventCard(
-                title: event['title'],
-                date: event['date'],
-                description: event['description'],
-                icon: event['icon'],
-              );
-            }),
-          ],
-        ),
-      ),
-    );
-  }
+
 }

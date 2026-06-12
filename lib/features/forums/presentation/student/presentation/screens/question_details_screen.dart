@@ -59,12 +59,6 @@ class _QuestionDetailsScreenState extends State<QuestionDetailsScreen> {
           style: isLight ? AppLightTextStyles.headlineLarge : AppDarkTextStyles.headlineLarge,
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.more_vert, color: isLight ? ColorsManager.black : ColorsManager.darkTextPrimary),
-            onPressed: () {},
-          ),
-        ],
         elevation: 0,
       ),
       body: Column(
@@ -88,6 +82,7 @@ class _QuestionDetailsScreenState extends State<QuestionDetailsScreen> {
 
                       return ForumQuestionCard(
                         authorName: author,
+                        authorAvatarUrl: widget.discussion.authorAvatarUrl,
                         timeAgo: timeAgo,
                         questionTitle: widget.discussion.title,
                         questionBody: widget.discussion.content ?? 'No content provided.',
@@ -174,10 +169,18 @@ class _QuestionDetailsScreenState extends State<QuestionDetailsScreen> {
       padding: EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: posts.map((post) {
+          String postTimeAgo = 'Just now';
+          if (post.createdAt != null) {
+            final diff = DateTime.now().difference(post.createdAt!);
+            if (diff.inDays > 0) { postTimeAgo = '${diff.inDays}d ago'; }
+            else if (diff.inHours > 0) { postTimeAgo = '${diff.inHours}h ago'; }
+            else if (diff.inMinutes > 0) { postTimeAgo = '${diff.inMinutes}m ago'; }
+          }
           return ForumAnswerCard(
             authorName: post.authorName,
+            authorAvatarUrl: post.authorAvatarUrl,
             role: 'Student', // Can be derived dynamically later
-            timestamp: 'Just now',
+            timestamp: postTimeAgo,
             answerText: post.content,
             votes: post.votes,
             isTopRated: post.isCorrect,

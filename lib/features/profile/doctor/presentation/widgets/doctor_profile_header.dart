@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:bnu_lms_app/shared/config/api_constants.dart';
 
 import '../../../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../../../shared/config/theme/app_light_text_styles.dart';
@@ -10,10 +11,14 @@ import '../../../../../../shared/resources/colors_manager.dart';
 class DoctorProfileHeader extends StatelessWidget {
   final String name;
   final String department;
+  final String role;
+  final String? profilePictureUrl;
   
   const DoctorProfileHeader({
     required this.name,
     required this.department,
+    required this.role,
+    this.profilePictureUrl,
     super.key,
   });
 
@@ -31,8 +36,20 @@ class DoctorProfileHeader extends StatelessWidget {
               backgroundColor: ColorsManager.lightBlueAccent,
               child: CircleAvatar(
                 radius: 42.r,
-                backgroundColor: ColorsManager.grayMedium,
-                child: Icon(Icons.person, size: 40.sp, color: ColorsManager.white),
+                backgroundColor: ColorsManager.grayMedium.withValues(alpha: 0.1),
+                child: ClipOval(
+                  child: profilePictureUrl != null && profilePictureUrl!.isNotEmpty
+                      ? Image.network(
+                          profilePictureUrl!.startsWith('http') 
+                              ? profilePictureUrl! 
+                              : '${ApiConstants.baseUrl.replaceAll('api/', '')}${profilePictureUrl!.startsWith('/') ? profilePictureUrl!.substring(1) : profilePictureUrl!}',
+                          width: 84.r,
+                          height: 84.r,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Icon(Icons.person, size: 40.sp, color: ColorsManager.white),
+                        )
+                      : Icon(Icons.person, size: 40.sp, color: ColorsManager.white),
+                ),
               ),
             ),
             // Verified Badge
@@ -62,7 +79,7 @@ class DoctorProfileHeader extends StatelessWidget {
         ),
         SizedBox(height: 4.h),
         Text(
-          'ASSISTANT PROFESSOR',
+          role.toUpperCase(),
           style: AppLightTextStyles.labelSmall.copyWith(
             color: ColorsManager.blue,
             fontWeight: FontWeight.w700,
