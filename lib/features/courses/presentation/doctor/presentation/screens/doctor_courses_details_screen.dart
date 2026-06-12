@@ -8,15 +8,12 @@ import '../../../../../../shared/providers/theme_provider.dart';
 import '../../../../../../shared/resources/colors_manager.dart';
 
 import '../../../shared_widgets/course_header_card.dart';
-import '../widgets/doctor_courses_details/about_course_section.dart';
 import '../widgets/courses_details_tabs/course_assignments_tab.dart';
 import '../widgets/courses_details_tabs/course_attendance_tab.dart';
 import '../widgets/courses_details_tabs/course_materials_tab.dart';
 import '../widgets/courses_details_tabs/course_quizzes_tab.dart';
 import '../widgets/courses_details_tabs/course_students_tab.dart';
-import '../widgets/doctor_courses_details/learning_outcomes_section.dart';
-import '../widgets/doctor_courses_details/next_session_section.dart';
-import '../widgets/doctor_courses_details/overview_stats_row.dart';
+
 
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,7 +39,7 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
     final isLight = themeProvider.isLightTheme();
 
     return DefaultTabController(
-      length: 6, // Updated to 6
+      length: 5,
       child: Scaffold(
         backgroundColor: isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground,
         appBar: AppBar(
@@ -63,15 +60,7 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
                 ? AppLightTextStyles.headlineLarge
                 : AppDarkTextStyles.headlineLarge,
           ),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.more_vert_rounded,
-                color: isLight ? ColorsManager.black : ColorsManager.white,
-              ),
-            ),
-          ],
+          actions: [],
         ),
         body: BlocProvider(
           create: (context) => getIt<CourseDetailsCubit>()..fetchCourseDetails(courseId),
@@ -115,12 +104,11 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
                       tabAlignment: TabAlignment.start,
                       dividerColor: Colors.transparent,
                       tabs: const [
-                        Tab(text: 'Overview'),
                         Tab(text: 'Students'),
-                        Tab(text: 'Assignments'),
-                        Tab(text: 'Quizzes'),
                         Tab(text: 'Materials'),
                         Tab(text: 'Attendance'),
+                        Tab(text: 'Assignments'),
+                        Tab(text: 'Quizzes'),
                       ],
                     ),
 
@@ -128,41 +116,23 @@ class DoctorCourseDetailsScreen extends StatelessWidget {
                     Expanded(
                       child: TabBarView(
                         children: [
-                          // 1. Overview Tab Content
-                          SingleChildScrollView(
-                            padding: EdgeInsets.all(20.w),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const OverviewStatsRow(),
-                                SizedBox(height: 24.h),
-                                const AboutCourseSection(),
-                                SizedBox(height: 24.h),
-                                const LearningOutcomesSection(),
-                                SizedBox(height: 24.h),
-                                const NextSessionSection(),
-                                SizedBox(height: 80.h), // Padding for FAB
-                              ],
-                            ),
-                          ),
+                          // 1. Students Tab
+                          CourseStudentsTab(courseId: course.id),
 
-                          // 2. Students Tab
-                          const CourseStudentsTab(),
+                          // 2. Materials Tab
+                          const CourseMaterialsTab(),
 
-                          // 3. Assignments Tab
+                          // 3. Attendance Tab
+                          CourseAttendanceTab(courseId: course.id),
+
+                          // 4. Assignments Tab
                           CourseAssignmentsTab(courseId: course.id),
 
-                          // 4. Quizzes Tab
+                          // 5. Quizzes Tab
                           BlocProvider(
                             create: (_) => getIt<QuizListCubit>()..loadQuizzes(course!.id),
                             child: CourseQuizzesTab(courseId: course.id),
                           ),
-
-                          // 5. Materials Tab (Pass the course to this one so we can show modules)
-                          const CourseMaterialsTab(),
-
-                          // 6. Attendance Tab
-                          CourseAttendanceTab(courseId: course.id),
                         ],
                       ),
                     ),

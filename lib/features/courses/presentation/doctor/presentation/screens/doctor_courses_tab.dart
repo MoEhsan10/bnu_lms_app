@@ -93,8 +93,8 @@ class _DoctorCoursesTabView extends StatelessWidget {
                           return DoctorCourseCard(
                             academicYear: 'Academic Year 2024/25',
                             courseName: course.title,
-                            studentsCount: 'Manage Course', // Placeholder
-                            timeString: course.instructorName, // Using instructor space to show your name
+                            courseCode: 'SWE-301', // Example course code, API lacks it currently
+                            instructorName: course.instructorName,
                             courseIcon: Icons.engineering_outlined,
                             onManageTap: () {
                               final route = role == UserRole.ta ? Routes.taCoursesDetails : Routes.doctorCoursesDetails;

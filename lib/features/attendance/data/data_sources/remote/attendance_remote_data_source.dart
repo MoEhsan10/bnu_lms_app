@@ -30,6 +30,9 @@ abstract class AttendanceRemoteDataSource {
   });
 
   Future<List<CourseAttendanceReportModel>> getCourseAttendanceReports(int courseId);
+
+  /// Student-specific: GET /api/Attendance/my/{courseId}
+  Future<List<AttendanceRecordModel>> getMyAttendanceHistory(int courseId);
 }
 
 @LazySingleton(as: AttendanceRemoteDataSource)
@@ -137,6 +140,20 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
       final reports = response.data as List<dynamic>;
       return reports
           .map((e) => CourseAttendanceReportModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return [];
+      throw RemoteException(message: _extractErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<List<AttendanceRecordModel>> getMyAttendanceHistory(int courseId) async {
+    try {
+      final response = await _dio.get('${ApiConstants.baseUrl}Attendance/my/$courseId');
+      final list = response.data as List<dynamic>? ?? [];
+      return list
+          .map((e) => AttendanceRecordModel.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return [];

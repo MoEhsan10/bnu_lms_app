@@ -29,7 +29,14 @@ class SettingsSection extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _buildSettingsItem(context, Icons.person_outline, 'Edit Profile'),
+              _buildSettingsItem(
+                context, 
+                Icons.person_outline, 
+                'Edit Profile',
+                onTap: () {
+                  Navigator.pushNamed(context, Routes.editProfile);
+                },
+              ),
               _buildDivider(),
               _buildSettingsItem(context, Icons.lock_outline, 'Security & Password'),
               _buildDivider(),
@@ -43,7 +50,14 @@ class SettingsSection extends StatelessWidget {
                 },
               ),
               _buildDivider(),
-              _buildSettingsItem(context, Icons.help_outline, 'Help Center'),
+              _buildSettingsItem(
+                context, 
+                Icons.help_outline, 
+                'Help Center',
+                onTap: () {
+                  Navigator.pushNamed(context, Routes.helpCenter);
+                },
+              ),
               _buildDivider(),
               _buildSettingsItem(
                 context, 

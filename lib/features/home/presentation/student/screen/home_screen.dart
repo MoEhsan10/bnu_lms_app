@@ -10,6 +10,8 @@ import '../../../../courses/presentation/student/screens/courses_tab.dart';
 import '../../../../forums/presentation/student/presentation/screens/forums_tab.dart';
 import '../../../../profile/student/presentation/screens/profile_tab.dart';
 import 'home_tab.dart';
+import '../../../../../shared/di/injection.dart';
+import '../../../../profile/presentation/cubit/profile_cubit.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -28,6 +30,13 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   int selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fetch profile so avatar is ready for header immediately
+    Future.microtask(() => getIt<ProfileCubit>().fetchProfile());
+  }
 
   @override
   Widget build(BuildContext context) {

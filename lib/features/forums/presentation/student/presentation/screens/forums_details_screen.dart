@@ -76,12 +76,6 @@ class _ForumsDetailsBodyState extends State<_ForumsDetailsBody> {
           style: isLight ? AppLightTextStyles.headlineLarge : AppDarkTextStyles.headlineLarge,
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.more_vert, color: isLight ? ColorsManager.black : ColorsManager.darkTextPrimary),
-            onPressed: () {},
-          ),
-        ],
         elevation: 0,
       ),
       body: Column(
@@ -237,6 +231,7 @@ class _ForumsDetailsBodyState extends State<_ForumsDetailsBody> {
                                     ))),
                                 child: ForumQuestionCard(
                                   authorName: p.authorName,
+                                  authorAvatarUrl: p.authorAvatarUrl,
                                   timeAgo: timeAgo,
                                   questionTitle: questionData['title'] as String,
                                   questionBody: p.content,
@@ -268,7 +263,7 @@ class _ForumsDetailsBodyState extends State<_ForumsDetailsBody> {
               ),
               backgroundColor: ColorsManager.blue,
               foregroundColor: ColorsManager.white,
-              child: const Icon(Icons.add),
+              child: const Icon(Icons.campaign),
             )
           : null,
     );

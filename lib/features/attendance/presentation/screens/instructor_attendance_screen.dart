@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../../../../shared/config/api_constants.dart';
 import '../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../shared/di/injection.dart';
@@ -55,29 +57,93 @@ class _InstructorAttendanceScreenBody extends StatefulWidget {
 }
 
 class _InstructorAttendanceScreenBodyState extends State<_InstructorAttendanceScreenBody> {
-  String _qrToken = ""; // Starts empty; populated from the backend response
+  String _qrToken = "";
+  String _sessionTitle = "";
   int _studentsAttended = 0;
   Timer? _liveFetchTimer;
+  Timer? _qrRefreshTimer;
+  int _qrSecondsLeft = 90;
+  bool _isMockScanning = false;
 
   @override
   void initState() {
     super.initState();
     _startLiveFetching();
+    _startQrRefreshCountdown();
   }
 
   @override
   void dispose() {
     _liveFetchTimer?.cancel();
+    _qrRefreshTimer?.cancel();
     super.dispose();
   }
 
   void _startLiveFetching() {
-    // Poll for attended students every 5 seconds to keep the count updated live
     _liveFetchTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (mounted) {
         context.read<InstructorAttendanceCubit>().fetchActiveAttendees(widget.courseId);
       }
     });
+  }
+
+  void _startQrRefreshCountdown() {
+    _qrSecondsLeft = 90;
+    _qrRefreshTimer?.cancel();
+    _qrRefreshTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        _qrSecondsLeft--;
+      });
+      if (_qrSecondsLeft <= 0) {
+        timer.cancel();
+        // Regenerate QR by creating a new session
+        context.read<InstructorAttendanceCubit>().createSession(
+          courseId: widget.courseId,
+          title: "Lecture #${widget.lectureId}",
+          duration: 90,
+          lat: 30.0712,
+          lng: 31.2825,
+        );
+        _startQrRefreshCountdown();
+      }
+    });
+  }
+
+  /// DEV ONLY: Fires a mock scan for emulator / presentation demo.
+  Future<void> _fireMockScan() async {
+    if (_isMockScanning) return;
+    setState(() => _isMockScanning = true);
+
+    try {
+      final dio = getIt<Dio>();
+      await dio.post('${ApiConstants.baseUrl}Attendance/mock-scan/${widget.courseId}');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Mock scan fired! Counter will update shortly.'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      if (mounted) {
+        context.read<InstructorAttendanceCubit>().fetchActiveAttendees(widget.courseId);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Mock scan failed: ${e.toString()}'),
+          backgroundColor: ColorsManager.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isMockScanning = false);
+    }
   }
 
   void _showAttendeesBottomSheet(BuildContext context) {
@@ -97,85 +163,81 @@ class _InstructorAttendanceScreenBodyState extends State<_InstructorAttendanceSc
       builder: (sheetContext) {
         return BlocProvider.value(
           value: context.read<InstructorAttendanceCubit>(),
-          child: StatefulBuilder(
-            builder: (context, setModalState) {
-              return Container(
-                padding: EdgeInsets.all(24.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          child: Container(
+            padding: EdgeInsets.all(24.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Active Attendees",
-                          style: textStyle.copyWith(fontWeight: FontWeight.bold, fontSize: 18.sp),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close_rounded),
-                          onPressed: () => Navigator.pop(sheetContext),
-                        ),
-                      ],
+                    Text(
+                      "Active Attendees",
+                      style: textStyle.copyWith(fontWeight: FontWeight.bold, fontSize: 18.sp),
                     ),
-                    const Divider(),
-                    Expanded(
-                      child: BlocBuilder<InstructorAttendanceCubit, InstructorAttendanceState>(
-                        builder: (context, state) {
-                          if (state is InstructorAttendanceLoading) {
-                            return const Center(child: CircularProgressIndicator());
-                          }
-
-                          List<dynamic> activeList = [];
-                          if (state is InstructorAttendeesLoaded) {
-                            activeList = state.attendees;
-                          }
-
-                          if (activeList.isEmpty) {
-                            return Center(
-                              child: Text(
-                                "No students have checked in yet.",
-                                style: subtextStyle.copyWith(color: ColorsManager.grayMedium),
-                              ),
-                            );
-                          }
-
-                          return ListView.builder(
-                            itemCount: activeList.length,
-                            itemBuilder: (context, index) {
-                              final student = activeList[index];
-                              return ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                leading: CircleAvatar(
-                                  backgroundColor: ColorsManager.blue.withValues(alpha: 0.1),
-                                  child: Text(
-                                    student.studentName.isNotEmpty ? student.studentName[0].toUpperCase() : 'S',
-                                    style: const TextStyle(color: ColorsManager.blue, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                title: Text(
-                                  student.studentName,
-                                  style: textStyle.copyWith(fontSize: 14.sp, fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text(
-                                  "ID: ${student.studentId.length > 8 ? student.studentId.substring(0, 8) : student.studentId}",
-                                  style: subtextStyle.copyWith(fontSize: 12.sp, color: ColorsManager.grayMedium),
-                                ),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.delete_outline_rounded, color: ColorsManager.red),
-                                  onPressed: () {
-                                    _confirmRevoke(context, student.studentId, student.studentName);
-                                  },
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Navigator.pop(sheetContext),
                     ),
                   ],
                 ),
-              );
-            },
+                const Divider(),
+                Expanded(
+                  child: BlocBuilder<InstructorAttendanceCubit, InstructorAttendanceState>(
+                    builder: (context, state) {
+                      if (state is InstructorAttendanceLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      List<dynamic> activeList = [];
+                      if (state is InstructorAttendeesLoaded) {
+                        activeList = state.attendees;
+                      }
+
+                      if (activeList.isEmpty) {
+                        return Center(
+                          child: Text(
+                            "No students have checked in yet.",
+                            style: subtextStyle.copyWith(color: ColorsManager.grayMedium),
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        itemCount: activeList.length,
+                        itemBuilder: (context, index) {
+                          final student = activeList[index];
+                          return ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: CircleAvatar(
+                              backgroundColor: ColorsManager.blue.withValues(alpha: 0.1),
+                              child: Text(
+                                student.studentName.isNotEmpty ? student.studentName[0].toUpperCase() : 'S',
+                                style: const TextStyle(color: ColorsManager.blue, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            title: Text(
+                              student.studentName,
+                              style: textStyle.copyWith(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                              "ID: ${student.studentId.length > 8 ? student.studentId.substring(0, 8) : student.studentId}",
+                              style: subtextStyle.copyWith(fontSize: 12.sp, color: ColorsManager.grayMedium),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline_rounded, color: ColorsManager.red),
+                              onPressed: () {
+                                _confirmRevoke(context, student.studentId, student.studentName);
+                              },
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -192,31 +254,22 @@ class _InstructorAttendanceScreenBodyState extends State<_InstructorAttendanceSc
       context: context,
       builder: (dialogCtx) => AlertDialog(
         backgroundColor: cardBg,
-        title: Text(
-          "Revoke Attendance",
-          style: titleStyle.copyWith(fontWeight: FontWeight.bold),
-        ),
+        title: Text("Revoke Attendance", style: titleStyle.copyWith(fontWeight: FontWeight.bold)),
         content: Text(
-          "Are you sure you want to mark $studentName as absent? This will permanently delete their scan record.",
+          "Are you sure you want to mark $studentName as absent?",
           style: bodyStyle,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: Text(
-              "Cancel",
-              style: bodyStyle.copyWith(color: ColorsManager.grayMedium),
-            ),
+            child: Text("Cancel", style: bodyStyle.copyWith(color: ColorsManager.grayMedium)),
           ),
           TextButton(
             onPressed: () {
               context.read<InstructorAttendanceCubit>().removeStudentFromAttendance(widget.courseId, studentId);
               Navigator.pop(dialogCtx);
             },
-            child: Text(
-              "Revoke",
-              style: bodyStyle.copyWith(color: ColorsManager.red, fontWeight: FontWeight.bold),
-            ),
+            child: Text("Revoke", style: bodyStyle.copyWith(color: ColorsManager.red, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -239,6 +292,7 @@ class _InstructorAttendanceScreenBodyState extends State<_InstructorAttendanceSc
         if (state is InstructorSessionCreated) {
           setState(() {
             _qrToken = state.session.qrCodeToken;
+            _sessionTitle = state.session.sessionTitle;
           });
         } else if (state is InstructorAttendeesLoaded) {
           setState(() {
@@ -265,6 +319,25 @@ class _InstructorAttendanceScreenBodyState extends State<_InstructorAttendanceSc
               ),
               onPressed: () => Navigator.pop(context),
             ),
+            actions: [
+              // 🐛 DEV: Mock scan button — simulates a student scan for emulator/presentation
+              Tooltip(
+                message: 'Simulate Student Scan (Demo Only)',
+                child: _isMockScanning
+                    ? Padding(
+                        padding: EdgeInsets.all(12.w),
+                        child: SizedBox(
+                          width: 20.sp,
+                          height: 20.sp,
+                          child: const CircularProgressIndicator(strokeWidth: 2, color: ColorsManager.blue),
+                        ),
+                      )
+                    : IconButton(
+                        icon: Icon(Icons.person_add_alt_1_rounded, color: ColorsManager.blue, size: 24.sp),
+                        onPressed: _fireMockScan,
+                      ),
+              ),
+            ],
           ),
           body: SafeArea(
             child: Padding(
@@ -274,16 +347,27 @@ class _InstructorAttendanceScreenBodyState extends State<_InstructorAttendanceSc
                 children: [
                   SizedBox(height: 20.h),
 
-                  // Course metadata info
                   Text(
-                    "CS-201: Advanced Data Structures",
+                    _sessionTitle.isNotEmpty ? "$_sessionTitle — Attendance Session" : "Lecture #${widget.lectureId} — Attendance Session",
                     style: titleStyle.copyWith(fontWeight: FontWeight.bold, color: ColorsManager.blue),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    "Lecture #${widget.lectureId} Attendance",
-                    style: bodyStyle.copyWith(color: ColorsManager.grayMedium),
+                  SizedBox(height: 6.h),
+
+                  // QR Refresh countdown
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.refresh_rounded, size: 14.sp, color: ColorsManager.grayMedium),
+                      SizedBox(width: 4.w),
+                      Text(
+                        "QR refreshes in ${_qrSecondsLeft}s",
+                        style: bodyStyle.copyWith(
+                          color: _qrSecondsLeft <= 15 ? ColorsManager.red : ColorsManager.grayMedium,
+                          fontSize: 12.sp,
+                        ),
+                      ),
+                    ],
                   ),
 
                   const Spacer(),
@@ -294,13 +378,7 @@ class _InstructorAttendanceScreenBodyState extends State<_InstructorAttendanceSc
                       color: cardBg,
                       borderRadius: BorderRadius.circular(24.r),
                       boxShadow: isLight
-                          ? [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              )
-                            ]
+                          ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))]
                           : [],
                     ),
                     padding: EdgeInsets.all(24.w),
@@ -340,13 +418,32 @@ class _InstructorAttendanceScreenBodyState extends State<_InstructorAttendanceSc
                               color: isLight ? ColorsManager.black : ColorsManager.white,
                             ),
                           ),
+                        // Countdown progress bar
+                        if (_qrToken.isNotEmpty) ...[
+                          SizedBox(height: 16.h),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4.r),
+                            child: LinearProgressIndicator(
+                              value: _qrSecondsLeft / 90.0,
+                              backgroundColor: ColorsManager.grayMedium.withValues(alpha: 0.2),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                _qrSecondsLeft > 30
+                                    ? ColorsManager.blue
+                                    : _qrSecondsLeft > 15
+                                        ? Colors.orange
+                                        : ColorsManager.red,
+                              ),
+                              minHeight: 4.h,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
 
                   SizedBox(height: 32.h),
 
-                  // Attendance count typography (wrapped in GestureDetector as requested)
+                  // Attendance count — tap to view list
                   GestureDetector(
                     onTap: () => _showAttendeesBottomSheet(context),
                     child: MouseRegion(
@@ -370,11 +467,7 @@ class _InstructorAttendanceScreenBodyState extends State<_InstructorAttendanceSc
                               ),
                             ),
                             SizedBox(width: 8.w),
-                            Icon(
-                              Icons.keyboard_arrow_up_rounded,
-                              color: ColorsManager.blue,
-                              size: 20.sp,
-                            ),
+                            Icon(Icons.keyboard_arrow_up_rounded, color: ColorsManager.blue, size: 20.sp),
                           ],
                         ),
                       ),
@@ -392,53 +485,47 @@ class _InstructorAttendanceScreenBodyState extends State<_InstructorAttendanceSc
                         backgroundColor: ColorsManager.red,
                         foregroundColor: Colors.white,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.r),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
                       ),
                       onPressed: () {
-                        // Safe confirmation before closing session
                         showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
                             backgroundColor: cardBg,
-                            title: Text(
-                              "Stop Attendance",
-                              style: titleStyle.copyWith(fontWeight: FontWeight.bold),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+                            title: Row(
+                              children: [
+                                const Icon(Icons.warning_rounded, color: ColorsManager.red),
+                                SizedBox(width: 8.w),
+                                Text("Stop Attendance", style: titleStyle.copyWith(fontWeight: FontWeight.bold)),
+                              ],
                             ),
                             content: Text(
-                              "Are you sure you want to end this attendance session? This will close token validation.",
+                              "Are you sure you want to end this attendance session?",
                               style: bodyStyle,
                             ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx),
-                                child: Text(
-                                  "Cancel",
-                                  style: bodyStyle.copyWith(color: ColorsManager.grayMedium),
-                                ),
+                                child: Text("Cancel", style: bodyStyle.copyWith(color: ColorsManager.grayMedium)),
                               ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(ctx); // Close dialog
-                                  Navigator.pop(context); // Exit attendance screen
-                                },
-                                child: Text(
-                                  "End Session",
-                                  style: bodyStyle.copyWith(color: ColorsManager.red, fontWeight: FontWeight.bold),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: ColorsManager.red,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
                                 ),
+                                onPressed: () {
+                                  Navigator.pop(ctx);
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("End Session", style: TextStyle(fontWeight: FontWeight.bold)),
                               ),
                             ],
                           ),
                         );
                       },
-                      child: Text(
-                        "Stop Attendance",
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: Text("Stop Attendance", style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
                     ),
                   ),
                   SizedBox(height: 20.h),

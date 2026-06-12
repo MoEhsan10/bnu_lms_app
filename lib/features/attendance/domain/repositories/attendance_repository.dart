@@ -28,4 +28,8 @@ abstract class AttendanceRepository {
   });
 
   Future<Either<Failure, List<CourseAttendanceReportEntity>>> getCourseAttendanceReports(int courseId);
+
+  /// Student-specific: fetches the authenticated student's own attendance records
+  /// across all sessions for a course. Hits GET /api/Attendance/my/{courseId}.
+  Future<Either<Failure, List<AttendanceRecordEntity>>> getMyAttendanceHistory(int courseId);
 }

@@ -81,10 +81,6 @@ class _DoctorForumsDetailsBodyState extends State<_DoctorForumsDetailsBody> {
           ],
         ),
         centerTitle: true,
-        actions: [
-          IconButton(icon: Icon(Icons.search, color: isLight ? ColorsManager.black : ColorsManager.white), onPressed: () {}),
-          IconButton(icon: Icon(Icons.notifications_none, color: isLight ? ColorsManager.black : ColorsManager.white), onPressed: () {}),
-        ],
         elevation: 0,
       ),
       body: Column(

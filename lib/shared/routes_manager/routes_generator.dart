@@ -11,10 +11,12 @@ import 'package:bnu_lms_app/features/quizzes/presentation/cubit/quiz_grading_cub
 import 'package:bnu_lms_app/features/quizzes/presentation/cubit/quiz_results_cubit.dart';
 import 'package:bnu_lms_app/shared/routes_manager/routes.dart';
 import 'package:bnu_lms_app/features/ai_chat/presentation/screens/ai_chat_screen.dart';
+import 'package:bnu_lms_app/features/attendance/domain/entities/attendance_record_entity.dart';
 import 'package:bnu_lms_app/features/attendance/presentation/screens/attendance_screen.dart';
 import 'package:bnu_lms_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:bnu_lms_app/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:bnu_lms_app/features/courses/presentation/doctor/presentation/screens/doctor_courses_details_screen.dart';
+import 'package:bnu_lms_app/features/courses/presentation/doctor/presentation/screens/lecture_attendance_details_screen.dart';
 import 'package:bnu_lms_app/features/courses/presentation/student/screens/courses_details_screen.dart';
 
 import 'package:bnu_lms_app/features/gate/presentation/screens/gate_screen.dart';
@@ -45,6 +47,9 @@ import '../../features/home/presentation/doctor/presentation/screens/doctor_home
 import '../../features/home/presentation/student/screen/home_screen.dart';
 import '../../features/quizzes/domain/entities/quiz_entity.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
+import '../../features/profile/presentation/screens/edit_profile_screen.dart';
+import '../../features/profile/presentation/screens/help_center_screen.dart';
+import '../../features/profile/presentation/cubit/profile_cubit.dart';
 
 class RoutesGenerator {
   static Route<dynamic>? getRoute(RouteSettings settings) {
@@ -58,6 +63,15 @@ class RoutesGenerator {
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       case Routes.settings:
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
+      case Routes.editProfile:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: getIt<ProfileCubit>(),
+            child: const EditProfileScreen(),
+          ),
+        );
+      case Routes.helpCenter:
+        return MaterialPageRoute(builder: (_) => const HelpCenterScreen());
       case Routes.notifications:
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
@@ -257,6 +271,19 @@ class RoutesGenerator {
         return MaterialPageRoute(
           builder: (_) => DoctorQuestionDetailsScreen(
             discussion: questionArgs['discussion'] as DiscussionEntity,
+          ),
+        );
+        
+      case Routes.lectureAttendanceDetails:
+        final lectureArgs = args as Map<String, dynamic>?;
+        if (lectureArgs == null || !lectureArgs.containsKey('title') || !lectureArgs.containsKey('date') || !lectureArgs.containsKey('attendees')) {
+          return _unDefinedRoute();
+        }
+        return MaterialPageRoute(
+          builder: (_) => LectureAttendanceDetailsScreen(
+            lectureTitle: lectureArgs['title'] as String,
+            date: lectureArgs['date'] as String,
+            attendees: lectureArgs['attendees'] as List<AttendanceRecordEntity>,
           ),
         );
 

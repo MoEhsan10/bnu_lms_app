@@ -2,43 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+
 import '../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../shared/config/theme/app_light_text_styles.dart';
 import '../../../../shared/di/injection.dart';
 import '../../../../shared/providers/theme_provider.dart';
 import '../../../../shared/resources/colors_manager.dart';
+import '../../../courses/domain/entities/course_entity.dart';
+import '../../../courses/presentation/cubit/courses_cubit/courses_cubit.dart';
+import '../../../courses/presentation/cubit/courses_cubit/courses_state.dart';
 import '../cubit/student_attendance_cubit.dart';
 import '../cubit/student_attendance_state.dart';
 import 'student_attendance_screen.dart';
+import 'student_course_attendance_screen.dart';
 
 class AttendanceScreen extends StatelessWidget {
   final int courseId;
 
-  const AttendanceScreen({super.key, this.courseId = 1});
+  const AttendanceScreen({super.key, this.courseId = 0});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<StudentAttendanceCubit>()..fetchDashboard(courseId),
-      child: _AttendanceDashboardBody(courseId: courseId),
+      create: (_) => getIt<CoursesCubit>()..fetchEnrolledCourses(),
+      child: const _AttendanceDashboardBody(),
     );
   }
 }
 
 class _AttendanceDashboardBody extends StatelessWidget {
-  final int courseId;
-
-  const _AttendanceDashboardBody({required this.courseId});
+  const _AttendanceDashboardBody();
 
   @override
   Widget build(BuildContext context) {
     final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
-    final screenBg = isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground;
-    final cardBg = isLight ? ColorsManager.white : ColorsManager.darkSurface;
-    final appBarBg = isLight ? ColorsManager.white : ColorsManager.darkSurface;
-    final headlineStyle = isLight ? AppLightTextStyles.headlineSmall : AppDarkTextStyles.headlineSmall;
-    final titleStyle = isLight ? AppLightTextStyles.titleMedium : AppDarkTextStyles.titleMedium;
-    final bodyStyle = isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium;
+    final screenBg =
+        isLight ? ColorsManager.lightBackground : ColorsManager.darkBackground;
+    final appBarBg =
+        isLight ? ColorsManager.white : ColorsManager.darkSurface;
+    final headlineStyle = isLight
+        ? AppLightTextStyles.headlineSmall
+        : AppDarkTextStyles.headlineSmall;
+    final titleStyle = isLight
+        ? AppLightTextStyles.titleMedium
+        : AppDarkTextStyles.titleMedium;
 
     return Scaffold(
       backgroundColor: screenBg,
@@ -47,7 +54,7 @@ class _AttendanceDashboardBody extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          "My Attendance",
+          'My Attendance',
           style: headlineStyle.copyWith(fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
@@ -62,241 +69,126 @@ class _AttendanceDashboardBody extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             color: ColorsManager.blue,
-            onPressed: () => context.read<StudentAttendanceCubit>().fetchDashboard(courseId),
+            onPressed: () =>
+                context.read<CoursesCubit>().fetchEnrolledCourses(),
             tooltip: 'Refresh',
           ),
         ],
       ),
-      body: BlocBuilder<StudentAttendanceCubit, StudentAttendanceState>(
+      body: BlocBuilder<CoursesCubit, CoursesState>(
         builder: (context, state) {
-          return RefreshIndicator(
-            color: ColorsManager.blue,
-            onRefresh: () => context.read<StudentAttendanceCubit>().fetchDashboard(courseId),
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── 1. Scan CTA Card ──────────────────────────────────────
-                  _ScanCard(courseId: courseId),
+          if (state is CoursesLoading) {
+            return const Center(
+              child: CircularProgressIndicator(color: ColorsManager.blue),
+            );
+          }
 
-                  SizedBox(height: 24.h),
-
-                  // ── 2. Term Overview Card ─────────────────────────────────
-                  Text(
-                    "Term Overview",
-                    style: titleStyle.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 12.h),
-                  _buildOverviewCard(context, state, cardBg, bodyStyle, isLight),
-
-                  SizedBox(height: 28.h),
-
-                  // ── 3. Recent Logs ────────────────────────────────────────
-                  Text(
-                    "Recent Logs",
-                    style: titleStyle.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 12.h),
-                  _buildRecentLogs(context, state, cardBg, isLight),
-                ],
+          if (state is CoursesError) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.error_outline_rounded,
+                        color: ColorsManager.red, size: 48.sp),
+                    SizedBox(height: 12.h),
+                    Text(state.message,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: ColorsManager.red, fontSize: 14.sp)),
+                  ],
+                ),
               ),
-            ),
-          );
+            );
+          }
+
+          if (state is CoursesLoaded) {
+            final courses = state.courses;
+
+            if (courses.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32.h),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.school_outlined,
+                          size: 48.sp, color: ColorsManager.grayMedium),
+                      SizedBox(height: 12.h),
+                      Text('No enrolled courses found.',
+                          style: TextStyle(
+                              color: ColorsManager.grayMedium,
+                              fontSize: 14.sp)),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return RefreshIndicator(
+              color: ColorsManager.blue,
+              onRefresh: () async =>
+                  context.read<CoursesCubit>().fetchEnrolledCourses(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.all(20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Scan CTA ────────────────────────────────────────────
+                    _ScanCard(courses: courses),
+                    SizedBox(height: 24.h),
+
+                    // ── Section label ────────────────────────────────────────
+                    Text(
+                      'My Courses',
+                      style: titleStyle.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 12.h),
+
+                    // ── Course cards ─────────────────────────────────────────
+                    ...courses.map((course) => _CourseAttendanceCard(
+                          course: course,
+                          isLight: isLight,
+                        )),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          return const SizedBox.shrink();
         },
       ),
     );
-  }
-
-  Widget _buildOverviewCard(
-    BuildContext context,
-    StudentAttendanceState state,
-    Color cardBg,
-    TextStyle bodyStyle,
-    bool isLight,
-  ) {
-    if (state is StudentDashboardLoading) {
-      return Container(
-        padding: EdgeInsets.all(18.w),
-        decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        child: const Center(
-          child: CircularProgressIndicator(color: ColorsManager.blue),
-        ),
-      );
-    }
-
-    int present = 0;
-    int absent = 0;
-    double rate = 0.0;
-
-    if (state is StudentDashboardLoaded) {
-      present = state.presentCount;
-      absent = state.absentCount;
-      rate = state.attendanceRate;
-    }
-
-    return Container(
-      padding: EdgeInsets.all(18.w),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(20.r),
-        boxShadow: isLight
-            ? [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                )
-              ]
-            : [],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "${rate.toStringAsFixed(1)}%",
-                style: TextStyle(
-                  fontSize: 32.sp,
-                  fontWeight: FontWeight.w900,
-                  color: ColorsManager.blue,
-                ),
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                "Attendance Rate",
-                style: bodyStyle.copyWith(
-                  color: ColorsManager.grayMedium,
-                  fontSize: 12.sp,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              _MetricItem(label: "Present", value: present, color: ColorsManager.green),
-              SizedBox(width: 20.w),
-              _MetricItem(label: "Absent", value: absent, color: ColorsManager.red),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentLogs(
-    BuildContext context,
-    StudentAttendanceState state,
-    Color cardBg,
-    bool isLight,
-  ) {
-    if (state is StudentDashboardLoading) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24.0),
-          child: CircularProgressIndicator(color: ColorsManager.blue),
-        ),
-      );
-    }
-
-    if (state is StudentDashboardError) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Text(
-            state.message,
-            style: TextStyle(color: ColorsManager.red, fontSize: 13.sp),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
-
-    if (state is StudentDashboardLoaded) {
-      final reports = state.reports;
-
-      if (reports.isEmpty) {
-        return Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 32.h),
-            child: Column(
-              children: [
-                Icon(Icons.history_toggle_off_rounded, size: 40.sp, color: ColorsManager.grayMedium),
-                SizedBox(height: 8.h),
-                Text(
-                  "No attendance records yet.",
-                  style: TextStyle(color: ColorsManager.grayMedium, fontSize: 13.sp),
-                ),
-              ],
-            ),
-          ),
-        );
-      }
-
-      // Flatten all records across sessions into one flat log list
-      final List<_LogItem> logs = [];
-      for (final report in reports) {
-        for (final rec in report.attendanceRecords) {
-          logs.add(_LogItem(
-            sessionTitle: report.sessionTitle,
-            scannedAt: rec.scannedAt,
-            isPresent: rec.isPresent,
-          ));
-        }
-      }
-
-      // Sort by most recent first
-      logs.sort((a, b) => b.scannedAt.compareTo(a.scannedAt));
-
-      return ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: logs.length,
-        itemBuilder: (context, index) {
-          final item = logs[index];
-          final timeStr =
-              "${item.scannedAt.hour.toString().padLeft(2, '0')}:${item.scannedAt.minute.toString().padLeft(2, '0')}";
-
-          return _LogCard(
-            sessionTitle: item.sessionTitle,
-            time: timeStr,
-            isPresent: item.isPresent,
-            cardBg: cardBg,
-            isLight: isLight,
-          );
-        },
-      );
-    }
-
-    return const SizedBox.shrink();
   }
 }
 
-// ── CTA Scan Card ─────────────────────────────────────────────────────────────
+// ── Scan CTA Card ─────────────────────────────────────────────────────────────
 
 class _ScanCard extends StatelessWidget {
-  final int courseId;
+  final List<CourseSummaryEntity> courses;
 
-  const _ScanCard({required this.courseId});
+  const _ScanCard({required this.courses});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        final result = await Navigator.push(
+        // Use first course id as default for scanning, student scans QR which
+        // already contains the session/course context on the backend.
+        final int scanCourseId = courses.isNotEmpty ? courses.first.id : 0;
+        await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => StudentAttendanceScreen(courseId: courseId),
+            builder: (_) =>
+                StudentAttendanceScreen(courseId: scanCourseId),
           ),
         );
-        if (result == true && context.mounted) {
-          context.read<StudentAttendanceCubit>().fetchDashboard(courseId);
+        // After returning, refresh courses list (stats may have changed)
+        if (context.mounted) {
+          context.read<CoursesCubit>().fetchEnrolledCourses();
         }
       },
       borderRadius: BorderRadius.circular(20.r),
@@ -338,7 +230,7 @@ class _ScanCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Scan Attendance",
+                    'Scan Attendance',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18.sp,
@@ -368,116 +260,201 @@ class _ScanCard extends StatelessWidget {
   }
 }
 
-// ── Metric column ─────────────────────────────────────────────────────────────
+// ── Course Attendance Card ────────────────────────────────────────────────────
+// Each card has its own StudentAttendanceCubit scoped to the course.
 
-class _MetricItem extends StatelessWidget {
-  final String label;
-  final int value;
-  final Color color;
-
-  const _MetricItem({required this.label, required this.value, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          "$value",
-          style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: color),
-        ),
-        SizedBox(height: 4.h),
-        Text(
-          label,
-          style: TextStyle(fontSize: 12.sp, color: ColorsManager.grayMedium),
-        ),
-      ],
-    );
-  }
-}
-
-// ── Log card ──────────────────────────────────────────────────────────────────
-
-class _LogCard extends StatelessWidget {
-  final String sessionTitle;
-  final String time;
-  final bool isPresent;
-  final Color cardBg;
+class _CourseAttendanceCard extends StatelessWidget {
+  final CourseSummaryEntity course;
   final bool isLight;
 
-  const _LogCard({
-    required this.sessionTitle,
-    required this.time,
-    required this.isPresent,
-    required this.cardBg,
+  const _CourseAttendanceCard({
+    required this.course,
     required this.isLight,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: isLight
-            ? [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                )
-              ]
-            : [],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  sessionTitle,
-                  style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  "Time: $time",
-                  style: TextStyle(fontSize: 11.sp, color: ColorsManager.grayMedium),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-            decoration: BoxDecoration(
-              color: (isPresent ? ColorsManager.green : ColorsManager.red).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Text(
-              isPresent ? "PRESENT" : "ABSENT",
-              style: TextStyle(
-                color: isPresent ? ColorsManager.green : ColorsManager.red,
-                fontSize: 10.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
+    return BlocProvider(
+      create: (_) =>
+          getIt<StudentAttendanceCubit>()..fetchDashboard(course.id),
+      child: _CourseAttendanceCardContent(
+        course: course,
+        isLight: isLight,
       ),
     );
   }
 }
 
-// ── Internal data class ───────────────────────────────────────────────────────
+class _CourseAttendanceCardContent extends StatelessWidget {
+  final CourseSummaryEntity course;
+  final bool isLight;
 
-class _LogItem {
-  final String sessionTitle;
-  final DateTime scannedAt;
-  final bool isPresent;
+  const _CourseAttendanceCardContent({
+    required this.course,
+    required this.isLight,
+  });
 
-  _LogItem({required this.sessionTitle, required this.scannedAt, required this.isPresent});
+  @override
+  Widget build(BuildContext context) {
+    final cardBg = isLight ? ColorsManager.white : ColorsManager.darkSurface;
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => StudentCourseAttendanceScreen(
+              courseId: course.id,
+              courseName: course.title,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 14.h),
+        padding: EdgeInsets.all(18.w),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: isLight
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : [],
+        ),
+        child: Row(
+          children: [
+            // Icon
+            Container(
+              width: 48.w,
+              height: 48.w,
+              decoration: BoxDecoration(
+                color: ColorsManager.blue.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              child: Icon(Icons.school_rounded,
+                  color: ColorsManager.blue, size: 24.sp),
+            ),
+            SizedBox(width: 14.w),
+
+            // Title + stats
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    course.title,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: isLight
+                          ? ColorsManager.black
+                          : ColorsManager.darkTextPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 6.h),
+                  BlocBuilder<StudentAttendanceCubit, StudentAttendanceState>(
+                    builder: (context, state) {
+                      if (state is StudentDashboardLoading) {
+                        return SizedBox(
+                          height: 14.h,
+                          width: 80.w,
+                          child: LinearProgressIndicator(
+                            color: ColorsManager.blue,
+                            backgroundColor: ColorsManager.blue
+                                .withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                        );
+                      }
+                      if (state is StudentDashboardLoaded) {
+                        return Row(
+                          children: [
+                            _MiniStat(
+                              label: 'Rate',
+                              value:
+                                  '${state.attendanceRate.toStringAsFixed(0)}%',
+                              color: ColorsManager.blue,
+                            ),
+                            SizedBox(width: 12.w),
+                            _MiniStat(
+                              label: 'Present',
+                              value: '${state.presentCount}',
+                              color: ColorsManager.green,
+                            ),
+                            SizedBox(width: 12.w),
+                            _MiniStat(
+                              label: 'Absent',
+                              value: '${state.absentCount}',
+                              color: ColorsManager.red,
+                            ),
+                          ],
+                        );
+                      }
+                      if (state is StudentDashboardError) {
+                        return Text(
+                          'Unavailable',
+                          style: TextStyle(
+                              color: ColorsManager.grayMedium,
+                              fontSize: 11.sp),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: ColorsManager.grayMedium,
+              size: 16.sp,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MiniStat extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _MiniStat({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 6.w,
+          height: 6.w,
+          decoration:
+              BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        SizedBox(width: 4.w),
+        Text(
+          '$label: $value',
+          style: TextStyle(
+              fontSize: 11.sp,
+              color: ColorsManager.grayMedium,
+              fontWeight: FontWeight.w500),
+        ),
+      ],
+    );
+  }
 }

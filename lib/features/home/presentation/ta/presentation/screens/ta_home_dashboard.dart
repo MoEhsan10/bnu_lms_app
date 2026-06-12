@@ -5,13 +5,9 @@ import 'package:provider/provider.dart';
 import '../../../../../../shared/providers/theme_provider.dart';
 import '../../../../../../shared/resources/colors_manager.dart';
 import '../../../../../../shared/resources/app_sizes.dart';
-
-
-import '../../../../../grades/presentation/widgets/grades_course_selection_screen.dart';
-import '../../../doctor/presentation/widgets/doctor_dashboard_header.dart';
 import '../widgets/ta_stats_grid.dart';
-import '../widgets/urgent_actions_section.dart';
-import '../widgets/todays_schedule_section.dart';
+import '../../../doctor/presentation/widgets/doctor_dashboard_header.dart';
+import '../../../doctor/presentation/widgets/teaching_tools_section.dart';
 import '../../../../../../shared/routes_manager/routes.dart';
 import '../../../../../../shared/config/theme/app_dark_text_styles.dart';
 import '../../../../../../shared/config/theme/app_light_text_styles.dart';
@@ -40,132 +36,9 @@ class TaHomeDashboard extends StatelessWidget {
               // 2. Stats Grid (Labs, Grading, Forums)
               const TaStatsGrid(),
 
-              // Grades Management Card for TA
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const GradesCourseSelectionScreen(isInstructor: false),
-                      ),
-                    );
-                  },
-                  borderRadius: BorderRadius.circular(16.r),
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(20.w),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)], // Purple gradient
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(12.w),
-                          decoration: BoxDecoration(
-                            color: ColorsManager.white.withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(Icons.grade_rounded, color: ColorsManager.white, size: 28.sp),
-                        ),
-                        SizedBox(width: 16.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Grades Management',
-                                style: AppDarkTextStyles.titleMedium.copyWith(color: ColorsManager.white, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                'Manage term work & student grades',
-                                style: AppDarkTextStyles.labelSmall.copyWith(color: ColorsManager.white.withValues(alpha: 0.9)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Icon(Icons.arrow_forward_ios, color: ColorsManager.white, size: 16.sp),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              SizedBox(height: AppSizes.largeSpacing),
 
-              SizedBox(height: 16.h),
-
-              // New Full-Width Quiz Creation Card for TA
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, Routes.quizWizard);
-                  },
-                  borderRadius: BorderRadius.circular(16.r),
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(20.w),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF26C6DA), Color(0xFF0097A7)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF26C6DA).withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(12.w),
-                          decoration: BoxDecoration(
-                            color: ColorsManager.white.withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(Icons.quiz_rounded, color: ColorsManager.white, size: 28.sp),
-                        ),
-                        SizedBox(width: 16.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Create Assessment',
-                                style: AppDarkTextStyles.titleMedium.copyWith(color: ColorsManager.white, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                'Build a new interactive quiz or exam',
-                                style: AppDarkTextStyles.labelSmall.copyWith(color: ColorsManager.white.withValues(alpha: 0.9)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Icon(Icons.arrow_forward_ios, color: ColorsManager.white, size: 16.sp),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              const TeachingToolsSection(isInstructor: false),
 
               SizedBox(height: 16.h),
 
@@ -231,16 +104,6 @@ class TaHomeDashboard extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: AppSizes.largeSpacing),
-
-              // 3. Urgent Actions (Red/Blue cards)
-              const UrgentActionsSection(),
-
-              SizedBox(height: AppSizes.mediumSpacing),
-
-              // 4. Timeline Schedule
-              const TodaysScheduleSection(),
-
               SizedBox(height: 40.h), // Bottom padding
             ],
           ),
@@ -261,10 +124,9 @@ class _TaHeaderWrapper extends StatelessWidget {
     final isLight = themeProvider.isLightTheme();
 
     return Container(
-      height: 170.h,
       width: double.infinity,
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
+        top: MediaQuery.of(context).padding.top + 16.h, // Add a bit of top padding since we don't have the fixed height centering anymore
         left: 24.w,
         right: 24.w,
       ),
@@ -292,35 +154,7 @@ class _TaHeaderWrapper extends StatelessWidget {
           // Ideally, this widget accepts a name parameter.
           // If not, creates a TaDashboardHeader similar to DoctorDashboardHeader.
           const DoctorDashboardHeader(),
-
-          SizedBox(height: 14.h),
-
-          // Date Pill (Cyan for TA)
-          Container(
-            padding: REdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: isLight ? const Color(0xFFE0F7FA) : ColorsManager.darkBlue, // Cyan tint
-              borderRadius: BorderRadius.circular(25.r),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.calendar_month,
-                  size: 16.sp,
-                  color: const Color(0xFF2FBAD7), // TA Cyan
-                ),
-                SizedBox(width: 6.w),
-                // We can fetch dynamic date here later
-                Text(
-                  'Tuesday, 24 Oct 2023',
-                  style: isLight
-                      ? TextStyle(fontSize: 12.sp, color: Colors.black87, fontWeight: FontWeight.w500)
-                      : TextStyle(fontSize: 12.sp, color: Colors.white70, fontWeight: FontWeight.w500),
-                ),
-              ],
-            ),
-          ),
+          SizedBox(height: 16.h), // Bottom padding before the border radius cuts off
         ],
       ),
     );

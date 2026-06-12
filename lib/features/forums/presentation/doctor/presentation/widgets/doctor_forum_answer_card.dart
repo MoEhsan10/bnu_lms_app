@@ -14,6 +14,7 @@ class DoctorForumAnswerCard extends StatelessWidget {
   final int votes;
   final VoidCallback onMarkCorrect;
   final String? approvedByRole;
+  final String? authorAvatarUrl;
   final VoidCallback? onUpvote;
   final VoidCallback? onDownvote;
 
@@ -25,6 +26,7 @@ class DoctorForumAnswerCard extends StatelessWidget {
     required this.votes,
     required this.onMarkCorrect,
     this.approvedByRole,
+    this.authorAvatarUrl,
     this.onUpvote,
     this.onDownvote,
     super.key,
@@ -65,7 +67,29 @@ class DoctorForumAnswerCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CircleAvatar(radius: 14, backgroundColor: ColorsManager.grayMedium),
+                  CircleAvatar(
+                    radius: 14,
+                    backgroundColor: ColorsManager.blue,
+                    child: ClipOval(
+                      child: authorAvatarUrl != null && authorAvatarUrl!.isNotEmpty
+                          ? Image.network(
+                              authorAvatarUrl!.startsWith('http')
+                                  ? authorAvatarUrl!
+                                  : 'http://192.168.1.6:5205${authorAvatarUrl!.startsWith('/') ? authorAvatarUrl! : '/$authorAvatarUrl'}',
+                              width: 28,
+                              height: 28,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Text(
+                                authorName.isNotEmpty ? authorName[0].toUpperCase() : 'U',
+                                style: TextStyle(color: ColorsManager.white, fontWeight: FontWeight.bold, fontSize: 12),
+                              ),
+                            )
+                          : Text(
+                              authorName.isNotEmpty ? authorName[0].toUpperCase() : 'U',
+                              style: TextStyle(color: ColorsManager.white, fontWeight: FontWeight.bold, fontSize: 12),
+                            ),
+                    ),
+                  ),
                   SizedBox(width: 8),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

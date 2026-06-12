@@ -7,6 +7,8 @@ class Routes {
   // -- Core Navigation --
   static const String main = '/main'; // Main Layout (Bottom Nav)
   static const String settings = '/settings';
+  static const String editProfile = '/editProfile';
+  static const String helpCenter = '/helpCenter';
   static const String notifications = '/notifications';
   static const String notificationDetails = '/notificationDetails';
   static const String manageAnnouncements = '/manageAnnouncements';
@@ -41,6 +43,7 @@ class Routes {
   static const String doctorDashboard = '/doctorDashboard';
   static const String doctorCoursesDetails = '/doctorCoursesDetails';
   static const String doctorQuestionDetails = '/doctorQuestionDetails';
+  static const String lectureAttendanceDetails = '/lectureAttendanceDetails';
 
 
 // -- TA Features --

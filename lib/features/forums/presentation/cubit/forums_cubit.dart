@@ -33,6 +33,7 @@ class ForumsCubit extends Cubit<ForumsState> {
           status: data['status'] as String? ?? 'OPEN',
           createdAt: DateTime.tryParse(data['createdAt'] as String? ?? '')?.toLocal(),
           authorName: data['authorName'] as String? ?? 'Unknown',
+          authorAvatarUrl: data['authorAvatarUrl'] as String?,
           content: data['content'] as String?,
         );
 
@@ -62,6 +63,7 @@ class ForumsCubit extends Cubit<ForumsState> {
         final newPost = PostEntity(
           id: data['id'] as int,
           authorName: data['authorName'] as String? ?? 'Unknown',
+          authorAvatarUrl: data['authorAvatarUrl'] as String?,
           content: data['content'] as String,
           commentCount: data['commentCount'] as int? ?? 0,
           isCorrect: data['isCorrect'] as bool? ?? false,
@@ -74,7 +76,7 @@ class ForumsCubit extends Cubit<ForumsState> {
         final updatedDiscussions = List<DiscussionEntity>.from(state.discussions.map((d) {
           return d.id == discussionId ? DiscussionEntity(
             id: d.id, title: d.title, postCount: d.postCount + 1, status: d.status,
-            createdAt: d.createdAt, authorName: d.authorName, content: d.content
+            createdAt: d.createdAt, authorName: d.authorName, authorAvatarUrl: d.authorAvatarUrl, content: d.content
           ) : d;
         }));
 

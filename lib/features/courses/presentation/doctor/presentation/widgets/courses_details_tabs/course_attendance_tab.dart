@@ -12,6 +12,7 @@ import '../../../../../../attendance/domain/entities/course_attendance_report_en
 import '../../../../../../attendance/presentation/cubit/instructor_attendance_cubit.dart';
 import '../../../../../../attendance/presentation/cubit/instructor_attendance_state.dart';
 import '../../../../../../attendance/presentation/screens/instructor_attendance_screen.dart';
+import '../../../../../../../shared/routes_manager/routes.dart';
 
 class CourseAttendanceTab extends StatelessWidget {
   final int courseId;
@@ -307,7 +308,17 @@ class _CourseAttendanceTabBody extends StatelessWidget {
                 ],
               ),
               InkWell(
-                onTap: () => _showSessionDetails(context, report),
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    Routes.lectureAttendanceDetails,
+                    arguments: {
+                      'title': sessionInfo,
+                      'date': date,
+                      'attendees': report.attendanceRecords.where((r) => r.isPresent).toList(),
+                    },
+                  );
+                },
                 borderRadius: BorderRadius.circular(8.r),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
@@ -324,157 +335,6 @@ class _CourseAttendanceTabBody extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  void _showSessionDetails(BuildContext context, CourseAttendanceReportEntity report) {
-    final isLight = Provider.of<ThemeProvider>(context).isLightTheme();
-    final modalBg = isLight ? ColorsManager.white : ColorsManager.darkSurface;
-    final textStyle = isLight ? AppLightTextStyles.bodyMedium : AppDarkTextStyles.bodyMedium;
-    final titleStyle = isLight ? AppLightTextStyles.titleLarge : AppDarkTextStyles.titleLarge;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: modalBg,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-      ),
-      isScrollControlled: true,
-      builder: (context) {
-        final attendees = report.attendanceRecords.where((r) => r.isPresent).toList();
-
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.75,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Pull Bar
-              Center(
-                child: Container(
-                  width: 40.w,
-                  height: 4.h,
-                  margin: EdgeInsets.only(bottom: 16.h),
-                  decoration: BoxDecoration(
-                    color: ColorsManager.grayMedium.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2.r),
-                  ),
-                ),
-              ),
-              // Title Info
-              Text(
-                report.sessionTitle,
-                style: titleStyle.copyWith(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                "Session #${report.sessionId} • ${attendees.length} Students Present",
-                style: AppLightTextStyles.labelSmall.copyWith(
-                  color: ColorsManager.grayMedium,
-                ),
-              ),
-              SizedBox(height: 16.h),
-              const Divider(),
-              SizedBox(height: 8.h),
-              // List
-              Expanded(
-                child: attendees.isEmpty
-                    ? Center(
-                        child: Text(
-                          "No students attended this session.",
-                          style: textStyle.copyWith(color: ColorsManager.grayMedium),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: attendees.length,
-                        itemBuilder: (context, index) {
-                          final attendee = attendees[index];
-                          // Time formatting e.g. "10:14"
-                          final scanTime = "${attendee.scannedAt.hour.toString().padLeft(2, '0')}:${attendee.scannedAt.minute.toString().padLeft(2, '0')}";
-
-                          return Container(
-                            margin: EdgeInsets.only(bottom: 12.h),
-                            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                            decoration: BoxDecoration(
-                              color: isLight
-                                  ? ColorsManager.white
-                                  : ColorsManager.darkBackground,
-                              borderRadius: BorderRadius.circular(12.r),
-                              border: Border.all(
-                                color: ColorsManager.blue.withValues(alpha: 0.15),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 18.r,
-                                  backgroundColor: ColorsManager.blue.withValues(alpha: 0.1),
-                                  child: Icon(
-                                    Icons.person,
-                                    color: ColorsManager.blue,
-                                    size: 18.sp,
-                                  ),
-                                ),
-                                SizedBox(width: 12.w),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        attendee.studentName,
-                                        style: textStyle.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(height: 2.h),
-                                      Text(
-                                        "ID: ${attendee.studentId}",
-                                        style: AppLightTextStyles.labelSmall.copyWith(
-                                          color: ColorsManager.grayMedium,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                                  decoration: BoxDecoration(
-                                    color: ColorsManager.green.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(6.r),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.check,
-                                        color: ColorsManager.green,
-                                        size: 10.sp,
-                                      ),
-                                      SizedBox(width: 4.w),
-                                      Text(
-                                        scanTime,
-                                        style: AppLightTextStyles.labelSmall.copyWith(
-                                          color: ColorsManager.green,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 10.sp,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 

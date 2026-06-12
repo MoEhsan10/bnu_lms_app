@@ -25,8 +25,7 @@ class _QuizQuestionsStepState extends State<QuizQuestionsStep> {
   int _correctOptionIndex = 0;
   String _questionType = 'Multiple Choice';
   final TextEditingController _questionTextController = TextEditingController();
-  final TextEditingController _pointsController = TextEditingController(text: '1');
-  final TextEditingController _timeLimitController = TextEditingController(text: '30');
+  final TextEditingController _pointsController = TextEditingController(text: '10');
   String? _imagePath;
   
   // Options controllers
@@ -41,7 +40,6 @@ class _QuizQuestionsStepState extends State<QuizQuestionsStep> {
   void dispose() {
     _questionTextController.dispose();
     _pointsController.dispose();
-    _timeLimitController.dispose();
     for (var controller in _optionControllers) {
       controller.dispose();
     }
@@ -79,7 +77,7 @@ class _QuizQuestionsStepState extends State<QuizQuestionsStep> {
       'text': _questionTextController.text.trim(),
       'type': _questionType,
       'points': int.tryParse(_pointsController.text) ?? 1,
-      'timeLimit': int.tryParse(_timeLimitController.text) ?? 30,
+      'timeLimit': 0, // Fallback since UI field removed
       'isEssay': _questionType == 'Open-ended / Essay',
       'options': options,
       'imagePath': _imagePath,
@@ -215,13 +213,7 @@ class _QuizQuestionsStepState extends State<QuizQuestionsStep> {
           ),
 
           SizedBox(height: 32.h),
-          Row(
-            children: [
-              Expanded(child: _buildTextField(isLight, inputFillColor, 'Points', '10', controller: _pointsController)),
-              SizedBox(width: 16.w),
-              Expanded(child: _buildTextField(isLight, inputFillColor, 'Time Limit (Sec)', '30', controller: _timeLimitController)),
-            ],
-          ),
+          _buildTextField(isLight, inputFillColor, 'Points', '10', controller: _pointsController),
 
           SizedBox(height: 32.h),
           
@@ -504,8 +496,7 @@ class _QuizQuestionsStepState extends State<QuizQuestionsStep> {
     setState(() {
       _questionType = q['type'] ?? 'Multiple Choice';
       _questionTextController.text = q['text'] ?? '';
-      _pointsController.text = (q['points'] ?? 1).toString();
-      _timeLimitController.text = (q['timeLimit'] ?? 30).toString();
+      _pointsController.text = (q['points'] ?? 10).toString();
       _imagePath = q['imagePath'];
       
       final options = q['options'] as List<Map<String, dynamic>>? ?? [];

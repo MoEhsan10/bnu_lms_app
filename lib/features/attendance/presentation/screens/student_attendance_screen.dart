@@ -56,16 +56,32 @@ class _StudentAttendanceScreenBodyState extends State<_StudentAttendanceScreenBo
     final barcode = capture.barcodes.firstOrNull;
     if (barcode == null || barcode.rawValue == null) return;
 
-    final String code = barcode.rawValue!;
-    // Validate that it is a CampusConnect attendance token format
-    if (!code.contains("cc-attendance-")) return; 
+    final String rawCode = barcode.rawValue!.trim();
+    if (rawCode.isEmpty) return;
+
+    // Extract token: handle both plain GUID tokens and JSON wrappers like {"token":"abc123"}
+    String token = rawCode;
+    if (rawCode.startsWith('{') && rawCode.contains('token')) {
+      try {
+        // Simple key extraction without importing dart:convert
+        final tokenMatch = RegExp(r'"token"\s*:\s*"([^"]+)"').firstMatch(rawCode);
+        if (tokenMatch != null) {
+          token = tokenMatch.group(1)!.trim();
+        }
+      } catch (_) {
+        // If parsing fails, use rawCode as-is
+      }
+    }
+
+    if (token.isEmpty) return;
 
     setState(() {
       _isProcessing = true;
     });
 
     // Trigger StudentAttendanceCubit to mark attendance securely
-    context.read<StudentAttendanceCubit>().markAttendance(qrToken: code);
+    // ignore: use_build_context_synchronously
+    context.read<StudentAttendanceCubit>().markAttendance(qrToken: token);
   }
 
   @override
@@ -77,10 +93,11 @@ class _StudentAttendanceScreenBodyState extends State<_StudentAttendanceScreenBo
     return BlocConsumer<StudentAttendanceCubit, StudentAttendanceState>(
       listener: (context, state) async {
         if (state is StudentAttendanceSuccess) {
+          final navigator = Navigator.of(context);
           // Success: auto pop after 5 seconds if not clicked manually
           await Future.delayed(const Duration(milliseconds: 5000));
           if (mounted) {
-            Navigator.pop(context, true);
+            navigator.pop(true);
           }
         } else if (state is StudentAttendanceError) {
           // Error: Allow user to scan again after 3 seconds

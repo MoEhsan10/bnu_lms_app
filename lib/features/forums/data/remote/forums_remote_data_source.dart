@@ -33,6 +33,7 @@ class ForumsRemoteDataSourceImpl implements ForumsRemoteDataSource {
           status: m['status'] as String? ?? 'OPEN',
           createdAt: _parseDate(m['createdAt']),
           authorName: m['authorName'] as String?,
+          authorAvatarUrl: m['authorAvatarUrl'] as String?,
           content: m['content'] as String?,
         );
       }).toList();
@@ -54,6 +55,7 @@ class ForumsRemoteDataSourceImpl implements ForumsRemoteDataSource {
         return PostEntity(
           id: m['id'] as int,
           authorName: m['authorName'] as String? ?? 'Unknown',
+          authorAvatarUrl: m['authorAvatarUrl'] as String?,
           content: m['content'] as String? ?? '',
           commentCount: m['commentCount'] as int? ?? 0,
           isCorrect: m['isCorrect'] as bool? ?? false,
@@ -65,6 +67,7 @@ class ForumsRemoteDataSourceImpl implements ForumsRemoteDataSource {
             return CommentEntity(
               id: cm['id'] as int,
               authorName: cm['authorName'] as String? ?? 'Unknown',
+              authorAvatarUrl: cm['authorAvatarUrl'] as String?,
               content: cm['content'] as String? ?? '',
             );
           }).toList(),

@@ -97,7 +97,6 @@ class _GradesDashboardScreenState extends State<GradesDashboardScreen> {
                       );
                     }).toList(),
                     const SizedBox(height: 24),
-                    _buildGradeAppealBanner(isDarkMode),
                   ],
                 ),
               ),
@@ -258,63 +257,4 @@ class _GradesDashboardScreenState extends State<GradesDashboardScreen> {
   //     ],
   //   );
   // }
-
-  Widget _buildGradeAppealBanner(bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF0C242A) : const Color(0xFFEAF8FB),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: isDarkMode ? ColorsManager.darkSurface : ColorsManager.white,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.lightbulb_outline, color: ColorsManager.blue, size: 24),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Grade Appeal Period',
-            style: TextStyle(
-              color: isDarkMode ? ColorsManager.darkTextPrimary : ColorsManager.black,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Found a discrepancy? You can request a grade re-evaluation until Oct 25th, 2023.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isDarkMode ? ColorsManager.darkTextSecondary : ColorsManager.grayDark,
-              fontSize: 13,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Text('Request Review', style: TextStyle(fontWeight: FontWeight.bold)),
-              label: const Icon(Icons.send, size: 16),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorsManager.blue,
-                foregroundColor: ColorsManager.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                elevation: 0,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

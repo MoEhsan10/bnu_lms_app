@@ -7,6 +7,11 @@ class ProfileModel {
   final int? academicYear;
   final int? creditHours;
   final int? enrolledCoursesCount;
+  final double? gpa;
+  final int? rank;
+  final String? studentId;
+  final String? role;
+  final String? profilePictureUrl;
 
   ProfileModel({
     required this.id,
@@ -17,6 +22,11 @@ class ProfileModel {
     this.academicYear,
     this.creditHours,
     this.enrolledCoursesCount,
+    this.gpa,
+    this.rank,
+    this.studentId,
+    this.role,
+    this.profilePictureUrl,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +39,11 @@ class ProfileModel {
       academicYear: json['academicYear'] as int?,
       creditHours: json['creditHours'] as int?,
       enrolledCoursesCount: json['enrolledCoursesCount'] as int?,
+      gpa: (json['gpa'] as num?)?.toDouble(),
+      rank: json['rank'] as int?,
+      studentId: json['studentId'] as String?,
+      role: json['role'] as String?,
+      profilePictureUrl: json['profilePictureUrl'] as String?,
     );
   }
 
@@ -42,6 +57,11 @@ class ProfileModel {
       'academicYear': academicYear,
       'creditHours': creditHours,
       'enrolledCoursesCount': enrolledCoursesCount,
+      'gpa': gpa,
+      'rank': rank,
+      'studentId': studentId,
+      'role': role,
+      'profilePictureUrl': profilePictureUrl,
     };
   }
 }
