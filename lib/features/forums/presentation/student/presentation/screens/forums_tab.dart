@@ -173,12 +173,6 @@ class _ForumsTabBodyState extends State<_ForumsTabBody> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () {},
-        backgroundColor: ColorsManager.blue,
-        child: const Icon(Icons.campaign, color: Colors.white),
-      ),
     );
   }
 

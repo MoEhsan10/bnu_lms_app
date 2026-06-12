@@ -181,7 +181,7 @@ class NotificationDetailsScreen extends StatelessWidget {
                         SizedBox(width: 8.w),
                         Expanded(
                           child: Text(
-                            'Not available', // To be populated when backend supports it
+                            notification.senderName ?? 'System',
                             style: TextStyle(
                               color: isLight ? ColorsManager.black : ColorsManager.white,
                               fontWeight: FontWeight.w600,
@@ -207,7 +207,7 @@ class NotificationDetailsScreen extends StatelessWidget {
                         SizedBox(width: 8.w),
                         Expanded(
                           child: Text(
-                            'Not available', // To be populated when backend supports it
+                            notification.courseName ?? 'General',
                             style: TextStyle(
                               color: isLight ? ColorsManager.black : ColorsManager.white,
                               fontWeight: FontWeight.w600,
